@@ -10,9 +10,16 @@ bilat_sample_diameter = 7 # Diameter of each pixel neighborhood that is used dur
 #hough_transform
 
 hough_angle_res = 720.0 # angle resolution in radians
-hough_min_points_line = 50 # min number of votes for valid line (min de pontos a intersetar nas sinuosoidais)
-hough_min_line_length = 5 # min allowed length of line
-hough_max_line_gap_join= 0 # max allowed gap between line for joining them
+hough_min_points_line = 75 # min number of votes for valid line (min de pontos a intersetar nas sinuosoidais)
 
-#draw hough_lines
-hough_lines_color = (0,0,255) # red
+
+
+#kMeans
+kmeans_cluster_n = 2
+
+#separate line clusters
+line_clusters_eps = 8
+#draw objects
+color_red = (0,0,255)
+color_green = (0,255,0)
+color_blue = (255,0,0)

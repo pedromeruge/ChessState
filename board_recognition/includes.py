@@ -4,5 +4,6 @@ import math
 # import matplotlib.pyplot as plt
 from pathlib import Path
 import random
-# from sklearn.cluster import DBSCAN
+from sklearn.cluster import DBSCAN, KMeans, AgglomerativeClustering
 import itertools
+from scipy.spatial.distance import pdist, squareform
