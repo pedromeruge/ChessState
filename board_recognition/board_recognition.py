@@ -1,3 +1,4 @@
+import typing
 from board_recognition.includes import *
 import board_recognition.parameters as Params
 
@@ -36,22 +37,25 @@ def process_board(orig_img):
                         )
     
     lines = lines.squeeze() # remover lista a mais que vem de HoughLines
-    lines = fix_negative_rho_in_hesse_normal_form(lines)
+    lines = fix_negative_rho_in_hesse_normal_form(lines) # meter todos os raios positivos, para contas certas
 
     if lines is None:
         print('>> No lines detected in Hough Transform ?!')
 
     # k-means
-    horiz_lines, vert_lines = get_line_clusters_kmeans(lines, Params.kmeans_cluster_n)
+    horiz_lines, vert_lines, lines_center_angle = get_line_clusters_kmeans(lines, Params.kmeans_cluster_n)
     
-    intersections = calc_lines_intersections(lines)
-    # line_clusters = cluster_similar_lines(lines,intersections)
+    horiz_lines = calc_lines_clusters( horiz_lines, vert_lines) # obter linhas horizontais a partir de média de linhas verticais
+    vert_lines = calc_lines_clusters( vert_lines, horiz_lines) # obter linhas verticais a partir de média de linhas horizontais
 
-    # for i, cluster in enumerate(line_clusters):
-    #     cdst = print_lines(cdst, cluster, (0 , 0, i * (255 / 10)))
-    cdst = print_lines(cdst, horiz_lines, Params.color_green)
-    cdst = print_lines(cdst, vert_lines, Params.color_red)
-    cdst = print_points(cdst, intersections, Params.color_blue)
+    for i, horiz_line in enumerate(horiz_lines):
+        cdst = print_lines(grey_img, np.array([horiz_line]), (0 , i * (255 / 10) + 30, 0))
+    
+    for i, vert_line in enumerate(vert_lines):
+        cdst = print_lines(grey_img, np.array([vert_line]), (0 , 0, i * (255 / 10) + 30))
+    # cdst = print_lines(cdst, horiz_lines, Params.color_green)
+    # cdst = print_lines(cdst, vert_lines, Params.color_red)
+    # cdst = print_points(cdst, intersections, Params.color_blue)
 
     return cdst
 
@@ -74,7 +78,7 @@ def get_line_clusters_kmeans(lines, clusters=2):
     # print("Horiz label: ", horiz_label, " lines: ", horiz_lines)
     # print("Vert label", vert_label, " lines:", vert_lines)
 
-    return horiz_lines, vert_lines
+    return horiz_lines, vert_lines, (cluster_centers[horiz_label], cluster_centers[vert_label])
 
 def get_line_clusters_agglomerative(lines, clusters=2):
     angles = lines[:,1]
@@ -105,67 +109,45 @@ def fix_negative_rho_in_hesse_normal_form(lines: np.ndarray) -> np.ndarray:
     lines[neg_rho_mask, 1] = lines[neg_rho_mask, 1] - np.pi # nessas linhas, fazer angulo - pi
     return lines
 
-#obter pontos (x,y) de interseção de retas em formato polar
-def calc_lines_intersections(lines):
-    vect_cartesian_lines = polar_to_cartesian_lines_vectorized(lines)
-    cartesian_intersect_points = find_intersections_vectorized(vect_cartesian_lines)
+#obter pontos (x,y) de interseção de retas em formato polar, tirar retas desnecessárias
+# na prática só usado entre 
+def calc_lines_clusters(lines, perp_lines):
 
-    return cartesian_intersect_points
+    lines_rhos, lines_thetas = lines.T #transposta
 
-# devolve [[A1 B1 C1],...], tendo que func geometrica de cada func é Ax + By = C
-def polar_to_cartesian_lines_vectorized(polar_lines):
-    thetas = polar_lines[:, 1]
-    rhos = polar_lines[:, 0]
-    
-    A = np.cos(thetas)
-    B = np.sin(thetas)
-    C = rhos
-    
-    return (A,B,C)
+    perp_line_rho, perp_line_theta = np.mean(perp_lines, axis=0) # calcular média ao longo de colunas
 
-def find_intersections_vectorized(cartesian_lines):
-    A,B,C = cartesian_lines
+    horiz_intersections = get_intersection_points(lines_rhos, lines_thetas, perp_line_rho, perp_line_theta)
 
-    # Create matrices for pairwise computation
-    A1, A2 = np.meshgrid(A, A)
-    B1, B2 = np.meshgrid(B, B)
-    C1, C2 = np.meshgrid(C, C)
-    
-    # Compute determinants
-    det = A1 * B2 - A2 * B1
-    
-    # Avoid division by zero for parallel lines
-    mask = det != 0
-    
-    x = np.zeros_like(det, dtype=np.float64)
-    y = np.zeros_like(det, dtype=np.float64)
-    
-    x[mask] = (B2[mask] * C1[mask] - B1[mask] * C2[mask]) / det[mask]
-    y[mask] = (A1[mask] * C2[mask] - A2[mask] * C1[mask]) / det[mask]
-    
-    # Mask upper triangle and diagonal to avoid duplicate calculations
-    upper_triangle_mask = np.triu(mask, k=1)
-    
-    intersections = np.column_stack((x[upper_triangle_mask], y[upper_triangle_mask]))
-    
-    return intersections
+    cluster = DBSCAN(eps=Params.line_clusters_eps, min_samples=1).fit(horiz_intersections)
+    labels = cluster.labels_
 
-def cluster_similar_lines(lines, intersections):
-    clusters = DBSCAN(eps=Params.line_clusters_eps, min_samples=8).fit(intersections)
-    clusters_labels = clusters.labels_
+    final_lines = []
 
-    line_groups = {}
-    for idx, label in enumerate(clusters_labels):
-        if label == -1:
-            continue  # Ignore noise points
-        if label not in line_groups:
-            line_groups[label] = []
-        line_groups[label].append(lines[idx])
-    return line_groups
+    for label in np.unique(labels):
+        # criar boolean para label atual
+        mask = (labels == label)
+        # obter média para cada cluster
+        average_rho_theta = np.mean(lines[mask], axis=0)
+        final_lines.append(average_rho_theta)
+
+    return np.stack(final_lines)
+
+#Obtain lines intersection points, can be vectorized if args are in array
+def get_intersection_points(rho1: np.ndarray, theta1: np.ndarray, rho2: np.ndarray, theta2: np.ndarray) -> typing.Tuple[np.ndarray, np.ndarray]:
+
+    # rho1 = x cos(theta1) + y sin(theta1)
+    # rho2 = x cos(theta2) + y sin(theta2)
+    cos_t1 = np.cos(theta1)
+    cos_t2 = np.cos(theta2)
+    sin_t1 = np.sin(theta1)
+    sin_t2 = np.sin(theta2)
+    x = (sin_t1 * rho2 - sin_t2 * rho1) / (cos_t2 * sin_t1 - cos_t1 * sin_t2)
+    y = (cos_t1 * rho2 - cos_t2 * rho1) / (sin_t2 * cos_t1 - sin_t1 * cos_t2)
+    return np.stack((x,y), axis=-1) # meter em pares 2 a 2, em vez de listas separadas
 
 def print_points(img, points, color):
     for x,y in points:
-
         cv2.circle(img, (int(x),int(y)),radius=0, color=color, thickness=-1)
     return img
 
