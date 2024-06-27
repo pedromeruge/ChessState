@@ -60,7 +60,7 @@ def process_board(orig_img):
     # horiz_lines = find_best_lines_cluster(horiz_lines, eps=0.01, theta_threshold=0.3, rho_threshold=400.0)
     # vert_lines = find_best_lines_cluster(vert_lines, eps=0.08, theta_threshold= 0.3, rho_threshold=500.0)  
 
-    horiz_lines = find_best_lines_sorted(horiz_lines, theta_threshold=0.1)
+    horiz_lines = find_best_lines_sorted(horiz_lines, theta_threshold=Params.sorted_theta_threshold)
     vert_lines = find_best_lines_sorted(vert_lines, theta_threshold=0.1)
 
     # for i, horiz_line in enumerate(horiz_lines):
@@ -134,7 +134,7 @@ def simplify_line_clusters(lines, perp_lines):
 
     horiz_intersections = get_intersection_points(lines_rhos, lines_thetas, perp_line_rho, perp_line_theta)
 
-    cluster = DBSCAN(eps=Params.line_clusters_eps, min_samples=1).fit(horiz_intersections)
+    cluster = DBSCAN(eps=Params.line_clusters_eps, min_samples=Params.line_clusters_min_samples).fit(horiz_intersections)
     labels = cluster.labels_
 
     final_lines = []
@@ -227,7 +227,7 @@ def fit_linear_model_and_find_grid_lines(lines, max_lines):
     
     # Return the filtered lines up to max_lines
     remaining_lines = sorted_lines[mask]
-    return remaining_lines[:max_lines]
+    return remaining_lines
 
 def print_points(img, points, color):
     for x,y in points:
@@ -236,7 +236,6 @@ def print_points(img, points, color):
 
 def print_lines(img, lines, color):
     if lines is not None:
-        print("printing lines: ", lines)
         for i in range(0, len(lines)):
             rho = lines[i][0]
             theta = lines[i][1]

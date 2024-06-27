@@ -33,8 +33,11 @@ def main():
     if len(sys.argv) != 3:
         raise Exception("main.py <input_photo_path> <output_folder_path>")
     orig_img = get_img()
+    start_time = time.time()
     result_img = process_board(orig_img)
+    print("Execution time: %s s" % (time.time() - start_time)) # print do tempo decorrido
     show_result(orig_img,result_img, writeToFile=True)
 
 if __name__ == "__main__":
     main()
+    
