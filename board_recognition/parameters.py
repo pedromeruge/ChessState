@@ -10,7 +10,8 @@ bilat_sample_diameter = 7 # Diameter of each pixel neighborhood that is used dur
 #hough_transform
 
 hough_angle_res = 720.0 # angle resolution in radians
-hough_min_points_line = 75 # min number of votes for valid line (min de pontos a intersetar nas sinuosoidais)
+hough_min_points_line = 90 # min number of votes for valid line (min de pontos a intersetar nas sinuosoidais)
+# -> 80 works good
 
 #kMeans
 kmeans_cluster_n = 2
@@ -18,6 +19,16 @@ kmeans_cluster_n = 2
 #DBSCAN separate line clusters
 line_clusters_eps = 12
 
+#find_best_lines 
+#Cluster
+cluster_horiz_eps = 0.01
+cluster_horiz_theta = 0.3
+cluster_horiz_rho = 400.0
+cluster_vert_eps = 0.08
+cluster_vert_theta = 0.3
+cluster_vert_rho = 500.0
+#Sorted
+sorted_horiz_theta = 0.1
 #draw objects
 color_red = (0,0,255)
 color_green = (0,255,0)
