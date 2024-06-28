@@ -36,7 +36,7 @@ def main():
     start_time = time.time()
     result_img = process_board(orig_img)
     print("Execution time: %s s" % (time.time() - start_time)) # print do tempo decorrido
-    show_result(orig_img,result_img, writeToFile=True)
+    show_result(orig_img,result_img, writeToFile=False)
 
 if __name__ == "__main__":
     main()

@@ -57,12 +57,10 @@ def process_board(orig_img):
     horiz_lines = simplify_line_clusters( horiz_lines, vert_lines) # obter linhas horizontais a partir de média de linhas verticais
     vert_lines = simplify_line_clusters( vert_lines, old_horiz_lines) # obter linhas verticais a partir de média de linhas horizontais
 
-    # horiz_lines = find_best_lines_cluster(horiz_lines, eps=0.01, theta_threshold=0.3, rho_threshold=400.0)
-    # vert_lines = find_best_lines_cluster(vert_lines, eps=0.08, theta_threshold= 0.3, rho_threshold=500.0)  
-
     horiz_lines = find_best_lines_sorted(horiz_lines, theta_threshold=Params.sorted_theta_threshold)
     vert_lines = find_best_lines_sorted(vert_lines, theta_threshold=0.1)
 
+    corner_points = find_corner_points(horiz_lines, vert_lines)
     # for i, horiz_line in enumerate(horiz_lines):
     #     cdst = print_lines(orig_img, np.array([horiz_line]), (0 , i * (255 / 10) + 30, 0))
     
@@ -70,7 +68,7 @@ def process_board(orig_img):
     #     cdst = print_lines(orig_img, np.array([vert_line]), (0 , 0, i * (255 / 10) + 30))
     cdst = print_lines(orig_img, horiz_lines, Params.color_green)
     cdst = print_lines(orig_img, vert_lines, Params.color_red)
-    # cdst = print_points(cdst, intersections, Params.color_blue)
+    cdst = print_points(cdst, corner_points, Params.color_blue)
 
     return cdst
 
@@ -225,13 +223,24 @@ def fit_linear_model_and_find_grid_lines(lines, max_lines):
     mask = np.ones(len(sorted_lines), dtype=bool)
     mask[indices_to_remove] = False
     
-    # Return the filtered lines up to max_lines
+    # Return the filtered lines up to max_lines, sorted by increasing rho
     remaining_lines = sorted_lines[mask]
     return remaining_lines
 
+def find_corner_points(horiz_lines, vert_lines):
+    filtered_horiz_lines = horiz_lines[[0,0,-1,-1]] # pegar so ém primeira e última linhas horiz
+    filtered_vert_lines = vert_lines[[0,-1,0,-1]]
+    horiz_lines_rhos, horiz_lines_thetas = filtered_horiz_lines.T #transposta
+    vert_lines_rhos, vert_lines_thetas = filtered_vert_lines.T #transposta
+
+    intersections = get_intersection_points(horiz_lines_rhos, horiz_lines_thetas, vert_lines_rhos, vert_lines_thetas)
+    print(intersections)
+    return intersections
+
 def print_points(img, points, color):
     for x,y in points:
-        cv2.circle(img, (int(x),int(y)),radius=0, color=color, thickness=-1)
+        cv2.circle(img, (int(x),int(y)),radius=5, color=color, thickness=-1)
+        cv2.putText(img, f"X:{x}, Y:{y}", (int(x),int(y)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1, cv2.LINE_AA)
     return img
 
 def print_lines(img, lines, color):
