@@ -66,9 +66,12 @@ def process_board(orig_img):
     
     # for i, vert_line in enumerate(vert_lines):
     #     cdst = print_lines(orig_img, np.array([vert_line]), (0 , 0, i * (255 / 10) + 30))
-    cdst = print_lines(orig_img, horiz_lines, Params.color_green)
-    cdst = print_lines(orig_img, vert_lines, Params.color_red)
+
+    cdst = print_lines(cdst, horiz_lines, Params.color_green)
+    cdst = print_lines(cdst, vert_lines, Params.color_red)
     cdst = print_points(cdst, corner_points, Params.color_blue)
+    
+    cdst,homography_matrix = warp_image(orig_img, corner_points, Params.homography_width, Params.homography_height)
 
     return cdst
 
@@ -234,8 +237,27 @@ def find_corner_points(horiz_lines, vert_lines):
     vert_lines_rhos, vert_lines_thetas = filtered_vert_lines.T #transposta
 
     intersections = get_intersection_points(horiz_lines_rhos, horiz_lines_thetas, vert_lines_rhos, vert_lines_thetas)
-    print(intersections)
+    # print(intersections)
     return intersections
+
+def warp_image(img, corner_points, out_width=700, out_height=700):
+
+    #quanta margem dar à foto
+    margin = min(150, corner_points[0][1] * (out_height / img.shape[0]) * 1.2) # meio heuristica baseada na distância de ponto cima-esq até borda na foto original
+    margin = (corner_points[2][1] - corner_points[0][1]) / 8 # meio huerística baseada na altura de cada quadrado do chess
+    
+    pts_dst = np.array([
+        [margin, margin], # cima - esq
+        [out_width - margin, margin], # cima-dir
+        [margin, out_height - margin], # baixo-esq
+        [out_width - margin, out_height - margin] # baixo-dir
+    ], dtype=float)
+
+    h, status = cv2.findHomography(corner_points, pts_dst)
+
+    im_out = cv2.warpPerspective(img, h, (out_width, out_height))
+
+    return im_out, h
 
 def print_points(img, points, color):
     for x,y in points:
@@ -256,7 +278,7 @@ def print_lines(img, lines, color):
             pt2 = (int(x0 - 2000*(-b)), int(y0 - 2000*(a)))
 
             #draw line
-            cv2.line(img, pt1, pt2, color, 2, cv2.LINE_AA)
+            cv2.line(img, pt1, pt2, color, 3, cv2.LINE_AA)
 
             #draw text
             pt1_text = (int(x0 + 1000*(-b)), int(y0 + 1000*(a)))

@@ -28,3 +28,7 @@ sorted_theta_threshold = 0.1 # maximo de variação de ângulo de reta entre lin
 color_red = (0,0,255)
 color_green = (0,255,0)
 color_blue = (255,0,0)
+
+#warped image dimensions
+homography_width = 700
+homography_height = 700
