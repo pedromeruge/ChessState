@@ -24,11 +24,11 @@ line_clusters_min_samples = 1 # mínimo de samples para ponto não ser considera
 #Sorted
 sorted_theta_threshold = 0.1 # maximo de variação de ângulo de reta entre linhas consecutivas de grelha
 
+#warped image dimensions
+homography_width = 700
+homography_height = 700
+
 #draw objects
 color_red = (0,0,255)
 color_green = (0,255,0)
 color_blue = (255,0,0)
-
-#warped image dimensions
-homography_width = 700
-homography_height = 700

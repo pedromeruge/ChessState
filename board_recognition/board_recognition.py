@@ -67,11 +67,11 @@ def process_board(orig_img):
     # for i, vert_line in enumerate(vert_lines):
     #     cdst = print_lines(orig_img, np.array([vert_line]), (0 , 0, i * (255 / 10) + 30))
 
-    cdst = print_lines(cdst, horiz_lines, Params.color_green)
+    cdst = print_lines(orig_img, horiz_lines, Params.color_green)
     cdst = print_lines(cdst, vert_lines, Params.color_red)
     cdst = print_points(cdst, corner_points, Params.color_blue)
     
-    cdst,homography_matrix = warp_image(orig_img, corner_points, Params.homography_width, Params.homography_height)
+    cdst,homography_matrix = warp_image(cdst, corner_points)#, Params.homography_width, Params.homography_height)
 
     return cdst
 
@@ -240,22 +240,25 @@ def find_corner_points(horiz_lines, vert_lines):
     # print(intersections)
     return intersections
 
-def warp_image(img, corner_points, out_width=700, out_height=700):
+def warp_image(img, corner_points, out_width=0, out_height=0):
+
+    if(out_width == 0):
+        out_width = out_height = min(img.shape[1],img.shape[0])
 
     #quanta margem dar à foto
-    margin = min(150, corner_points[0][1] * (out_height / img.shape[0]) * 1.2) # meio heuristica baseada na distância de ponto cima-esq até borda na foto original
-    margin = (corner_points[2][1] - corner_points[0][1]) / 8 # meio huerística baseada na altura de cada quadrado do chess
+    margin = max(80,(corner_points[2][1] - corner_points[0][1]) / 8 * 3)# meio huerística baseada na altura de cada quadrado do chess
+    other_margin = 80 # só a borda de cima é que deve ter peças a sair fora do tabuleiro com a sua altura
     
     pts_dst = np.array([
-        [margin, margin], # cima - esq
-        [out_width - margin, margin], # cima-dir
-        [margin, out_height - margin], # baixo-esq
-        [out_width - margin, out_height - margin] # baixo-dir
+        [other_margin, margin], # cima - esq
+        [out_width - other_margin, margin], # cima-dir
+        [other_margin, out_height - other_margin], # baixo-esq
+        [out_width - other_margin, out_height - other_margin] # baixo-dir
     ], dtype=float)
 
     h, status = cv2.findHomography(corner_points, pts_dst)
 
-    im_out = cv2.warpPerspective(img, h, (out_width, out_height))
+    im_out = cv2.warpPerspective(img, h, (out_width, out_height)) # use same width and height in dest, as in orig
 
     return im_out, h
 
