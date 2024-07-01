@@ -71,7 +71,7 @@ def process_board(orig_img):
     cdst = print_lines(cdst, vert_lines, Params.color_red)
     cdst = print_points(cdst, corner_points, Params.color_blue)
     
-    cdst,homography_matrix = warp_image(cdst, corner_points)#, Params.homography_width, Params.homography_height)
+    cdst,homography_matrix = warp_image(cdst, corner_points, out_side_length=Params.homography_side_length)
 
     return cdst
 
@@ -240,25 +240,25 @@ def find_corner_points(horiz_lines, vert_lines):
     # print(intersections)
     return intersections
 
-def warp_image(img, corner_points, out_width=0, out_height=0):
+def warp_image(img, corner_points, out_side_length=-1):
 
-    if(out_width == 0):
-        out_width = out_height = min(img.shape[1],img.shape[0])
+    if(out_side_length == -1):
+        out_side_length = min(img.shape[1],img.shape[0])
 
     #quanta margem dar à foto
-    margin = max(80,(corner_points[2][1] - corner_points[0][1]) / 8 * 3)# meio huerística baseada na altura de cada quadrado do chess
-    other_margin = 80 # só a borda de cima é que deve ter peças a sair fora do tabuleiro com a sua altura
+    margin = max(out_side_length * 0.1,(corner_points[2][1] - corner_points[0][1]) / 8 * 3)# meio huerística baseada na altura de cada quadrado do chess
+    other_margin = out_side_length * 0.1 # só a borda de cima é que deve ter peças a sair fora do tabuleiro com a sua altura
     
     pts_dst = np.array([
         [other_margin, margin], # cima - esq
-        [out_width - other_margin, margin], # cima-dir
-        [other_margin, out_height - other_margin], # baixo-esq
-        [out_width - other_margin, out_height - other_margin] # baixo-dir
+        [out_side_length - other_margin, margin], # cima-dir
+        [other_margin, out_side_length - other_margin], # baixo-esq
+        [out_side_length - other_margin, out_side_length - other_margin] # baixo-dir
     ], dtype=float)
 
     h, status = cv2.findHomography(corner_points, pts_dst)
 
-    im_out = cv2.warpPerspective(img, h, (out_width, out_height)) # use same width and height in dest, as in orig
+    im_out = cv2.warpPerspective(img, h, (out_side_length, out_side_length)) # use same width and height in dest, as in orig
 
     return im_out, h
 
