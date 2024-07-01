@@ -1,7 +1,7 @@
 # Correr default: python3 main.py examples/small_roboflow_test/2f6fb003bb89cd401322a535acb42f65_jpg.rf.91ad9df05bd1f86bab67c8368ae5e4ad.jpg results/
 
 from board_recognition.board_recognition import *
-import sys
+from pieces_recognition.pieces_recognition import *
 
 def get_img():
     photo_path = sys.argv[1]
@@ -13,30 +13,19 @@ def get_img():
 
     return orig_img
 
-def show_result(orig_img, result_img, writeToFile=False):
-
-    #write result image to file
-    if (writeToFile):
-        out_path = sys.argv[2]
-        Path(out_path).mkdir(parents=True, exist_ok=True)
-        filename = sys.argv[1].split("/")[-1]
-        final_path = out_path + filename
-        cv2.imwrite(final_path, result_img)
-
-    #popup window with result
-    cv2.imshow('Result Image', result_img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-
 def main():
     if len(sys.argv) != 3:
         raise Exception("main.py <input_photo_path> <output_folder_path>")
+    
     orig_img = get_img()
+
     start_time = time.time()
-    result_img = process_board(orig_img)
+
+    result_img, corner_points = process_board(orig_img)
+
+    board_layout = process_empty_spaces(result_img, corner_points)
+
     print("Execution time: %s s" % (time.time() - start_time)) # print do tempo decorrido
-    show_result(orig_img,result_img, writeToFile=False)
 
 if __name__ == "__main__":
     main()

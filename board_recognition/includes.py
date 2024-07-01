@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import math
-# import matplotlib.pyplot as plt
 from pathlib import Path
 import random
 from sklearn.cluster import DBSCAN, KMeans, AgglomerativeClustering
@@ -16,3 +15,5 @@ import random
 import heapq
 from sklearn.linear_model import RANSACRegressor
 import time
+from pieces_recognition.pieces_recognition import *
+import sys

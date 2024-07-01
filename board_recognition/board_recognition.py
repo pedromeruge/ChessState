@@ -64,12 +64,14 @@ def process_board(orig_img):
 
     # cdst = print_lines(orig_img, horiz_lines, Params.color_green)
     # cdst = print_lines(cdst, vert_lines, Params.color_red)
+    # cdst = print_points(cdst, corner_points, Params.color_blue)
     
     cdst,homography_matrix, pts_dst = warp_image(orig_img, corner_points, inner_length=Params.homography_inner_length, top_margin=Params.homography_top_margin, other_margin=Params.homography_other_margins)
 
-    cdst = print_points(cdst, pts_dst, Params.color_blue)
-
-    return cdst
+    #print result
+    # show_result(orig_img,cdst, writeToFile=False)
+    
+    return cdst, pts_dst
 
 # obtain separated vertical and horizontal lines with kmeans
 # muito sucestível a extremos acho -> daí os maus resultados?
@@ -251,7 +253,6 @@ def warp_image(img, corner_points, inner_length=400, top_margin=150, other_margi
 
     im_out = cv2.warpPerspective(img, h, (inner_length + 2*other_margin, inner_length + top_margin + other_margin))
 
-    print(pts_dst)
     return im_out, h, pts_dst
 
 def print_points(img, points, color):
@@ -282,6 +283,20 @@ def print_lines(img, lines, color):
             cv2.putText(img, f"r:{rho}, ang:{theta}", text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1, cv2.LINE_AA)
     return img
 
+def show_result(orig_img, result_img, writeToFile=False):
+
+    #write result image to file
+    if (writeToFile):
+        out_path = sys.argv[2]
+        Path(out_path).mkdir(parents=True, exist_ok=True)
+        filename = sys.argv[1].split("/")[-1]
+        final_path = out_path + filename
+        cv2.imwrite(final_path, result_img)
+
+    #popup window with result
+    cv2.imshow('Result Image', result_img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 # !!
 # Experencia a tentar meter as retas numa regressao linear, mas n é eficiente e n funciona direito
