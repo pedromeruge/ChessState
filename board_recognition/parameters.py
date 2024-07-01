@@ -24,8 +24,10 @@ line_clusters_min_samples = 1 # mínimo de samples para ponto não ser considera
 #Sorted
 sorted_theta_threshold = 0.1 # maximo de variação de ângulo de reta entre linhas consecutivas de grelha
 
-#warped image dimensions
-homography_side_length = -1 # assume o tamanho da imagem original min(orig_width,orig_length)
+#tamanho da foto -> na CNN vamos usar imagens de 100x100, em que cada quadrado tem 50x50 com mais 25 de contexto à volta para cada lado!
+homography_inner_length = 400 # 50*8 (quadrados)
+homography_top_margin = 150 # tamanho excessivamente grande (50*3), para garantir que não se corta peças altas no fundo do tabuleiro
+homography_other_margins = 25
 
 #draw objects
 color_red = (0,0,255)

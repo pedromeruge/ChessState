@@ -61,17 +61,13 @@ def process_board(orig_img):
     vert_lines = find_best_lines_sorted(vert_lines, theta_threshold=0.1)
 
     corner_points = find_corner_points(horiz_lines, vert_lines)
-    # for i, horiz_line in enumerate(horiz_lines):
-    #     cdst = print_lines(orig_img, np.array([horiz_line]), (0 , i * (255 / 10) + 30, 0))
-    
-    # for i, vert_line in enumerate(vert_lines):
-    #     cdst = print_lines(orig_img, np.array([vert_line]), (0 , 0, i * (255 / 10) + 30))
 
-    cdst = print_lines(orig_img, horiz_lines, Params.color_green)
-    cdst = print_lines(cdst, vert_lines, Params.color_red)
-    cdst = print_points(cdst, corner_points, Params.color_blue)
+    # cdst = print_lines(orig_img, horiz_lines, Params.color_green)
+    # cdst = print_lines(cdst, vert_lines, Params.color_red)
     
-    cdst,homography_matrix = warp_image(cdst, corner_points, out_side_length=Params.homography_side_length)
+    cdst,homography_matrix, pts_dst = warp_image(orig_img, corner_points, inner_length=Params.homography_inner_length, top_margin=Params.homography_top_margin, other_margin=Params.homography_other_margins)
+
+    cdst = print_points(cdst, pts_dst, Params.color_blue)
 
     return cdst
 
@@ -240,27 +236,23 @@ def find_corner_points(horiz_lines, vert_lines):
     # print(intersections)
     return intersections
 
-def warp_image(img, corner_points, out_side_length=-1):
+def warp_image(img, corner_points, inner_length=400, top_margin=150, other_margin=25):
 
-    if(out_side_length == -1):
-        out_side_length = min(img.shape[1],img.shape[0])
-
-    #quanta margem dar à foto
-    margin = max(out_side_length * 0.1,(corner_points[2][1] - corner_points[0][1]) / 8 * 3)# meio huerística baseada na altura de cada quadrado do chess
-    other_margin = out_side_length * 0.1 # só a borda de cima é que deve ter peças a sair fora do tabuleiro com a sua altura
-    
+    bottom_row = top_margin + inner_length
+    right_col = inner_length + other_margin
     pts_dst = np.array([
-        [other_margin, margin], # cima - esq
-        [out_side_length - other_margin, margin], # cima-dir
-        [other_margin, out_side_length - other_margin], # baixo-esq
-        [out_side_length - other_margin, out_side_length - other_margin] # baixo-dir
+        [other_margin, top_margin], # cima - esq
+        [right_col, top_margin], # cima-dir
+        [other_margin, bottom_row], # baixo-esq
+        [right_col, bottom_row] # baixo-dir
     ], dtype=float)
 
     h, status = cv2.findHomography(corner_points, pts_dst)
 
-    im_out = cv2.warpPerspective(img, h, (out_side_length, out_side_length)) # use same width and height in dest, as in orig
+    im_out = cv2.warpPerspective(img, h, (inner_length + 2*other_margin, inner_length + top_margin + other_margin))
 
-    return im_out, h
+    print(pts_dst)
+    return im_out, h, pts_dst
 
 def print_points(img, points, color):
     for x,y in points:
