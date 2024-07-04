@@ -66,12 +66,11 @@ def process_board(orig_img):
     # cdst = print_lines(cdst, vert_lines, Params.color_red)
     # cdst = print_points(cdst, corner_points, Params.color_blue)
     
-    cdst,homography_matrix, pts_dst = warp_image(orig_img, corner_points, inner_length=Params.homography_inner_length, top_margin=Params.homography_top_margin, other_margin=Params.homography_other_margins)
 
     #print result
     # show_result(orig_img,cdst, writeToFile=False)
     
-    return cdst, pts_dst
+    return corner_points
 
 # obtain separated vertical and horizontal lines with kmeans
 # muito sucestível a extremos acho -> daí os maus resultados?
@@ -237,23 +236,6 @@ def find_corner_points(horiz_lines, vert_lines):
     intersections = get_intersection_points(horiz_lines_rhos, horiz_lines_thetas, vert_lines_rhos, vert_lines_thetas)
     # print(intersections)
     return intersections
-
-def warp_image(img, corner_points, inner_length=400, top_margin=150, other_margin=25):
-
-    bottom_row = top_margin + inner_length
-    right_col = inner_length + other_margin
-    pts_dst = np.array([
-        [other_margin, top_margin], # cima - esq
-        [right_col, top_margin], # cima-dir
-        [other_margin, bottom_row], # baixo-esq
-        [right_col, bottom_row] # baixo-dir
-    ], dtype=float)
-
-    h, status = cv2.findHomography(corner_points, pts_dst)
-
-    im_out = cv2.warpPerspective(img, h, (inner_length + 2*other_margin, inner_length + top_margin + other_margin))
-
-    return im_out, h, pts_dst
 
 def print_points(img, points, color):
     for x,y in points:

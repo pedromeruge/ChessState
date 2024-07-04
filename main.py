@@ -2,6 +2,7 @@
 
 from board_recognition.board_recognition import *
 from pieces_recognition.pieces_recognition import *
+from process_datasets.process_dataset_images import * 
 
 def get_img():
     photo_path = sys.argv[1]
@@ -23,10 +24,11 @@ def main():
 
     result_img, corner_points = process_board(orig_img)
 
-    board_layout = process_empty_spaces(result_img, corner_points)
+    # board_layout = process_empty_spaces(result_img, corner_points)
 
     print("Execution time: %s s" % (time.time() - start_time)) # print do tempo decorrido
 
 if __name__ == "__main__":
-    main()
-    
+
+    # main()
+    process_OSF_dataset(sys.argv[1],sys.argv[2])
