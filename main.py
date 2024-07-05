@@ -31,4 +31,4 @@ def main():
 if __name__ == "__main__":
 
     # main()
-    process_OSF_dataset(sys.argv[1],sys.argv[2])
+    process_ChessReD_dataset(sys.argv[1],sys.argv[2])
