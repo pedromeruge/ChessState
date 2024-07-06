@@ -105,7 +105,7 @@ def process_OSF_dataset(input_folder_path, output_folder_path):
     empty_folder.mkdir(parents=True, exist_ok=True)
     occupied_folder.mkdir(parents=True, exist_ok=True)
 
-    image_paths = list(input_folder.glob('*.png'))
+    image_paths = list(input_folder.glob('*.jpg')) + list(input_folder.glob('*.png')) + list(input_folder.glob('*.jpeg'))
     json_paths = {path.stem: input_folder / f'{path.stem}.json' for path in image_paths}  # corresponder cada png a um json 
 
     with ProcessPoolExecutor() as executor: # processar diferentes imagens em processos separados (CPU heavy)
@@ -149,7 +149,7 @@ def process_ChessReD_dataset(input_folder_path, output_folder_path):
     with json_path.open('r') as json_file:
         data = json.load(json_file)
 
-    corners_obj_list = [{"image_id": 0, "corners": {"bottom_right": [2610.3, 1560.9], "top_right": [1772.23, 638.59], "top_left": [488.7, 1078.7], "bottom_left": [1063.3, 2304.1]}, "id": 223804}]
+    corners_obj_list = data["annotations"]["corners"]
     images = data["images"]
     pieces = data["annotations"]["pieces"]
 
@@ -218,3 +218,42 @@ def find_range(objects, field, given_id):
     right_index = bisect_right(image_ids_list, given_id) - 1
     
     return objects[left_index:right_index + 1]
+
+#criar novas entradas
+def augment_images_in_dir(input_dataset_folder, output_augmented_folder, num_new_img_per_original=1):
+    input_folder = Path(input_dataset_folder)
+    output_folder = Path(output_augmented_folder)
+    output_folder.mkdir(parents=True, exist_ok=True)
+
+    image_paths = list(input_folder.glob('*.jpg')) + list(input_folder.glob('*.png')) + list(input_folder.glob('*.jpeg'))
+
+    with ProcessPoolExecutor(max_workers=10) as executor:
+        futures = [
+            executor.submit(process_and_save_image, image_path, output_folder, num_new_img_per_original)
+            for image_path in image_paths
+        ]
+        for future in  tqdm(as_completed(futures), total=len(futures), desc="Augmenting images"):
+            future.result()
+
+#augment de uma só imagem
+def process_and_save_image(image_path, output_dir, num_augmented_images_per_original):
+    image = cv2.imread(str(image_path))
+    image = cv2.resize(image, (100, 100))  # resize image (if needed)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    image = image.astype(np.float32) / 255.0  # normalize to [0, 1] before augment operations
+
+    for j in range(num_augmented_images_per_original):
+        aug_image = apply_augment_image(image)
+        aug_image = (aug_image.numpy() * 255).astype(np.uint8)  # rescale to [0, 255] (denormalize)
+        aug_image = cv2.cvtColor(aug_image, cv2.COLOR_RGB2BGR)  # Convert back to BGR
+        cv2.imwrite(str(output_dir / f'{image_path.stem}_aug_{j}{image_path.suffix}'), aug_image)
+
+#perform augment operation to image
+def apply_augment_image(image):
+    image = tf.image.random_flip_left_right(image)
+    image = tf.image.random_flip_up_down(image)
+    image = tf.image.random_brightness(image, max_delta=0.2)
+    image = tf.image.random_contrast(image, lower=0.8, upper=1.2)
+    image = tf.image.random_saturation(image, lower=0.8, upper=1.2)
+    image = tf.image.random_hue(image, max_delta=0.2)
+    return image

@@ -31,4 +31,5 @@ def main():
 if __name__ == "__main__":
 
     # main()
-    process_ChessReD_dataset(sys.argv[1],sys.argv[2])
+    augment_images_in_dir(sys.argv[1],sys.argv[2])
+    # interpret_empty_spaces(sys.argv[1],sys.argv[2])
