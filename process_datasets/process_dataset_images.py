@@ -1,18 +1,21 @@
 from process_datasets.includes import *
-import pieces_recognition.parameters as Params
+import pieces_recognition.parameters as PiecesParams
+import process_datasets.parameters as Params
 
 #comando:
-#python3 main.py /Volumes/BACKUPS/ChessState/OSF_dataset/exemplo/ /Volumes/BACKUPS/ChessState/OSF_dataset/processed/
-#python3 main.py /Volumes/BACKUPS/ChessState/OSF_dataset/exemplo/ /Users/peters/Desktop/ChessState/datasets/OSF_dataset/processed/
+# python3 main.py /Volumes/BACKUPS/ChessState/OSF_dataset/exemplo/ /Volumes/BACKUPS/ChessState/OSF_dataset/processed/
+# python3 main.py /Volumes/BACKUPS/ChessState/OSF_dataset/exemplo/ /Users/peters/Desktop/ChessState/datasets/OSF_dataset/processed/
+# (depois de fazer "source ~/venv-metal/bin/activate") python3 main.py /Volumes/BACKUPS/ChessState/ChessReD_dataset/processed/occupied/ /Volumes/BACKUPS/ChessState/ChessReD_dataset/processed/occupied/
+# rm occupied/*_aug_*
 
 #corner_points = [top_left, top_right, bottom_left, bottom_right]
 def process_empty_space_image(board_img_path, corner_points):
     board_img = cv2.imread(board_img_path, cv2.IMREAD_COLOR)
 
     warped_img, pts_dst = warp_image(board_img, corner_points, 
-                                     inner_length=Params.homography_inner_length, 
-                                     top_margin=Params.homography_top_margin, 
-                                     other_margin=Params.homography_other_margins)
+                                     inner_length=PiecesParams.homography_inner_length, 
+                                     top_margin=PiecesParams.homography_top_margin, 
+                                     other_margin=PiecesParams.homography_other_margins)
 
     squares_imgs = split_squares(warped_img, pts_dst)
 
@@ -40,8 +43,8 @@ def warp_image(img, corner_points, inner_length=400, top_margin=150, other_margi
 
 def split_squares(board_img, corner_points):
     squares = []
-    jump_size = Params.homography_square_length
-    margin = Params.homography_other_margins
+    jump_size = PiecesParams.homography_square_length
+    margin = PiecesParams.homography_other_margins
     top_left = corner_points[0]
 
     for y in range(8):
@@ -227,6 +230,18 @@ def augment_images_in_dir(input_dataset_folder, output_augmented_folder, num_new
 
     image_paths = list(input_folder.glob('*.jpg')) + list(input_folder.glob('*.png')) + list(input_folder.glob('*.jpeg'))
 
+    #do not create augmentations for images that already have them -> only needed for cases where augmentaiton had an error mid way through
+    # def needs_augmentation(image_path):
+    #     for j in range(num_new_img_per_original):
+    #         aug_image_path = output_folder / f'{image_path.stem}_aug_{j}{image_path.suffix}'
+    #         if not aug_image_path.exists():
+    #             return True # if at least one of the augmentation images is missing, return that it needs augmentation again
+    #     return False
+
+    # image_paths = [path for path in image_paths if needs_augmentation(path)]
+
+    # print(image_paths[:1000])
+
     with ProcessPoolExecutor(max_workers=10) as executor:
         futures = [
             executor.submit(process_and_save_image, image_path, output_folder, num_new_img_per_original)
@@ -238,22 +253,81 @@ def augment_images_in_dir(input_dataset_folder, output_augmented_folder, num_new
 #augment de uma só imagem
 def process_and_save_image(image_path, output_dir, num_augmented_images_per_original):
     image = cv2.imread(str(image_path))
+    if image is None:
+        print(f"Failed to read image: {image_path}")
+        return
+    
     image = cv2.resize(image, (100, 100))  # resize image (if needed)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    image = image.astype(np.float32) / 255.0  # normalize to [0, 1] before augment operations
+
+    base_seed = np.random.randint(0, 2**32 - 1)
 
     for j in range(num_augmented_images_per_original):
-        aug_image = apply_augment_image(image)
-        aug_image = (aug_image.numpy() * 255).astype(np.uint8)  # rescale to [0, 255] (denormalize)
+        seed = tf.constant([base_seed, base_seed + j], dtype=tf.int64)
+        aug_image = apply_augment_image(image, seed)
+        aug_image = (aug_image.numpy()).astype(np.uint8)
         aug_image = cv2.cvtColor(aug_image, cv2.COLOR_RGB2BGR)  # Convert back to BGR
         cv2.imwrite(str(output_dir / f'{image_path.stem}_aug_{j}{image_path.suffix}'), aug_image)
+        # print("image path:", image_path, "Image before:", image, "Image after:", aug_image)
 
 #perform augment operation to image
-def apply_augment_image(image):
-    image = tf.image.random_flip_left_right(image)
-    image = tf.image.random_flip_up_down(image)
-    image = tf.image.random_brightness(image, max_delta=0.2)
-    image = tf.image.random_contrast(image, lower=0.8, upper=1.2)
-    image = tf.image.random_saturation(image, lower=0.8, upper=1.2)
-    image = tf.image.random_hue(image, max_delta=0.2)
+def apply_augment_image(image, seed):
+    image = tf.image.stateless_random_flip_left_right(image, seed=seed)
+    image = tf.image.stateless_random_brightness(image, max_delta=Params.brightness_max_delta, seed=seed)
+    image = tf.image.stateless_random_contrast(image, lower=Params.contrast_lower_bound, upper=Params.contrast_upper_bound, seed=seed)
+    image = tf.image.stateless_random_saturation(image, lower=Params.saturation_lower_bound, upper=Params.saturation_upper_bound, seed=seed)
+    image = tf.image.stateless_random_hue(image, max_delta=Params.hue_max_delta, seed=seed)
+
     return image
+
+def split_train_val_test_data(input_path, output_path):
+    
+    input_dir = Path(input_path)
+    output_dir = Path(output_path)
+
+    classes = [cls.name for cls in input_dir.iterdir() if cls.is_dir()] # nomes de pastas dentro de input_path sao as classes
+
+    train_dir = output_dir / 'train'
+    val_dir = output_dir / 'val'
+    test_dir = output_dir / 'test'
+
+    #criar paths se n existem
+    for dir_path in [train_dir, val_dir, test_dir]:
+        for cls in classes:
+            (dir_path / cls).mkdir(parents=True, exist_ok=True)
+
+    # repeat spliiting for each class
+    with ProcessPoolExecutor(max_workers=15) as executor:
+        futures = [
+            executor.submit(split_data, cls, input_dir, train_dir, val_dir, test_dir) for cls in classes]
+
+        for future in  tqdm(as_completed(futures), total=len(futures), desc="Processing classes", unit="class"):
+            future.result()
+
+#given one class folder, splits the data inside it to train_val and test dirs
+def split_data(class_name, input_dir, train_dir, val_dir, test_dir):
+
+        class_dir = input_dir / class_name
+        images = [img for img in class_dir.glob('*') if img.suffix.lower() in {'.png', '.jpg', '.jpeg'}]
+
+        print("Dataset class: ", class_name, " N_entries: ", len(images))
+
+        # split into train+val and test
+        train_val_images, test_images = train_test_split(images, test_size=Params.test_ratio, random_state=123)
+
+        # split train+val into train and val
+        actual_val = Params.val_ratio * ( 1 - Params.test_ratio)
+        train_images, val_images = train_test_split(train_val_images, test_size=actual_val, random_state=123)
+        
+        train_bar = tqdm(total=len(train_images), desc=f"Processing {class_name} (train)", unit="file", leave=True)
+        val_bar = tqdm(total=len(val_images), desc=f"Processing {class_name} (val)", unit="file", leave=True)
+        test_bar = tqdm(total=len(test_images), desc=f"Processing {class_name} (test)", unit="file", leave=True)
+        
+        # Move files
+        with ThreadPoolExecutor() as executor:
+            futures = []
+            futures.extend([executor.submit(shutil.copy, img, train_dir / class_name / img.name) for img in train_images])
+            futures.extend([executor.submit(shutil.copy, img, val_dir / class_name / img.name) for img in val_images])
+            futures.extend([executor.submit(shutil.copy, img, test_dir / class_name / img.name) for img in test_images])
+            for future in tqdm(as_completed(futures), total=len(futures), desc=f"Processing {class_name}", unit="file"):
+                future.result()
