@@ -11,7 +11,9 @@ def build_CNN(input_shape=(100,100,3)): #
     model = Sequential()
 
     #1 conv Block
-    model.add(Conv2D(filters=16, kernel_size=(5,5), strides=(1,1), activation='relu', input_shape=input_shape)) # input_shape é imagem de 100x100 com 3 canais RGB
+    model.add(Input(shape=input_shape)) # input_shape é imagem de 100x100 com 3 canais RGB
+    model.add(tf.keras.layers.Rescaling(1./255)) # normalize photo values to [0,1] scale
+    model.add(Conv2D(filters=16, kernel_size=(5,5), strides=(1,1), activation='relu')) 
     model.add(MaxPooling2D(pool_size=(2,2), strides=(2,2))) # a cada 2x2 píxeis simplifica -> stride também é 2
 
     #2 conv Block
@@ -36,18 +38,33 @@ def build_CNN(input_shape=(100,100,3)): #
         loss='categorical_crossentropy',
         metrics=['accuracy'])
 
+    print("Model built")
     return model
 
 def train_CNN(model, input_dataset_folder, output_folder):
+    input_dir = Path(input_dataset_folder)
+    output_dir = Path(output_folder)
 
-    train_dir = input_dataset_folder + "train/"
-    validation_dir = input_dataset_folder + "val/"
-    test_dir = input_dataset_folder + "test/"
+    train_dir = input_dir / 'train'
+    val_dir = input_dir / 'val'
+    test_dir = input_dir / 'test'
+
+    checkpoint_path = output_dir / "cp.model.keras"
+
+    output_dir.mkdir(parents=True, exist_ok=True) # fazer pasta destino se n existir
+
+    model_cp_callback = tf.keras.callbacks.ModelCheckpoint( # checkpoint para guardar melhor model após cada epoch
+        filepath=checkpoint_path,
+        monitor='val_accuracy',
+        mode='max',
+        save_best_only=True)
+
+    print("Getting datasets")
 
     train_dataset = tf.keras.utils.image_dataset_from_directory(
         train_dir,
         labels='inferred',
-        label_mode='binary',
+        label_mode='categorical',
         batch_size=Params.batch_size,
         image_size=(Params.image_size, Params.image_size),
         shuffle=True,
@@ -55,9 +72,9 @@ def train_CNN(model, input_dataset_folder, output_folder):
     )
 
     validation_dataset = tf.keras.utils.image_dataset_from_directory(
-        validation_dir,
+        val_dir,
         labels='inferred',
-        label_mode='binary',
+        label_mode='categorical',
         batch_size=Params.batch_size,
         image_size=(Params.image_size, Params.image_size),
         shuffle=True,
@@ -67,32 +84,32 @@ def train_CNN(model, input_dataset_folder, output_folder):
     test_dataset = tf.keras.utils.image_dataset_from_directory(
         test_dir,
         labels='inferred',
-        label_mode='binary',
+        label_mode='categorical',
         batch_size=Params.batch_size,
         image_size=(Params.image_size, Params.image_size),
         shuffle=False,
         seed=123
     )
 
-    normalization_layer = tf.keras.layers.Rescaling(1./255)
-
-    #normalizar RGB para [0,1] -> melhores resultados em CNN
-    train_dataset = train_dataset.map(lambda x, y: (normalization_layer(x), y))
-    validation_dataset = validation_dataset.map(lambda x, y: (normalization_layer(x), y))
-    test_dataset = test_dataset.map(lambda x, y: (normalization_layer(x), y))
+    print("Prefetch data")
 
     # optimize performance, segundo os docs, armazenando dados em cache:
     #  https://www.tensorflow.org/tutorials/load_data/images?hl=pt-br#load_data_using_a_keras_utility
     AUTOTUNE = tf.data.AUTOTUNE 
 
-    train_dataset = train_dataset.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
+    train_dataset = train_dataset.cache().shuffle(100).batch(32).prefetch(buffer_size=AUTOTUNE)
     validation_dataset = validation_dataset.cache().prefetch(buffer_size=AUTOTUNE)
-    test_dataset = test_dataset.cache().prefetch(buffer_size=AUTOTUNE)
+    test_dataset = test_dataset.cache().batch(32).prefetch(buffer_size=AUTOTUNE)
 
-    model.fit(train_dataset, validation_dataset, epochs=Params.epochs)
+    print("Starting model fitting")
 
+    model.fit(
+        train_dataset,
+        validation_data = validation_dataset,
+        epochs=Params.epochs, 
+        callbacks=[model_cp_callback],
+        verbose=1)
+    
     # Evaluate the model on the test data
     test_loss, test_acc = model.evaluate(test_dataset)
     print(f"Test Loss: {test_loss}, Test Accuracy: {test_acc}")
-
-    model.save(output_folder)

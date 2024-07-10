@@ -7,6 +7,6 @@ import matplotlib.pyplot as plt
 
 import tensorflow as tf
 from keras.models import Sequential
-from keras.layers import Dense, Conv2D, MaxPooling2D, Dropout, Flatten
+from keras.layers import Dense, Conv2D, MaxPooling2D, Dropout, Flatten, Input
 from keras.optimizers import Adam
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter)

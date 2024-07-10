@@ -250,8 +250,34 @@ def augment_images_in_dir(input_dataset_folder, output_augmented_folder, num_new
         for future in  tqdm(as_completed(futures), total=len(futures), desc="Augmenting images"):
             future.result()
 
+#augment images for files specified in lines of folder
+def augment_images_in_file(input_folder, file_path, num_new_img_per_original=1):
+    with open(file_path, 'r') as file:
+        image_paths_complex = file.read().splitlines() #cada linha é um path
+
+    image_paths = []
+    output_paths = []
+
+    for image_path in image_paths_complex:
+        split_name = image_path.split("/")
+        output_folder = "/".join(split_name[0:-1])
+        file_name = split_name[-1]
+        image_paths.append(Path(input_folder + ("" if input_folder[-1] == "/" else "/")  + file_name))
+        output_paths.append(Path(output_folder))
+
+    # print(image_paths[0], output_paths[0])
+
+    with ProcessPoolExecutor(max_workers=10) as executor:
+        futures = [
+            executor.submit(process_and_save_image, image_path, output_folder, num_new_img_per_original)
+            for image_path, output_folder in zip(image_paths, output_paths)
+        ]
+        for future in  tqdm(as_completed(futures), total=len(futures), desc="Augmenting images"):
+            future.result()
+
 #augment de uma só imagem
 def process_and_save_image(image_path, output_dir, num_augmented_images_per_original):
+
     image = cv2.imread(str(image_path))
     if image is None:
         print(f"Failed to read image: {image_path}")

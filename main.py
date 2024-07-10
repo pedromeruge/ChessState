@@ -31,6 +31,7 @@ def main():
 if __name__ == "__main__":
 
     # main()
-    # augment_images_in_dir(sys.argv[1],sys.argv[2])
-    split_train_val_test_data(sys.argv[1],sys.argv[2])
     # interpret_empty_spaces(sys.argv[1],sys.argv[2])
+    model = build_CNN()
+    train_CNN(model, sys.argv[1],sys.argv[2])
+    
