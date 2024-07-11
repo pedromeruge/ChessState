@@ -97,9 +97,9 @@ def train_CNN(model, input_dataset_folder, output_folder):
     #  https://www.tensorflow.org/tutorials/load_data/images?hl=pt-br#load_data_using_a_keras_utility
     AUTOTUNE = tf.data.AUTOTUNE 
 
-    train_dataset = train_dataset.cache().shuffle(100).batch(32).prefetch(buffer_size=AUTOTUNE)
+    train_dataset = train_dataset.cache().prefetch(buffer_size=AUTOTUNE)
     validation_dataset = validation_dataset.cache().prefetch(buffer_size=AUTOTUNE)
-    test_dataset = test_dataset.cache().batch(32).prefetch(buffer_size=AUTOTUNE)
+    test_dataset = test_dataset.cache().prefetch(buffer_size=AUTOTUNE)
 
     print("Starting model fitting")
 

@@ -7,5 +7,5 @@ homography_other_margins = 25
 image_size = 100 # homography_square_length = image_size / 2
 
 #training parameters
-batch_size = 128
+batch_size = 64
 epochs = 3

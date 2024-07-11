@@ -345,9 +345,9 @@ def split_data(class_name, input_dir, train_dir, val_dir, test_dir):
         actual_val = Params.val_ratio * ( 1 - Params.test_ratio)
         train_images, val_images = train_test_split(train_val_images, test_size=actual_val, random_state=123)
         
-        train_bar = tqdm(total=len(train_images), desc=f"Processing {class_name} (train)", unit="file", leave=True)
-        val_bar = tqdm(total=len(val_images), desc=f"Processing {class_name} (val)", unit="file", leave=True)
-        test_bar = tqdm(total=len(test_images), desc=f"Processing {class_name} (test)", unit="file", leave=True)
+        # train_bar = tqdm(total=len(train_images), desc=f"Processing {class_name} (train)", unit="file", leave=True)
+        # val_bar = tqdm(total=len(val_images), desc=f"Processing {class_name} (val)", unit="file", leave=True)
+        # test_bar = tqdm(total=len(test_images), desc=f"Processing {class_name} (test)", unit="file", leave=True)
         
         # Move files
         with ThreadPoolExecutor() as executor:
