@@ -47,10 +47,8 @@ def main():
     BoardRecogn.show_result(cdst, writeToFile=False)
     
 if __name__ == "__main__":
-
-    # main()
+    main()
     # PiecesRecogn.train_ResNet_CNN(sys.argv[1],sys.argv[2])
-    PiecesRecogn.interpret_empty_spaces(sys.argv[1])
     # model = build_CNN()
-    # train_CNN(model, sys.argv[1],sys.argv[2])
+    # PiecesRecogn.build_vanilla_CNN(sys.argv[1],sys.argv[2])
     

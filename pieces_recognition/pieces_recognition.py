@@ -7,10 +7,9 @@ import board_recognition.parameters as BoardParams
 
 #corner_points = [top_left, top_right, bottom_left, bottom_right]
 def interpret_empty_spaces(square_imgs_list):
-    # model = buld_vanilla_CNN()
-    # train_vanilla_CNN(model, input_dataset_folder, output_folder)
-    # model = import_CNN(Params.squares_model)
-    model = import_resnet_CNN_weights(Params.squares_resnet_weights)
+
+    model = import_CNN(Params.import_squares_model_path)
+    # model = import_resnet_CNN_weights(Params.squares_resnet_weights)
     predicts = predict_squares(model, square_imgs_list)
     return predicts
 
@@ -70,7 +69,7 @@ def predict_squares(model, square_img_list):
     return result
 
 #tenativa de CNN vanilla, mas tem resultados fracos
-def train_vanilla_CNN(model, input_dataset_folder, output_folder):
+def build_vanilla_CNN(input_dataset_folder, output_folder):
 
     model = Sequential()
 
@@ -98,7 +97,7 @@ def train_vanilla_CNN(model, input_dataset_folder, output_folder):
 
     model.compile(
         optimizer=Adam(learning_rate=1e-3), 
-        loss='categorical_crossentropy',
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(),
         metrics=['accuracy'])
 
     print("Model built")
@@ -125,8 +124,6 @@ def train_vanilla_CNN(model, input_dataset_folder, output_folder):
 
     train_ds = tf.keras.preprocessing.image_dataset_from_directory(
         train_val_dir,
-        labels='inferred',
-        label_mode='categorical',
         validation_split=0.2,
         subset="training",
         seed=123,
@@ -139,8 +136,6 @@ def train_vanilla_CNN(model, input_dataset_folder, output_folder):
     val_ds = tf.keras.preprocessing.image_dataset_from_directory(
         train_val_dir,
         validation_split=0.2,
-        labels='inferred',
-        label_mode='categorical',
         subset="validation",
         seed=123,
         image_size=(Params.image_size, Params.image_size),
@@ -148,10 +143,8 @@ def train_vanilla_CNN(model, input_dataset_folder, output_folder):
         shuffle=True
     )
 
-    test_dataset = tf.keras.utils.image_dataset_from_directory(
+    test_ds = tf.keras.utils.image_dataset_from_directory(
         test_dir,
-        labels='inferred',
-        label_mode='categorical',
         batch_size=Params.batch_size,
         image_size=(Params.image_size, Params.image_size),
         shuffle=False,
@@ -170,7 +163,7 @@ def train_vanilla_CNN(model, input_dataset_folder, output_folder):
     val_ds = val_ds.map(lambda x, y: (normalization_layer(x), y), num_parallel_calls=AUTOTUNE)
     test_ds = test_ds.map(lambda x, y: (normalization_layer(x), y), num_parallel_calls=AUTOTUNE)
 
-    train_ds = train_ds.cache().shuffle(10000).prefetch(buffer_size=AUTOTUNE)
+    train_ds = train_ds.cache().shuffle(Params.shuffle_buffer_size).prefetch(buffer_size=AUTOTUNE)
     val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
     test_ds = test_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
@@ -184,10 +177,10 @@ def train_vanilla_CNN(model, input_dataset_folder, output_folder):
         verbose=1)
     
     # Evaluate the model on the test data
-    test_loss, test_acc = model.evaluate(test_dataset)
+    test_loss, test_acc = model.evaluate(test_ds)
     print(f"Test Loss: {test_loss}, Test Accuracy: {test_acc}")
 
-def train_ResNet_CNN(input_dataset_folder, output_folder):
+def build_ResNet_CNN(input_dataset_folder, output_folder):
 
     input_dir = Path(input_dataset_folder)
     output_dir = Path(output_folder)
@@ -235,7 +228,7 @@ def train_ResNet_CNN(input_dataset_folder, output_folder):
     val_ds = val_ds.map(lambda x, y: (normalization_layer(x), y), num_parallel_calls=AUTOTUNE)
     test_ds = test_ds.map(lambda x, y: (normalization_layer(x), y), num_parallel_calls=AUTOTUNE)
 
-    train_ds = train_ds.cache().shuffle(10000).prefetch(buffer_size=AUTOTUNE)
+    train_ds = train_ds.cache().shuffle(Params.shuffle_buffer_size).prefetch(buffer_size=AUTOTUNE)
     val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
     test_ds = test_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
