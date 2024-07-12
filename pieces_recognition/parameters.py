@@ -7,5 +7,14 @@ homography_other_margins = 25
 image_size = 100 # homography_square_length = image_size / 2
 
 #training parameters
-batch_size = 64
+batch_size = 32 # com 64 ficava sem memória!
+
+#vanilla CNN params
 epochs = 3
+
+#model path
+squares_model = "model_results/resnet.model.keras"
+squares_resnet_weights = "model_results/model.weights.h5"
+
+#square prediction security
+square_threshold_predict = 0.90

@@ -64,11 +64,11 @@ def process_board(orig_img):
 
     # cdst = print_lines(orig_img, horiz_lines, Params.color_green)
     # cdst = print_lines(cdst, vert_lines, Params.color_red)
-    # cdst = print_points(cdst, corner_points, Params.color_blue)
+    # cdst = print_points(orig_img, corner_points, Params.color_blue)
     
 
-    #print result
-    # show_result(orig_img,cdst, writeToFile=False)
+    # #print result
+    # show_result(cdst, writeToFile=False)
     
     return corner_points
 
@@ -265,7 +265,7 @@ def print_lines(img, lines, color):
             cv2.putText(img, f"r:{rho}, ang:{theta}", text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1, cv2.LINE_AA)
     return img
 
-def show_result(orig_img, result_img, writeToFile=False):
+def show_result(result_img, writeToFile=False):
 
     #write result image to file
     if (writeToFile):

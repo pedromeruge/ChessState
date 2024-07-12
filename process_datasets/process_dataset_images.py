@@ -5,12 +5,10 @@ import process_datasets.parameters as Params
 #comando:
 # python3 main.py /Volumes/BACKUPS/ChessState/OSF_dataset/exemplo/ /Volumes/BACKUPS/ChessState/OSF_dataset/processed/
 # python3 main.py /Volumes/BACKUPS/ChessState/OSF_dataset/exemplo/ /Users/peters/Desktop/ChessState/datasets/OSF_dataset/processed/
-# (depois de fazer "source ~/venv-metal/bin/activate") python3 main.py /Volumes/BACKUPS/ChessState/ChessReD_dataset/processed/occupied/ /Volumes/BACKUPS/ChessState/ChessReD_dataset/processed/occupied/
 # rm occupied/*_aug_*
 
 #corner_points = [top_left, top_right, bottom_left, bottom_right]
-def process_empty_space_image(board_img_path, corner_points):
-    board_img = cv2.imread(board_img_path, cv2.IMREAD_COLOR)
+def process_squares_img(board_img, corner_points):
 
     warped_img, pts_dst = warp_image(board_img, corner_points, 
                                      inner_length=PiecesParams.homography_inner_length, 
@@ -19,7 +17,7 @@ def process_empty_space_image(board_img_path, corner_points):
 
     squares_imgs = split_squares(warped_img, pts_dst)
 
-    # show_result(squares_imgs, writeToFile=False)
+    show_result(squares_imgs, writeToFile=False)
     
     return squares_imgs
 
@@ -125,7 +123,9 @@ def process_image_osf(image_path, json_path, empty_folder, occupied_folder):
     corners = np.array([data["corners"][1], data["corners"][2], data["corners"][0], data["corners"][3]])
     labels = data["fen"]
 
-    squares = process_empty_space_image(image_path, corners)
+    board_img = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    
+    squares = process_squares_img(board_img, corners)
     vec_labels = fenToVec(labels)
 
     for i, square_photo in enumerate(squares):
@@ -173,7 +173,9 @@ def process_image_chessred(corner_obj, images, pieces, empty_folder, occupied_fo
 
     labels = find_range(pieces,"image_id",corner_obj["image_id"])
 
-    squares = process_empty_space_image(image_path, corners)
+    board_img = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    
+    squares = process_squares_img(board_img, corners)
     vec_labels = listToVec(labels)
 
     for i, square_photo in enumerate(squares):

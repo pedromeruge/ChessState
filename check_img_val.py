@@ -20,5 +20,6 @@ def validate_images(directory):
 
 # Validate train, val, and test directories
 # validate_images('/Volumes/BACKUPS/ChessState/Final_dataset/val')
-validate_images('/Volumes/BACKUPS/ChessState/Final_dataset/test')
-validate_images('/Volumes/BACKUPS/ChessState/Final_dataset/train')
+# validate_images('/Volumes/BACKUPS/ChessState/Final_dataset/test')
+validate_images('/Users/peters/Desktop/ChessState/datasets/Final_dataset_squares/train_val/empty/')
+validate_images('/Users/peters/Desktop/ChessState/datasets/Final_dataset_squares/train_val/occupied/')

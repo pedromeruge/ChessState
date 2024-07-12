@@ -9,4 +9,5 @@ import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense, Conv2D, MaxPooling2D, Dropout, Flatten, Input
 from keras.optimizers import Adam
+from keras.saving import load_model
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter)
