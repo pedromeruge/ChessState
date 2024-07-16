@@ -48,7 +48,6 @@ def main():
     
 if __name__ == "__main__":
     main()
-    # PiecesRecogn.train_ResNet_CNN(sys.argv[1],sys.argv[2])
-    # model = build_CNN()
+    # PiecesRecogn.build_ResNet_CNN(sys.argv[1],sys.argv[2])
     # PiecesRecogn.build_vanilla_CNN(sys.argv[1],sys.argv[2])
     

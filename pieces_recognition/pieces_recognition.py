@@ -1,3 +1,4 @@
+from numpy import square
 from pieces_recognition.includes import *
 import pieces_recognition.parameters as Params
 import board_recognition.parameters as BoardParams
@@ -8,12 +9,12 @@ import board_recognition.parameters as BoardParams
 #corner_points = [top_left, top_right, bottom_left, bottom_right]
 def interpret_empty_spaces(square_imgs_list):
 
-    model = import_CNN(Params.import_squares_model_path)
-    # model = import_resnet_CNN_weights(Params.squares_resnet_weights)
+    # model = import_resnet_CNN_weights(Params.import_squares_resnet_weights_path)
+    model = import_vanilla_CNN(Params.import_squares_resnet_model_path)
     predicts = predict_squares(model, square_imgs_list)
     return predicts
 
-def import_CNN(input_path):
+def import_vanilla_CNN(input_path):
     model = load_model(
                 input_path,
                 compile=True)
@@ -49,12 +50,9 @@ def import_resnet_CNN_weights(input_path):
 
 def predict_squares(model, square_img_list):
 
-    print("antes normalizar: ", square_img_list)
     #normalizar imagem
     square_img_list = square_img_list.astype(np.float32) # convert to float to avoid overflows
     square_img_list /= 255.0 
-    
-    print("depois normalizar: ", square_img_list)
 
     predicts = model.predict(
             square_img_list,
@@ -190,9 +188,12 @@ def build_ResNet_CNN(input_dataset_folder, output_folder):
 
     output_dir.mkdir(parents=True, exist_ok=True) # fazer pasta destino se n existir
 
+    # Enable mixed precision
+    tf.keras.mixed_precision.set_global_policy('mixed_float16')
+
     train_ds = tf.keras.preprocessing.image_dataset_from_directory(
         train_val_dir,
-        validation_split=0.2,
+        validation_split=0.15,
         subset="training",
         seed=123,
         image_size=(Params.image_size, Params.image_size),
@@ -201,7 +202,7 @@ def build_ResNet_CNN(input_dataset_folder, output_folder):
 
     val_ds = tf.keras.preprocessing.image_dataset_from_directory(
         train_val_dir,
-        validation_split=0.2,
+        validation_split=0.15,
         subset="validation",
         seed=123,
         image_size=(Params.image_size, Params.image_size),
@@ -232,14 +233,14 @@ def build_ResNet_CNN(input_dataset_folder, output_folder):
     val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
     test_ds = test_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
-    checkpoint_path = output_dir / "resnet.model.keras"
+    # checkpoint_path = output_dir / "resnet.model.keras"
 
-    model_cp_callback = tf.keras.callbacks.ModelCheckpoint( # checkpoint para guardar melhor model após cada epoch
-        filepath=checkpoint_path,
-        monitor='val_accuracy',
-        mode='max',
-        save_best_only=True,
-        verbose=1)
+    # model_cp_callback = tf.keras.callbacks.ModelCheckpoint( # checkpoint para guardar melhor model após cada epoch
+    #     filepath=checkpoint_path,
+    #     monitor='val_accuracy',
+    #     mode='max',
+    #     save_best_only=True,
+    #     verbose=1)
 
     base_model = tf.keras.applications.ResNet50(
         input_shape=(Params.image_size, Params.image_size, 3),
@@ -250,11 +251,12 @@ def build_ResNet_CNN(input_dataset_folder, output_folder):
     base_model.trainable = False  # freeze base model
 
     # add classification head 
-    model = tf.keras.Sequential([
-        base_model,
-        tf.keras.layers.GlobalAveragePooling2D(),
-        Dense(2, activation='softmax')
-    ])
+    x = base_model.output
+    x = tf.keras.layers.GlobalAveragePooling2D()(x)  # Add Global Average Pooling layer
+    x = Dense(2, activation='softmax')(x)  # Add a Dense layer with 2 nodes and softmax activation
+
+    # Create the final model
+    model = tf.keras.Model(inputs=base_model.input, outputs=x)
 
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
@@ -267,12 +269,13 @@ def build_ResNet_CNN(input_dataset_folder, output_folder):
         train_ds,
         validation_data=val_ds,
         epochs=1,
-        callbacks=[model_cp_callback],
         verbose=1
     )
 
+    model.save(output_folder +  Params.squares_resnet_model_name + '_1.keras')
+
     # unfreeze base model
-    base_model.trainable = True
+    model.layers[0].trainable = True
 
     #recompile with lower training rate, but full CNN unfrozen now
     model.compile(
@@ -286,10 +289,10 @@ def build_ResNet_CNN(input_dataset_folder, output_folder):
         train_ds,
         validation_data=val_ds,
         epochs=2,
-        callbacks=[model_cp_callback],
         verbose=1
     )
 
+    model.save(output_folder +  Params.squares_resnet_model_name + '_2.keras')
     # Evaluate the model on the test data
     test_loss, test_acc = model.evaluate(test_ds)
     print(f"Test Loss: {test_loss}, Test Accuracy: {test_acc}")
