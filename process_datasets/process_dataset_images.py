@@ -5,7 +5,6 @@ import process_datasets.parameters as Params
 #comando:
 # python3 main.py /Volumes/BACKUPS/ChessState/OSF_dataset/exemplo/ /Volumes/BACKUPS/ChessState/OSF_dataset/processed/
 # python3 main.py /Volumes/BACKUPS/ChessState/OSF_dataset/exemplo/ /Users/peters/Desktop/ChessState/datasets/OSF_dataset/processed/
-# rm occupied/*_aug_*
 
 #corner_points = [top_left, top_right, bottom_left, bottom_right]
 def process_squares_img(board_img, corner_points):
@@ -14,13 +13,12 @@ def process_squares_img(board_img, corner_points):
                                      inner_length=PiecesParams.homography_inner_length, 
                                      top_margin=PiecesParams.homography_top_margin, 
                                      other_margin=PiecesParams.homography_other_margins)
-
+    
     squares_imgs = split_squares(warped_img, pts_dst)
 
-    show_result(squares_imgs, writeToFile=False)
+    # show_result(squares_imgs, writeToFile=False)
     
     return squares_imgs
-
 
 def warp_image(img, corner_points, inner_length=400, top_margin=150, other_margin=25):
 
@@ -38,6 +36,20 @@ def warp_image(img, corner_points, inner_length=400, top_margin=150, other_margi
     im_out = cv2.warpPerspective(img, h, (right_col + other_margin, bottom_row + other_margin))
 
     return im_out, pts_dst
+
+#warp 2d points defined in np array, given homography matrix
+def warp_points(points, homography_matrix):
+
+    # add third col with val 1 to (x,y) coordinates
+    points_homogeneous = np.hstack((points, np.ones((points.shape[0], 1))))
+    
+    # multiply points by matrix
+    transformed_points_homogeneous = homography_matrix @ points_homogeneous.T
+    
+    # remove last row, convert back to cartesian
+    transformed_points_cartesian = (transformed_points_homogeneous[:2] / transformed_points_homogeneous[2]).T
+    
+    return transformed_points_cartesian
 
 def split_squares(board_img, corner_points):
     squares = []
@@ -120,19 +132,56 @@ def process_image_osf(image_path, json_path, empty_folder, occupied_folder):
     with json_path.open('r') as json_file:
         data = json.load(json_file)
 
-    corners = np.array([data["corners"][1], data["corners"][2], data["corners"][0], data["corners"][3]])
+    corners = np.array([data["corners"][1], data["corners"][2], data["corners"][0], data["corners"][3]]) # ordenado com base em lado branco e preto
     labels = data["fen"]
+    vec_labels = fenToVec(labels)
+
+    corners, vec_labels = reorder_chessboard(corners, vec_labels) #ordenar os cantos para peças ficarem na vertical, e ordenar labels de peças de acordo
 
     board_img = cv2.imread(image_path, cv2.IMREAD_COLOR)
     
     squares = process_squares_img(board_img, corners)
-    vec_labels = fenToVec(labels)
 
     for i, square_photo in enumerate(squares):
+        square_photo = apply_augment_image(square_photo) # aplicar modificações às imagens
         output_folder = occupied_folder if vec_labels[i] else empty_folder
         square_photo_path = output_folder / f'{image_path.stem}_{i+1}{image_path.suffix}'
         cv2.imwrite(str(square_photo_path), square_photo)
 
+#  ordenar cantos e labels de tabuleiro, para ficar posicionado corretamente com peças na vertical
+def reorder_chessboard(corners, piece_labels):
+    ordered_corners, top_left_idx = sort_corners(corners)
+    ordered_labels = sort_labels(piece_labels, top_left_idx)
+    return ordered_corners, ordered_labels
+
+#dados 4 cantos no formato [[x,y],[x,y],..], ordenar de forma a obter peças na vertical apos warp
+def sort_corners(corners):
+    sums = corners.sum(axis=1, keepdims=True) # somar x+y de cada ponto
+    min_sum_idx = np.argmin(sums)
+    max_sum_idx = np.argmax(sums)
+
+    #start output array
+    ordered_points = np.empty_like(corners)
+    ordered_points[0] = corners[min_sum_idx] # canto com menor x+y é cima-esq
+    ordered_points[3] = corners[max_sum_idx] # canto com maior x+y é baixo-dir
+
+    idx1, idx2 = [i for i in range(4) if i not in (min_sum_idx, max_sum_idx)] # remaining indices
+    if corners[idx1, 1] < corners[idx2, 1]: # dos 2 cantos restantes, o que tiver menor y fica cima-dir (o restante fica em baixo-esq)
+            ordered_points[1] = corners[idx1]
+            ordered_points[2] = corners[idx2]
+    else:
+        ordered_points[1] = corners[idx2]
+        ordered_points[2] = corners[idx1]
+
+    return ordered_points, min_sum_idx
+
+#com base na posição onde cima-esq fica, concluir que rotação do tabuleiro foi realizada e ordenar as labels
+def sort_labels(piece_labels, top_left_idx):
+    board_2d = np.reshape(piece_labels, (8,8))
+    idx_to_rot = [0,1,-1,2] # número de rotações 90º clockwise 
+
+    ordered_labels = np.rot90(board_2d, k=idx_to_rot[top_left_idx])   # 270 degrees clockwise
+    return ordered_labels.flatten() # de volta para 1d array
 
 #iterar por imagens de OSF_dataset
 def process_ChessReD_dataset(input_folder_path, output_folder_path):
@@ -285,27 +334,24 @@ def process_and_save_image(image_path, output_dir, num_augmented_images_per_orig
         print(f"Failed to read image: {image_path}")
         return
     
-    image = cv2.resize(image, (100, 100))  # resize image (if needed)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-    base_seed = np.random.randint(0, 2**32 - 1)
+    image = cv2.resize(image, (PiecesParams.image_size, PiecesParams.image_size))  # resize image (if needed)
 
     for j in range(num_augmented_images_per_original):
-        seed = tf.constant([base_seed, base_seed + j], dtype=tf.int64)
-        aug_image = apply_augment_image(image, seed)
-        aug_image = (aug_image.numpy()).astype(np.uint8)
-        aug_image = cv2.cvtColor(aug_image, cv2.COLOR_RGB2BGR)  # Convert back to BGR
+        aug_image = apply_augment_image(image)
         cv2.imwrite(str(output_dir / f'{image_path.stem}_aug_{j}{image_path.suffix}'), aug_image)
         # print("image path:", image_path, "Image before:", image, "Image after:", aug_image)
 
 #perform augment operation to image
-def apply_augment_image(image, seed):
+def apply_augment_image(image):
+    base_seed = np.random.randint(0, 2**32 - 1)
+    seed = tf.constant([0, base_seed], dtype=tf.int64)
     image = tf.image.stateless_random_flip_left_right(image, seed=seed)
     image = tf.image.stateless_random_brightness(image, max_delta=Params.brightness_max_delta, seed=seed)
-    image = tf.image.stateless_random_contrast(image, lower=Params.contrast_lower_bound, upper=Params.contrast_upper_bound, seed=seed)
-    image = tf.image.stateless_random_saturation(image, lower=Params.saturation_lower_bound, upper=Params.saturation_upper_bound, seed=seed)
+    image = tf.image.stateless_random_contrast(image, lower=1-Params.contrast_delta, upper=1+Params.contrast_delta, seed=seed)
+    image = tf.image.stateless_random_saturation(image, lower=1-Params.saturation_delta, upper=1+Params.saturation_delta, seed=seed)
     image = tf.image.stateless_random_hue(image, max_delta=Params.hue_max_delta, seed=seed)
-
+    image = tf.image.random_jpeg_quality(image, min_jpeg_quality=100 - Params.noise_max_delta, max_jpeg_quality=100)
+    image = image.numpy().astype(np.uint8)
     return image
 
 def split_train_val_test_data(input_path, output_path):

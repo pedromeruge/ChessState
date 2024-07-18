@@ -146,7 +146,7 @@ def simplify_line_clusters(lines, perp_lines):
 
     return np.stack(final_lines)
 
-#Obtain lines intersection points, can be vectorized if args are in array
+# obtain lines intersection points
 def get_intersection_points(rho1: np.ndarray, theta1: np.ndarray, rho2: np.ndarray, theta2: np.ndarray) -> typing.Tuple[np.ndarray, np.ndarray]:
 
     # rho1 = x cos(theta1) + y sin(theta1)

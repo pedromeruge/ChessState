@@ -47,7 +47,8 @@ def main():
     BoardRecogn.show_result(cdst, writeToFile=False)
     
 if __name__ == "__main__":
-    main()
+    # main()
+    ProcData.process_OSF_dataset(sys.argv[1],sys.argv[2])
     # PiecesRecogn.build_ResNet_CNN(sys.argv[1],sys.argv[2])
     # PiecesRecogn.build_vanilla_CNN(sys.argv[1],sys.argv[2])
     

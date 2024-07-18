@@ -17,4 +17,7 @@ Main issues:
 - Image size is only 100x100 but resnet50 model receives 224x224 size images -> subtle features that are important for classification might have been lost in image size reduction
 - In augmentation, I didn't apply warping or rescaling to the square images, for reasons already stated. However, I could apply these augmentations to the chessboard images before square partitioning, thus making the images have broader angles and perspectives, which would ultimately result in more varied square individual images (while still maintaining the required 100x100 or 224x224 size images)
 
-I will make a new dataset with this aspects in mind..
+Thoughts:
+- The most common error seems to be identifying white pieces (or lighter pieces) occupying the white squares (or lighter squares). Would the model benefit from a separation in 6 output layers (instead of only 2), distinguishing black and white squares, occupied by black or white pieces, or not occupied at all.
+
+I will make a new dataset with these aspects in mind..
