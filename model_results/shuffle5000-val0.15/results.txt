@@ -1,7 +1,0 @@
-8862/8862 ━━━━━━━━━━━━━━━━━━━━ 1114s 124ms/step - accuracy: 0.7798 - loss: 0.4739 - val_accuracy: 0.8602 - val_loss: 0.3516
-Epoch 1/2
-8862/8862 ━━━━━━━━━━━━━━━━━━━━ 1129s 127ms/step - accuracy: 0.8592 - loss: 0.3532 - val_accuracy: 0.8695 - val_loss: 0.3473
-Epoch 2/2
-8862/8862 ━━━━━━━━━━━━━━━━━━━━ 1093s 123ms/step - accuracy: 0.8615 - loss: 0.3480 - val_accuracy: 0.8579 - val_loss: 0.3422
-1159/1159 ━━━━━━━━━━━━━━━━━━━━ 120s 103ms/step - accuracy: 0.8704 - loss: 0.3715
-Test Loss: 0.3487132489681244, Test Accuracy: 0.8537901043891907

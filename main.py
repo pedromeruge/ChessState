@@ -47,8 +47,11 @@ def main():
     BoardRecogn.show_result(cdst, writeToFile=False)
     
 if __name__ == "__main__":
-    # main()
-    ProcData.process_OSF_dataset(sys.argv[1],sys.argv[2])
+    main()
+    # ProcData.augment_images_in_dir(sys.argv[1],sys.argv[2], max_files_augmented=35000)
+    # ProcData.split_train_val_test_data(sys.argv[1],sys.argv[2])
+    # ProcData.process_ChessReD_dataset(sys.argv[1],sys.argv[2])
+    # ProcData.process_OSF_dataset_files_in_txt(sys.argv[1],sys.argv[2],sys.argv[3])
     # PiecesRecogn.build_ResNet_CNN(sys.argv[1],sys.argv[2])
     # PiecesRecogn.build_vanilla_CNN(sys.argv[1],sys.argv[2])
     

@@ -19,7 +19,12 @@ def validate_images(directory):
     print(">>>Finished directory: ", directory)
 
 # Validate train, val, and test directories
-# validate_images('/Volumes/BACKUPS/ChessState/Final_dataset/val')
-# validate_images('/Volumes/BACKUPS/ChessState/Final_dataset/test')
-validate_images('/Users/peters/Desktop/ChessState/datasets/Final_dataset_squares/train_val/empty/')
-validate_images('/Users/peters/Desktop/ChessState/datasets/Final_dataset_squares/train_val/occupied/')
+
+# validate_images('/Users/peters/Desktop/ChessState/datasets/Dataset_squares_2/processed/empty')
+# validate_images('/Users/peters/Desktop/ChessState/datasets/Dataset_squares_2/processed/occupied')
+# validate_images('/Users/peters/Desktop/ChessState/datasets/Dataset_squares_2/processed2/empty')
+# validate_images('/Users/peters/Desktop/ChessState/datasets/Dataset_squares_2/processed2/occupied/')
+validate_images('/Users/peters/Desktop/ChessState/datasets/Dataset_squares_2/final_dataset/test/empty')
+validate_images('/Users/peters/Desktop/ChessState/datasets/Dataset_squares_2/final_dataset/test/occupied/')
+validate_images('/Users/peters/Desktop/ChessState/datasets/Dataset_squares_2/final_dataset/train/empty')
+validate_images('/Users/peters/Desktop/ChessState/datasets/Dataset_squares_2/final_dataset/train/occupied/')

@@ -1,0 +1,15 @@
+2024-07-23 17:57:35.103268: I tensorflow/core/kernels/data/shuffle_dataset_op.cc:480] Shuffle buffer filled.
+9383/9383 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - accuracy: 0.9745 - loss: 0.0645     
+Epoch 1: val_accuracy improved from -inf to 0.99382, saving model to model_results/new_dataset/shuffle3000-val0.05/cp.model.keras
+9383/9383 ━━━━━━━━━━━━━━━━━━━━ 590s 61ms/step - accuracy: 0.9745 - loss: 0.0645 - val_accuracy: 0.9938 - val_loss: 0.0174
+Epoch 2/3
+9383/9383 ━━━━━━━━━━━━━━━━━━━━ 0s 69ms/step - accuracy: 0.9944 - loss: 0.0154   
+Epoch 2: val_accuracy did not improve from 0.99382
+9383/9383 ━━━━━━━━━━━━━━━━━━━━ 664s 71ms/step - accuracy: 0.9944 - loss: 0.0154 - val_accuracy: 0.9938 - val_loss: 0.0189
+Epoch 3/3
+9383/9383 ━━━━━━━━━━━━━━━━━━━━ 0s 69ms/step - accuracy: 0.9968 - loss: 0.0097    
+Epoch 3: val_accuracy improved from 0.99382 to 0.99600, saving model to model_results/new_dataset/shuffle3000-val0.05/cp.model.keras
+9383/9383 ━━━━━━━━━━━━━━━━━━━━ 666s 71ms/step - accuracy: 0.9968 - loss: 0.0097 - val_accuracy: 0.9960 - val_loss: 0.0124
+1304/1304 ━━━━━━━━━━━━━━━━━━━━ 24s 19ms/step - accuracy: 0.9941 - loss: 0.0160  
+Test Loss: 0.010530130006372929, Test Accuracy: 0.9963669776916504
+

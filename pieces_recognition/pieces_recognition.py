@@ -10,7 +10,7 @@ import board_recognition.parameters as BoardParams
 def interpret_empty_spaces(square_imgs_list):
 
     # model = import_resnet_CNN_weights(Params.import_squares_resnet_weights_path)
-    model = import_vanilla_CNN(Params.import_squares_resnet_model_path)
+    model = import_vanilla_CNN(Params.import_squares_model_path)
     predicts = predict_squares(model, square_imgs_list)
     return predicts
 
@@ -69,6 +69,9 @@ def predict_squares(model, square_img_list):
 #tenativa de CNN vanilla, mas tem resultados fracos
 def build_vanilla_CNN(input_dataset_folder, output_folder):
 
+    #clear previous sessions
+    tf.keras.backend.clear_session()
+
     model = Sequential()
 
     #1 conv Block
@@ -120,6 +123,9 @@ def build_vanilla_CNN(input_dataset_folder, output_folder):
 
     print("Getting datasets")
 
+        # Enable mixed precision
+    tf.keras.mixed_precision.set_global_policy('mixed_float16')
+
     train_ds = tf.keras.preprocessing.image_dataset_from_directory(
         train_val_dir,
         validation_split=0.2,
@@ -133,7 +139,7 @@ def build_vanilla_CNN(input_dataset_folder, output_folder):
 
     val_ds = tf.keras.preprocessing.image_dataset_from_directory(
         train_val_dir,
-        validation_split=0.2,
+        validation_split=0.05,
         subset="validation",
         seed=123,
         image_size=(Params.image_size, Params.image_size),
@@ -187,6 +193,9 @@ def build_ResNet_CNN(input_dataset_folder, output_folder):
     test_dir = input_dir / 'test'
 
     output_dir.mkdir(parents=True, exist_ok=True) # fazer pasta destino se n existir
+
+    #clear previous sessions
+    tf.keras.backend.clear_session()
 
     # Enable mixed precision
     tf.keras.mixed_precision.set_global_policy('mixed_float16')

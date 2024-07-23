@@ -1,3 +1,4 @@
+from numpy import square
 from process_datasets.includes import *
 import pieces_recognition.parameters as PiecesParams
 import process_datasets.parameters as Params
@@ -121,32 +122,69 @@ def process_OSF_dataset(input_folder_path, output_folder_path):
     image_paths = list(input_folder.glob('*.jpg')) + list(input_folder.glob('*.png')) + list(input_folder.glob('*.jpeg'))
     json_paths = {path.stem: input_folder / f'{path.stem}.json' for path in image_paths}  # corresponder cada png a um json 
 
-    with ProcessPoolExecutor() as executor: # processar diferentes imagens em processos separados (CPU heavy)
+    with ProcessPoolExecutor(max_workers=10) as executor: # processar diferentes imagens em processos separados (CPU heavy)
         futures = [executor.submit(process_image_osf, image_path, json_paths[image_path.stem], empty_folder, occupied_folder)
                    for image_path in image_paths]
 
         for future in tqdm(as_completed(futures), total=len(futures), desc="Processing images"): # progress bar para saber quantas fotos já foram processadas
             future.result()  # wait for all tasks to complete
 
-def process_image_osf(image_path, json_path, empty_folder, occupied_folder):
-    with json_path.open('r') as json_file:
-        data = json.load(json_file)
+#process only photos for corrupted files described in txt (result of running check_img_val.py script)
+def process_OSF_dataset_files_in_txt(input_folder_path, output_folder_path, input_txt):
 
-    corners = np.array([data["corners"][1], data["corners"][2], data["corners"][0], data["corners"][3]]) # ordenado com base em lado branco e preto
-    labels = data["fen"]
-    vec_labels = fenToVec(labels)
+    input_folder = Path(input_folder_path)
 
-    corners, vec_labels = reorder_chessboard(corners, vec_labels) #ordenar os cantos para peças ficarem na vertical, e ordenar labels de peças de acordo
+    with open(input_txt,'r') as input_file:
+        image_json_paths = dict()
 
-    board_img = cv2.imread(image_path, cv2.IMREAD_COLOR)
+        for line in input_file:
+            if not line.startswith("Corrupted image file:"):
+                continue
+            match = re.search(r"(\/.*\/)(.*?)_\d{1,2}(\.\w+)",line)
+            if (match == -1):
+                raise Exception("File path not correct")
+                continue
+            # output_folder_path = match.group(1) # ineficiente, mas este script corre poucas vezes
+            file_name = match.group(2) + match.group(3) # filename.ext
+            image_json_paths[file_name] = (input_folder / file_name, input_folder / (match.group(2) + ".json"))
+
+    output_folder = Path(output_folder_path)
     
-    squares = process_squares_img(board_img, corners)
+    empty_folder = output_folder / 'empty'
+    occupied_folder = output_folder / 'occupied'
 
-    for i, square_photo in enumerate(squares):
-        square_photo = apply_augment_image(square_photo) # aplicar modificações às imagens
-        output_folder = occupied_folder if vec_labels[i] else empty_folder
-        square_photo_path = output_folder / f'{image_path.stem}_{i+1}{image_path.suffix}'
-        cv2.imwrite(str(square_photo_path), square_photo)
+    empty_folder.mkdir(parents=True, exist_ok=True)
+    occupied_folder.mkdir(parents=True, exist_ok=True)
+
+    with ProcessPoolExecutor(max_workers=10) as executor: # processar diferentes imagens em processos separados (CPU heavy)
+        futures = [executor.submit(process_image_osf, image_path, json_path, empty_folder, occupied_folder)
+                   for (image_path,json_path) in image_json_paths.values()]
+
+        for future in tqdm(as_completed(futures), total=len(futures), desc="Processing images"): # progress bar para saber quantas fotos já foram processadas
+            future.result()  # wait for all tasks to complete
+
+def process_image_osf(image_path, json_path, empty_folder, occupied_folder):
+    try :
+        with json_path.open('r') as json_file:
+            data = json.load(json_file)
+
+        corners = np.array([data["corners"][1], data["corners"][2], data["corners"][0], data["corners"][3]]) # ordenado com base em lado branco e preto
+        labels = data["fen"]
+        vec_labels = fenToVec(labels)
+
+        corners, vec_labels = reorder_chessboard(corners, vec_labels) #ordenar os cantos para peças ficarem na vertical, e ordenar labels de peças de acordo
+
+        board_img = cv2.imread(image_path, cv2.IMREAD_COLOR)
+        
+        squares = process_squares_img(board_img, corners)
+
+        for i, square_photo in enumerate(squares):
+            square_photo = apply_augment_image(square_photo) # aplicar modificações às imagens
+            output_folder = occupied_folder if vec_labels[i] else empty_folder
+            square_photo_path = output_folder / f'{image_path.stem}_{i+1}{image_path.suffix}'
+            cv2.imwrite(str(square_photo_path), square_photo)
+    except Exception as e:
+        print(e)
 
 #  ordenar cantos e labels de tabuleiro, para ficar posicionado corretamente com peças na vertical
 def reorder_chessboard(corners, piece_labels):
@@ -155,17 +193,21 @@ def reorder_chessboard(corners, piece_labels):
     return ordered_corners, ordered_labels
 
 #dados 4 cantos no formato [[x,y],[x,y],..], ordenar de forma a obter peças na vertical apos warp
+
 def sort_corners(corners):
     sums = corners.sum(axis=1, keepdims=True) # somar x+y de cada ponto
     min_sum_idx = np.argmin(sums)
-    max_sum_idx = np.argmax(sums)
 
-    #start output array
-    ordered_points = np.empty_like(corners)
+    ordered_points = np.empty_like(corners)    #start output array
+
     ordered_points[0] = corners[min_sum_idx] # canto com menor x+y é cima-esq
-    ordered_points[3] = corners[max_sum_idx] # canto com maior x+y é baixo-dir
+    
+    start_point = corners[min_sum_idx]
+    distances = np.sum((corners-start_point)**2,axis=1)
+    max_dist_idx = np.argmax(distances) 
+    ordered_points[3] = corners[max_dist_idx] # canto com maior dist a cima-esq será baixo-dir
 
-    idx1, idx2 = [i for i in range(4) if i not in (min_sum_idx, max_sum_idx)] # remaining indices
+    idx1, idx2 = [i for i in range(4) if i not in (min_sum_idx, max_dist_idx)] # remaining indices
     if corners[idx1, 1] < corners[idx2, 1]: # dos 2 cantos restantes, o que tiver menor y fica cima-dir (o restante fica em baixo-esq)
             ordered_points[1] = corners[idx1]
             ordered_points[2] = corners[idx2]
@@ -180,7 +222,7 @@ def sort_labels(piece_labels, top_left_idx):
     board_2d = np.reshape(piece_labels, (8,8))
     idx_to_rot = [0,1,-1,2] # número de rotações 90º clockwise 
 
-    ordered_labels = np.rot90(board_2d, k=idx_to_rot[top_left_idx])   # 270 degrees clockwise
+    ordered_labels = np.rot90(board_2d, k=idx_to_rot[top_left_idx])   # apply rotation
     return ordered_labels.flatten() # de volta para 1d array
 
 #iterar por imagens de OSF_dataset
@@ -208,7 +250,7 @@ def process_ChessReD_dataset(input_folder_path, output_folder_path):
     # for corner_obj in corners_obj_list:
     #     process_image_chessred(corner_obj, images, pieces, empty_folder, occupied_folder, input_folder)
         
-    with ProcessPoolExecutor() as executor:
+    with ProcessPoolExecutor(max_workers=10) as executor:
         futures = [executor.submit(process_image_chessred, corner_obj, images, pieces, empty_folder, occupied_folder, input_folder)
                    for corner_obj in corners_obj_list]
 
@@ -221,13 +263,16 @@ def process_image_chessred(corner_obj, images, pieces, empty_folder, occupied_fo
     image_path = input_folder / images[corner_obj["image_id"]]["path"]
 
     labels = find_range(pieces,"image_id",corner_obj["image_id"])
+    vec_labels = listToVec(labels)
+
+    corners, vec_labels = reorder_chessboard(corners, vec_labels) #ordenar os cantos para peças ficarem na vertical, e ordenar labels de peças de acordo
 
     board_img = cv2.imread(image_path, cv2.IMREAD_COLOR)
     
     squares = process_squares_img(board_img, corners)
-    vec_labels = listToVec(labels)
 
     for i, square_photo in enumerate(squares):
+        square_photo = apply_augment_image(square_photo) # aplicar modificações às imagens
         output_folder = occupied_folder if vec_labels[i] else empty_folder
         square_photo_path = output_folder / f'{image_path.stem}_{i+1}{image_path.suffix}'
         cv2.imwrite(str(square_photo_path), square_photo)
@@ -274,12 +319,15 @@ def find_range(objects, field, given_id):
     return objects[left_index:right_index + 1]
 
 #criar novas entradas
-def augment_images_in_dir(input_dataset_folder, output_augmented_folder, num_new_img_per_original=1):
+def augment_images_in_dir(input_dataset_folder, output_augmented_folder, num_new_img_per_original=1, max_files_augmented=0):
     input_folder = Path(input_dataset_folder)
     output_folder = Path(output_augmented_folder)
     output_folder.mkdir(parents=True, exist_ok=True)
 
     image_paths = list(input_folder.glob('*.jpg')) + list(input_folder.glob('*.png')) + list(input_folder.glob('*.jpeg'))
+
+    if (max_files_augmented > 0):
+        image_paths = image_paths[:max_files_augmented]
 
     #do not create augmentations for images that already have them -> only needed for cases where augmentaiton had an error mid way through
     # def needs_augmentation(image_path):
@@ -338,7 +386,7 @@ def process_and_save_image(image_path, output_dir, num_augmented_images_per_orig
 
     for j in range(num_augmented_images_per_original):
         aug_image = apply_augment_image(image)
-        cv2.imwrite(str(output_dir / f'{image_path.stem}_aug_{j}{image_path.suffix}'), aug_image)
+        cv2.imwrite(str(output_dir / f'{image_path.stem}_aug02_{j}{image_path.suffix}'), aug_image)
         # print("image path:", image_path, "Image before:", image, "Image after:", aug_image)
 
 #perform augment operation to image
@@ -354,32 +402,31 @@ def apply_augment_image(image):
     image = image.numpy().astype(np.uint8)
     return image
 
-def split_train_val_test_data(input_path, output_path):
+def split_train_val_test_data(input_path, output_path, copy=True):
     
     input_dir = Path(input_path)
     output_dir = Path(output_path)
 
     classes = [cls.name for cls in input_dir.iterdir() if cls.is_dir()] # nomes de pastas dentro de input_path sao as classes
 
-    train_dir = output_dir / 'train'
-    val_dir = output_dir / 'val'
+    train_val_dir = output_dir / 'train_val'
     test_dir = output_dir / 'test'
 
     #criar paths se n existem
-    for dir_path in [train_dir, val_dir, test_dir]:
+    for dir_path in [train_val_dir, test_dir]:
         for cls in classes:
             (dir_path / cls).mkdir(parents=True, exist_ok=True)
 
     # repeat spliiting for each class
-    with ProcessPoolExecutor(max_workers=15) as executor:
+    with ProcessPoolExecutor(max_workers=10) as executor:
         futures = [
-            executor.submit(split_data, cls, input_dir, train_dir, val_dir, test_dir) for cls in classes]
+            executor.submit(split_data, cls, input_dir, train_val_dir, test_dir, copy) for cls in classes]
 
         for future in  tqdm(as_completed(futures), total=len(futures), desc="Processing classes", unit="class"):
             future.result()
 
 #given one class folder, splits the data inside it to train_val and test dirs
-def split_data(class_name, input_dir, train_dir, val_dir, test_dir):
+def split_data(class_name, input_dir, train_val_dir, test_dir, copy=True):
 
         class_dir = input_dir / class_name
         images = [img for img in class_dir.glob('*') if img.suffix.lower() in {'.png', '.jpg', '.jpeg'}]
@@ -389,19 +436,10 @@ def split_data(class_name, input_dir, train_dir, val_dir, test_dir):
         # split into train+val and test
         train_val_images, test_images = train_test_split(images, test_size=Params.test_ratio, random_state=123)
 
-        # split train+val into train and val
-        actual_val = Params.val_ratio * ( 1 - Params.test_ratio)
-        train_images, val_images = train_test_split(train_val_images, test_size=actual_val, random_state=123)
-        
-        # train_bar = tqdm(total=len(train_images), desc=f"Processing {class_name} (train)", unit="file", leave=True)
-        # val_bar = tqdm(total=len(val_images), desc=f"Processing {class_name} (val)", unit="file", leave=True)
-        # test_bar = tqdm(total=len(test_images), desc=f"Processing {class_name} (test)", unit="file", leave=True)
-        
-        # Move files
-        with ThreadPoolExecutor() as executor:
+        # Copy/Move files
+        with ThreadPoolExecutor(max_workers=5) as executor:
             futures = []
-            futures.extend([executor.submit(shutil.copy, img, train_dir / class_name / img.name) for img in train_images])
-            futures.extend([executor.submit(shutil.copy, img, val_dir / class_name / img.name) for img in val_images])
-            futures.extend([executor.submit(shutil.copy, img, test_dir / class_name / img.name) for img in test_images])
+            futures.extend([executor.submit(shutil.copy if copy else shutil.move, img, train_val_dir / class_name / img.name) for img in train_val_images])
+            futures.extend([executor.submit(shutil.copy if copy else shutil.move, img, test_dir / class_name / img.name) for img in test_images])
             for future in tqdm(as_completed(futures), total=len(futures), desc=f"Processing {class_name}", unit="file"):
                 future.result()
