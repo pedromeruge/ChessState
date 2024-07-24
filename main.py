@@ -52,6 +52,6 @@ if __name__ == "__main__":
     # ProcData.split_train_val_test_data(sys.argv[1],sys.argv[2])
     # ProcData.process_ChessReD_dataset(sys.argv[1],sys.argv[2])
     # ProcData.process_OSF_dataset_files_in_txt(sys.argv[1],sys.argv[2],sys.argv[3])
-    # PiecesRecogn.build_ResNet_CNN(sys.argv[1],sys.argv[2])
+    # PiecesRecogn.build_pretrained_CNN(sys.argv[1],sys.argv[2])
     # PiecesRecogn.build_vanilla_CNN(sys.argv[1],sys.argv[2])
     

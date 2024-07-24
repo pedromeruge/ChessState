@@ -1,0 +1,12 @@
+
+5571/5571 ━━━━━━━━━━━━━━━━━━━━ 1835s 324ms/step - accuracy: 0.9336 - loss: 0.1687 - val_accuracy: 0.9542 - val_loss: 0.1243
+
+Epoch 1/2
+5571/5571 ━━━━━━━━━━━━━━━━━━━━ 1829s 328ms/step - accuracy: 0.9585 - loss: 0.1102 - val_accuracy: 0.9570 - val_loss: 0.1124
+
+Epoch 2/2
+5571/5571 ━━━━━━━━━━━━━━━━━━━━ 1826s 328ms/step - accuracy: 0.9595 - loss: 0.1081 - val_accuracy: 0.9578 - val_loss: 0.1113
+
+###Testing
+598/652 ━━━━━━━━━━━━━━━━━━━━ 15s 290ms/step - accuracy: 0.9533(at the time) - loss: 0.1224
+-> The testing part failed at the end, but the model was saved
