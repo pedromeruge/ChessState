@@ -1,7 +1,7 @@
 # Correr default: python3 main.py examples/small_roboflow_test/2f6fb003bb89cd401322a535acb42f65_jpg.rf.91ad9df05bd1f86bab67c8368ae5e4ad.jpg results/
 
 import board_recognition.board_recognition as BoardRecogn
-import pieces_recognition.pieces_recognition as PiecesRecogn
+import squares_recognition.squares_recognition as PiecesRecogn
 import process_datasets.process_dataset_images as ProcData 
 import board_recognition.parameters as BoardParams
 import sys
@@ -47,7 +47,8 @@ def main():
     BoardRecogn.show_result(cdst, writeToFile=False)
     
 if __name__ == "__main__":
-    main()
+    # main()
+    ProcData.process_OSF_dataset_pieces(sys.argv[1],sys.argv[2])
     # ProcData.augment_images_in_dir(sys.argv[1],sys.argv[2], max_files_augmented=35000)
     # ProcData.split_train_val_test_data(sys.argv[1],sys.argv[2])
     # ProcData.process_ChessReD_dataset(sys.argv[1],sys.argv[2])

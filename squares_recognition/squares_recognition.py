@@ -1,6 +1,6 @@
 from numpy import square
-from pieces_recognition.includes import *
-import pieces_recognition.parameters as Params
+from squares_recognition.includes import *
+import squares_recognition.parameters as Params
 import board_recognition.parameters as BoardParams
 
 # (depois de fazer "source ~/venv-metal/bin/activate") python3 main.py dataset_input/ model_output
@@ -19,33 +19,6 @@ def import_vanilla_CNN(input_path):
                 input_path,
                 compile=True)
     
-    return model
-
-def import_resnet_CNN_weights(input_path):
-    # Recreate the model architecture
-    base_model = tf.keras.applications.ResNet50(
-        input_shape=(Params.image_size, Params.image_size, 3),
-        include_top=False,
-        weights=None  # weights loaded after
-    )
-
-    # Rebuild the model with the same architecture
-    model = Sequential([
-        base_model,
-        tf.keras.layers.GlobalAveragePooling2D(),
-        Dense(2, activation='softmax')
-    ])
-
-    # Load the weights into the model
-    model.load_weights(input_path)
-
-    # Optionally, compile the model if you plan to use it for further training or evaluation
-    model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
-        loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-        metrics=['accuracy']
-    )
-
     return model
 
 def predict_squares(model, square_img_list):

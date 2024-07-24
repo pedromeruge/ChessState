@@ -15,5 +15,5 @@ import random
 import heapq
 from sklearn.linear_model import RANSACRegressor
 import time
-from pieces_recognition.pieces_recognition import *
+from squares_recognition.squares_recognition import *
 import sys

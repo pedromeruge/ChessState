@@ -1,6 +1,6 @@
 from numpy import square
 from process_datasets.includes import *
-import pieces_recognition.parameters as PiecesParams
+import squares_recognition.parameters as PiecesParams
 import process_datasets.parameters as Params
 
 #comando:
@@ -15,11 +15,53 @@ def process_squares_img(board_img, corner_points):
                                      top_margin=PiecesParams.homography_top_margin, 
                                      other_margin=PiecesParams.homography_other_margins)
     
-    squares_imgs = split_squares(warped_img, pts_dst)
+    #obtain squares images
+    squares = []
+    jump_size = PiecesParams.homography_square_length
+    margin = PiecesParams.homography_other_margins
+    top_left = pts_dst[0]
 
+    for y in range(8):
+        for x in range(8):
+            start_x = int(x * jump_size)
+            end_x = int(start_x + jump_size*2)
+            start_y = int(top_left[1] - margin + y * jump_size)
+            end_y = int(start_y + jump_size*2)
+
+            tiles = warped_img[start_y : end_y, start_x : end_x] # cols, rows
+            squares.append(tiles)
+
+    return np.array(squares)
     # show_result(squares_imgs, writeToFile=False)
+
+def process_pieces_img(board_img, corner_points, vec_labels):
+    warped_img, pts_dst = warp_image(board_img, corner_points, 
+                                     inner_length=PiecesParams.homography_inner_length, 
+                                     top_margin=PiecesParams.homography_top_margin, 
+                                     other_margin=PiecesParams.homography_other_margins)
     
-    return squares_imgs
+    #obtain pieces images
+    pieces = []
+    jump_size = PiecesParams.homography_square_length
+    margin = PiecesParams.homography_other_margins
+    top_left = pts_dst[0]
+
+    for y in range(8):
+        for x in range(8):
+            if (vec_labels[y*8 + x] == 0.0): # if square is empty, ignore
+                pieces.append(None)
+                continue
+
+            start_x = int(x * jump_size)
+            end_x = int(start_x + jump_size*2)
+            start_y = int(top_left[1] - margin + y * jump_size)
+            end_y = int(start_y + jump_size*2)
+
+            tiles = warped_img[start_y : end_y, start_x : end_x] # cols, rows
+            pieces.append(tiles)
+
+    return np.array(pieces, dtype=object)
+    # show_result(squares_imgs, writeToFile=False)
 
 def warp_image(img, corner_points, inner_length=400, top_margin=150, other_margin=25):
 
@@ -37,38 +79,6 @@ def warp_image(img, corner_points, inner_length=400, top_margin=150, other_margi
     im_out = cv2.warpPerspective(img, h, (right_col + other_margin, bottom_row + other_margin))
 
     return im_out, pts_dst
-
-#warp 2d points defined in np array, given homography matrix
-def warp_points(points, homography_matrix):
-
-    # add third col with val 1 to (x,y) coordinates
-    points_homogeneous = np.hstack((points, np.ones((points.shape[0], 1))))
-    
-    # multiply points by matrix
-    transformed_points_homogeneous = homography_matrix @ points_homogeneous.T
-    
-    # remove last row, convert back to cartesian
-    transformed_points_cartesian = (transformed_points_homogeneous[:2] / transformed_points_homogeneous[2]).T
-    
-    return transformed_points_cartesian
-
-def split_squares(board_img, corner_points):
-    squares = []
-    jump_size = PiecesParams.homography_square_length
-    margin = PiecesParams.homography_other_margins
-    top_left = corner_points[0]
-
-    for y in range(8):
-        for x in range(8):
-            start_x = int(x * jump_size)
-            end_x = int(start_x + jump_size*2)
-            start_y = int(top_left[1] - margin + y * jump_size)
-            end_y = int(start_y + jump_size*2)
-
-            tiles = board_img[start_y : end_y, start_x : end_x] # cols, rows
-            squares.append(tiles)
-
-    return np.array(squares)
 
 def show_result(chess_squares, writeToFile=False):
 
@@ -106,8 +116,8 @@ def show_result(chess_squares, writeToFile=False):
 
     print("Square size (WxH):", chess_squares[0].shape[1], "x", chess_squares[0].shape[0])
 
-#iterar por imagens de OSF_dataset
-def process_OSF_dataset(input_folder_path, output_folder_path):
+#obtain dataset of split and separated images of squares in OSF dataset as: occupied,empty
+def process_OSF_dataset_squares(input_folder_path, output_folder_path):
     if len(sys.argv) != 3:
         raise Exception("main.py <input_dataset_folder> <output_folder_path>")
     
@@ -119,18 +129,40 @@ def process_OSF_dataset(input_folder_path, output_folder_path):
     empty_folder.mkdir(parents=True, exist_ok=True)
     occupied_folder.mkdir(parents=True, exist_ok=True)
 
+    output_subfolders = [empty_folder, occupied_folder]
+
+    split_OSF_dataset(input_folder, output_subfolders, split_board_squares)
+
+#obtain dataset of split and separated images of differente piece types in OSF dataset
+def process_OSF_dataset_pieces(input_folder_path, output_folder_path):
+    if len(sys.argv) != 3:
+        raise Exception("main.py <input_dataset_folder> <output_folder_path>")
+    
+    input_folder = Path(input_folder_path)
+    output_folder = Path(output_folder_path)
+
+    output_subfolders = []
+    for piece in Params.fen_to_name.values():
+        piece_subfolder = output_folder / piece
+        piece_subfolder.mkdir(parents=True, exist_ok=True)
+        output_subfolders.append(piece_subfolder)
+    
+    split_OSF_dataset(input_folder, output_subfolders, split_board_pieces)
+    
+#split all images in the osf_dataset, given a split function
+def split_OSF_dataset(input_folder, output_subfolders, split_func):
     image_paths = list(input_folder.glob('*.jpg')) + list(input_folder.glob('*.png')) + list(input_folder.glob('*.jpeg'))
     json_paths = {path.stem: input_folder / f'{path.stem}.json' for path in image_paths}  # corresponder cada png a um json 
 
     with ProcessPoolExecutor(max_workers=10) as executor: # processar diferentes imagens em processos separados (CPU heavy)
-        futures = [executor.submit(process_image_osf, image_path, json_paths[image_path.stem], empty_folder, occupied_folder)
+        futures = [executor.submit(process_single_img_osf, image_path, json_paths[image_path.stem], output_subfolders, split_func)
                    for image_path in image_paths]
 
         for future in tqdm(as_completed(futures), total=len(futures), desc="Processing images"): # progress bar para saber quantas fotos já foram processadas
             future.result()  # wait for all tasks to complete
-
+    
 #process only photos for corrupted files described in txt (result of running check_img_val.py script)
-def process_OSF_dataset_files_in_txt(input_folder_path, output_folder_path, input_txt):
+def process_OSF_dataset_squares_in_txt(input_folder_path, output_folder_path, input_txt):
 
     input_folder = Path(input_folder_path)
 
@@ -143,7 +175,6 @@ def process_OSF_dataset_files_in_txt(input_folder_path, output_folder_path, inpu
             match = re.search(r"(\/.*\/)(.*?)_\d{1,2}(\.\w+)",line)
             if (match == -1):
                 raise Exception("File path not correct")
-                continue
             # output_folder_path = match.group(1) # ineficiente, mas este script corre poucas vezes
             file_name = match.group(2) + match.group(3) # filename.ext
             image_json_paths[file_name] = (input_folder / file_name, input_folder / (match.group(2) + ".json"))
@@ -156,14 +187,12 @@ def process_OSF_dataset_files_in_txt(input_folder_path, output_folder_path, inpu
     empty_folder.mkdir(parents=True, exist_ok=True)
     occupied_folder.mkdir(parents=True, exist_ok=True)
 
-    with ProcessPoolExecutor(max_workers=10) as executor: # processar diferentes imagens em processos separados (CPU heavy)
-        futures = [executor.submit(process_image_osf, image_path, json_path, empty_folder, occupied_folder)
-                   for (image_path,json_path) in image_json_paths.values()]
+    output_subfolders = [empty_folder, occupied_folder]
 
-        for future in tqdm(as_completed(futures), total=len(futures), desc="Processing images"): # progress bar para saber quantas fotos já foram processadas
-            future.result()  # wait for all tasks to complete
-
-def process_image_osf(image_path, json_path, empty_folder, occupied_folder):
+    split_OSF_dataset(input_folder, output_subfolders, split_board_squares)
+    
+#receives either split_board_squares or split_board_pieces funcs, to split the squares or pieces of an image of the osf dataset
+def process_single_img_osf(image_path, json_path, output_subfolders, split_func):
     try :
         with json_path.open('r') as json_file:
             data = json.load(json_file)
@@ -176,16 +205,34 @@ def process_image_osf(image_path, json_path, empty_folder, occupied_folder):
 
         board_img = cv2.imread(image_path, cv2.IMREAD_COLOR)
         
-        squares = process_squares_img(board_img, corners)
-
-        for i, square_photo in enumerate(squares):
-            square_photo = apply_augment_image(square_photo) # aplicar modificações às imagens
-            output_folder = occupied_folder if vec_labels[i] else empty_folder
-            square_photo_path = output_folder / f'{image_path.stem}_{i+1}{image_path.suffix}'
-            cv2.imwrite(str(square_photo_path), square_photo)
+        split_func(image_path, board_img, corners, vec_labels, output_subfolders)
+        
     except Exception as e:
         print(e)
 
+def split_board_squares(image_path, board_img, corners, vec_labels, output_subfolders):
+
+    squares = process_squares_img(board_img, corners)
+
+    empty_folder, occupied_folder = output_subfolders
+    for i, square_photo in enumerate(squares):
+        square_photo = apply_augment_image(square_photo) # aplicar modificações às imagens
+        output_folder = occupied_folder if vec_labels[i] else empty_folder
+        square_photo_path = output_folder / f'{image_path.stem}_{i+1}{image_path.suffix}'
+        cv2.imwrite(str(square_photo_path), square_photo)
+
+def split_board_pieces(image_path, board_img, corners, vec_labels, output_subfolders):
+
+    pieces = process_pieces_img(board_img, corners, vec_labels)
+    
+    for i, piece_photo in enumerate(pieces):
+        if piece_photo is None: # só guardar fotos com peças, excluir espaços vazios
+            continue
+        piece_photo = apply_augment_image(piece_photo, piece=True) # aplicar modificações às imagens
+        output_folder = output_subfolders[list(Params.fen_to_name.keys()).index(str(int(vec_labels[i])))] # meio pesado, mas funciona
+        piece_photo_path = output_folder / f'{image_path.stem}_{i+1}{image_path.suffix}'
+        cv2.imwrite(str(piece_photo_path), piece_photo)
+        
 #  ordenar cantos e labels de tabuleiro, para ficar posicionado corretamente com peças na vertical
 def reorder_chessboard(corners, piece_labels):
     ordered_corners, top_left_idx = sort_corners(corners)
@@ -193,7 +240,6 @@ def reorder_chessboard(corners, piece_labels):
     return ordered_corners, ordered_labels
 
 #dados 4 cantos no formato [[x,y],[x,y],..], ordenar de forma a obter peças na vertical apos warp
-
 def sort_corners(corners):
     sums = corners.sum(axis=1, keepdims=True) # somar x+y de cada ponto
     min_sum_idx = np.argmin(sums)
@@ -279,8 +325,7 @@ def process_image_chessred(corner_obj, images, pieces, empty_folder, occupied_fo
 
 #aux funcs
 def fenToVec(fen):
-    pieces =    {"P": 1, "N": 2, "B": 3, "R": 4, "Q": 5, "K": 6,
-                "p": -1, "n": -2, "b": -3, "r": -4, "q": -5, "k": -6}
+    pieces =  Params.fen_from_char
 
     result_vec = np.zeros(64)
     i = 0
@@ -296,8 +341,7 @@ def fenToVec(fen):
     return result_vec
 
 def listToVec(pieces_list):
-    pieces = {"0": 1, "1": 4, "2": 2, "3": 3, "4": 5, "5": 6,
-            "6": -1, "7": -4, "8": -2, "9": -3, "10": -5, "11": -6}
+    pieces = Params.fen_from_int
 
     result_vec = np.zeros(64)
     for piece_obj in pieces_list:
@@ -390,7 +434,7 @@ def process_and_save_image(image_path, output_dir, num_augmented_images_per_orig
         # print("image path:", image_path, "Image before:", image, "Image after:", aug_image)
 
 #perform augment operation to image
-def apply_augment_image(image):
+def apply_augment_image(image, piece=False):
     base_seed = np.random.randint(0, 2**32 - 1)
     seed = tf.constant([0, base_seed], dtype=tf.int64)
     image = tf.image.stateless_random_flip_left_right(image, seed=seed)
@@ -398,6 +442,8 @@ def apply_augment_image(image):
     image = tf.image.stateless_random_contrast(image, lower=1-Params.contrast_delta, upper=1+Params.contrast_delta, seed=seed)
     image = tf.image.stateless_random_saturation(image, lower=1-Params.saturation_delta, upper=1+Params.saturation_delta, seed=seed)
     image = tf.image.stateless_random_hue(image, max_delta=Params.hue_max_delta, seed=seed)
+    if (piece): #augmentos extras a aplicar para imagens de peças
+        pass
     image = tf.image.random_jpeg_quality(image, min_jpeg_quality=100 - Params.noise_max_delta, max_jpeg_quality=100)
     image = image.numpy().astype(np.uint8)
     return image
