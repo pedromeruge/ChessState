@@ -1,8 +1,11 @@
 # Correr default: python3 main.py examples/small_roboflow_test/2f6fb003bb89cd401322a535acb42f65_jpg.rf.91ad9df05bd1f86bab67c8368ae5e4ad.jpg results/
 
 import board_recognition.board_recognition as BoardRecogn
-import squares_recognition.squares_recognition as PiecesRecogn
-import process_datasets.process_dataset_images as ProcData 
+import squares_recognition.squares_recognition as SquaresRecogn
+import process_datasets.pieces_datasets as ProcPiecesData
+import process_datasets.squares_datasets as ProcSquaresData
+import process_datasets.chessred_dataset as ProcChRed
+import process_datasets.osf_dataset as ProcOsf
 import board_recognition.parameters as BoardParams
 import sys
 import cv2
@@ -34,9 +37,9 @@ def main():
 
     corner_points = BoardRecogn.process_board(orig_img)
 
-    square_imgs = ProcData.process_squares_img(orig_img, corner_points)
+    square_imgs = ProcSquaresData.process_squares_img(orig_img, corner_points)
 
-    predicts = PiecesRecogn.interpret_empty_spaces(square_imgs)
+    predicts = SquaresRecogn.interpret_empty_spaces(square_imgs)
 
     print("Execution time: %s s" % (time.time() - start_time)) # print do tempo decorrido
     
@@ -48,11 +51,7 @@ def main():
     
 if __name__ == "__main__":
     # main()
-    ProcData.process_OSF_dataset_pieces(sys.argv[1],sys.argv[2])
-    # ProcData.augment_images_in_dir(sys.argv[1],sys.argv[2], max_files_augmented=35000)
-    # ProcData.split_train_val_test_data(sys.argv[1],sys.argv[2])
-    # ProcData.process_ChessReD_dataset(sys.argv[1],sys.argv[2])
-    # ProcData.process_OSF_dataset_files_in_txt(sys.argv[1],sys.argv[2],sys.argv[3])
+    ProcOsf.process_OSF_dataset_pieces(sys.argv[1],sys.argv[2])
     # PiecesRecogn.build_pretrained_CNN(sys.argv[1],sys.argv[2])
     # PiecesRecogn.build_vanilla_CNN(sys.argv[1],sys.argv[2])
     

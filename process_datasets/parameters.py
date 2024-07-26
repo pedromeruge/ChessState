@@ -1,6 +1,6 @@
 #augment values
 # warp_max_delta = 40 # [0,..]
-brightness_max_delta = 0.4
+brightness_max_delta = 0.35
 contrast_delta= 0.3
 saturation_delta = 0.3
 hue_max_delta = 0.03
