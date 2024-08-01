@@ -25,7 +25,7 @@ def process_OSF_dataset_squares(input_folder_path, output_folder_path):
 
     output_subfolders = [empty_folder, occupied_folder]
 
-    split_OSF_dataset(input_folder, output_subfolders, SquaresData.split_board_squares)
+    split_OSF_dataset(input_folder, output_subfolders, SquaresData.split_board_squares, SquaresData.augment_square_image)
 
 #obtain dataset of split and separated images of differente piece types in OSF dataset
 def process_OSF_dataset_pieces(input_folder_path, output_folder_path):
@@ -41,22 +41,22 @@ def process_OSF_dataset_pieces(input_folder_path, output_folder_path):
         piece_subfolder.mkdir(parents=True, exist_ok=True)
         output_subfolders.append(piece_subfolder)
     
-    split_OSF_dataset(input_folder, output_subfolders, PiecesData.split_board_pieces)
+    split_OSF_dataset(input_folder, output_subfolders, PiecesData.split_board_pieces, PiecesData.augment_piece_image)
     
 #split all images in the osf_dataset, given a split function
-def split_OSF_dataset(input_folder, output_subfolders, split_func):
+def split_OSF_dataset(input_folder, output_subfolders, split_func, augment_func=None):
     image_paths = list(input_folder.glob('*.jpg')) + list(input_folder.glob('*.png')) + list(input_folder.glob('*.jpeg'))
     json_paths = {path.stem: input_folder / f'{path.stem}.json' for path in image_paths}  # corresponder cada png a um json 
 
     with ProcessPoolExecutor(max_workers=10) as executor: # processar diferentes imagens em processos separados (CPU heavy)
-        futures = [executor.submit(process_single_img_osf, image_path, json_paths[image_path.stem], output_subfolders, split_func)
+        futures = [executor.submit(process_single_img_osf, image_path, json_paths[image_path.stem], output_subfolders, split_func, augment_func)
                    for image_path in image_paths]
 
         for future in tqdm(as_completed(futures), total=len(futures), desc="Processing images"): # progress bar para saber quantas fotos já foram processadas
             future.result()  # wait for all tasks to complete
     
 #receives either split_board_squares or split_board_pieces funcs, to split the squares or pieces of an image of the osf dataset
-def process_single_img_osf(image_path, json_path, output_subfolders, split_func):
+def process_single_img_osf(image_path, json_path, output_subfolders, split_func, augment_func=None):
     try :
         with json_path.open('r') as json_file:
             data = json.load(json_file)
@@ -69,7 +69,7 @@ def process_single_img_osf(image_path, json_path, output_subfolders, split_func)
 
         board_img = cv2.imread(image_path, cv2.IMREAD_COLOR)
         
-        split_func(image_path, board_img, corners, vec_labels, output_subfolders)
+        split_func(image_path, board_img, corners, vec_labels, output_subfolders, augment_func)
         
     except Exception as e:
         print(e)

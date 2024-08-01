@@ -51,7 +51,8 @@ def main():
     
 if __name__ == "__main__":
     # main()
-    ProcOsf.process_OSF_dataset_pieces(sys.argv[1],sys.argv[2])
+    # ProcOsf.process_OSF_dataset_pieces(sys.argv[1],sys.argv[2])
+    ProcChRed.process_ChessReD_dataset_pieces(sys.argv[1],sys.argv[2])
     # PiecesRecogn.build_pretrained_CNN(sys.argv[1],sys.argv[2])
     # PiecesRecogn.build_vanilla_CNN(sys.argv[1],sys.argv[2])
     

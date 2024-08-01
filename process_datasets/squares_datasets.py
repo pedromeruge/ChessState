@@ -16,7 +16,7 @@ homography_other_margins = int(homography_square_length / 2)
 #corner_points = [top_left, top_right, bottom_left, bottom_right]
 def process_squares_img(board_img, corner_points):
 
-    warped_img, pts_dst = CommonData.warp_image(board_img, corner_points, 
+    warped_img, pts_dst, homography_mat = CommonData.warp_image(board_img, corner_points, 
                                      inner_length=homography_inner_length, 
                                      top_margin=homography_top_margin, 
                                      other_margin=homography_other_margins)
@@ -85,15 +85,28 @@ def process_OSF_dataset_squares_in_txt(input_folder_path, output_folder_path, in
 
     output_subfolders = [empty_folder, occupied_folder]
 
-    CommonData.split_OSF_dataset(input_folder, output_subfolders, split_board_squares)
+    CommonData.split_OSF_dataset(input_folder, output_subfolders, split_board_squares, augment_square_image)
     
-def split_board_squares(image_path, board_img, corners, vec_labels, output_subfolders):
+def split_board_squares(image_path, board_img, corners, vec_labels, output_subfolders, augment_func):
 
     squares = process_squares_img(board_img, corners)
 
     empty_folder, occupied_folder = output_subfolders
     for i, square_photo in enumerate(squares):
-        square_photo = CommonData.apply_augment_image(square_photo) # aplicar modificações às imagens
+        square_photo = augment_func(square_photo) # aplicar modificações às imagens
         output_folder = occupied_folder if vec_labels[i] else empty_folder
         square_photo_path = output_folder / f'{image_path.stem}_{i+1}{image_path.suffix}'
         cv2.imwrite(str(square_photo_path), square_photo)
+
+#perform augment operation to image
+def augment_square_image(image):
+    base_seed = np.random.randint(0, 2**32 - 1)
+    seed = tf.constant([0, base_seed], dtype=tf.int64)
+    image = tf.image.stateless_random_flip_left_right(image, seed=seed)
+    image = tf.image.stateless_random_brightness(image, max_delta=Params.brightness_max_delta, seed=seed)
+    image = tf.image.stateless_random_contrast(image, lower=1-Params.contrast_delta, upper=1+Params.contrast_delta, seed=seed)
+    image = tf.image.stateless_random_saturation(image, lower=1-Params.saturation_delta, upper=1+Params.saturation_delta, seed=seed)
+    image = tf.image.stateless_random_hue(image, max_delta=Params.hue_max_delta, seed=seed)
+    image = tf.image.random_jpeg_quality(image, min_jpeg_quality=100 - Params.noise_max_delta, max_jpeg_quality=100)
+    image = image.numpy().astype(np.uint8)
+    return image

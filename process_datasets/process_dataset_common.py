@@ -28,7 +28,7 @@ def warp_image(img, corner_points, inner_length=400, top_margin=150, other_margi
 
     im_out = cv2.warpPerspective(img, h, (right_col + other_margin, bottom_row + other_margin))
 
-    return im_out, pts_dst
+    return im_out, pts_dst, h
 
 def show_result(chess_squares, writeToFile=False):
 
@@ -144,7 +144,7 @@ def find_range(objects, field, given_id):
     return objects[left_index:right_index + 1]
 
 #criar novas entradas
-def augment_images_in_dir(input_dataset_folder, output_augmented_folder, num_new_img_per_original=1, max_files_augmented=0):
+def augment_images_in_dir(input_dataset_folder, output_augmented_folder, augment_func, num_new_img_per_original=1, max_files_augmented=0):
     input_folder = Path(input_dataset_folder)
     output_folder = Path(output_augmented_folder)
     output_folder.mkdir(parents=True, exist_ok=True)
@@ -168,14 +168,14 @@ def augment_images_in_dir(input_dataset_folder, output_augmented_folder, num_new
 
     with ProcessPoolExecutor(max_workers=10) as executor:
         futures = [
-            executor.submit(process_and_save_image, image_path, output_folder, num_new_img_per_original)
+            executor.submit(process_and_save_image, image_path, output_folder, augment_func, num_new_img_per_original)
             for image_path in image_paths
         ]
         for future in  tqdm(as_completed(futures), total=len(futures), desc="Augmenting images"):
             future.result()
 
 #augment images for files specified in lines of folder
-def augment_images_in_file(input_folder, file_path, image_size=None, num_new_img_per_original=1):
+def augment_images_in_file(input_folder, file_path, augment_func, image_size=None, num_new_img_per_original=1):
     with open(file_path, 'r') as file:
         image_paths_complex = file.read().splitlines() #cada linha é um path
 
@@ -193,14 +193,14 @@ def augment_images_in_file(input_folder, file_path, image_size=None, num_new_img
 
     with ProcessPoolExecutor(max_workers=10) as executor:
         futures = [
-            executor.submit(process_and_save_image, image_path, output_folder, num_new_img_per_original, image_size)
+            executor.submit(process_and_save_image, image_path, output_folder, num_new_img_per_original, augment_func, image_size)
             for image_path, output_folder in zip(image_paths, output_paths)
         ]
         for future in  tqdm(as_completed(futures), total=len(futures), desc="Augmenting images"):
             future.result()
 
 #augment de uma só imagem
-def process_and_save_image(image_path, output_dir, num_augmented_images_per_original, image_size=None):
+def process_and_save_image(image_path, output_dir, num_augmented_images_per_original, augment_func, image_size=None):
 
     image = cv2.imread(str(image_path))
     if image is None:
@@ -211,24 +211,9 @@ def process_and_save_image(image_path, output_dir, num_augmented_images_per_orig
         image = cv2.resize(image, (image_size[0], image_size[1]))  # resize image (if needed)
 
     for j in range(num_augmented_images_per_original):
-        aug_image = apply_augment_image(image)
+        aug_image = augment_func(image)
         cv2.imwrite(str(output_dir / f'{image_path.stem}_aug02_{j}{image_path.suffix}'), aug_image)
         # print("image path:", image_path, "Image before:", image, "Image after:", aug_image)
-
-#perform augment operation to image
-def apply_augment_image(image, piece=False):
-    base_seed = np.random.randint(0, 2**32 - 1)
-    seed = tf.constant([0, base_seed], dtype=tf.int64)
-    image = tf.image.stateless_random_flip_left_right(image, seed=seed)
-    image = tf.image.stateless_random_brightness(image, max_delta=Params.brightness_max_delta, seed=seed)
-    image = tf.image.stateless_random_contrast(image, lower=1-Params.contrast_delta, upper=1+Params.contrast_delta, seed=seed)
-    image = tf.image.stateless_random_saturation(image, lower=1-Params.saturation_delta, upper=1+Params.saturation_delta, seed=seed)
-    image = tf.image.stateless_random_hue(image, max_delta=Params.hue_max_delta, seed=seed)
-    if (piece): #augmentos extras a aplicar para imagens de peças
-        pass
-    image = tf.image.random_jpeg_quality(image, min_jpeg_quality=100 - Params.noise_max_delta, max_jpeg_quality=100)
-    image = image.numpy().astype(np.uint8)
-    return image
 
 def split_train_val_test_data(input_path, output_path, copy=True):
     
@@ -271,3 +256,6 @@ def split_data(class_name, input_dir, train_val_dir, test_dir, copy=True):
             futures.extend([executor.submit(shutil.copy if copy else shutil.move, img, test_dir / class_name / img.name) for img in test_images])
             for future in tqdm(as_completed(futures), total=len(futures), desc=f"Processing {class_name}", unit="file"):
                 future.result()
+
+def inbetween(minv, val, maxv):
+    return min(maxv, max(minv, val))
