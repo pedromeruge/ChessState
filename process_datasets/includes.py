@@ -13,3 +13,5 @@ from sklearn.preprocessing import minmax_scale
 from sklearn.model_selection import train_test_split
 import shutil # copiar,mover ficheiros
 import re
+import print_funcs.print_funcs as Prints
+import traceback

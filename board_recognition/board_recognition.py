@@ -1,4 +1,3 @@
-import typing
 from board_recognition.includes import *
 import board_recognition.parameters as Params
 
@@ -68,7 +67,7 @@ def process_board(orig_img):
     
 
     # #print result
-    # show_result(cdst, writeToFile=False)
+    # Prints.show_result(cdst)
     
     return corner_points
 
@@ -236,49 +235,6 @@ def find_corner_points(horiz_lines, vert_lines):
     intersections = get_intersection_points(horiz_lines_rhos, horiz_lines_thetas, vert_lines_rhos, vert_lines_thetas)
     # print(intersections)
     return intersections
-
-def print_points(img, points, color):
-    for x,y in points:
-        cv2.circle(img, (int(x),int(y)),radius=5, color=color, thickness=-1)
-        cv2.putText(img, f"X:{x}, Y:{y}", (int(x),int(y)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1, cv2.LINE_AA)
-    return img
-
-def print_lines(img, lines, color):
-    if lines is not None:
-        for i in range(0, len(lines)):
-            rho = lines[i][0]
-            theta = lines[i][1]
-            a = math.cos(theta)
-            b = math.sin(theta)
-            x0 = a * rho
-            y0 = b * rho
-            pt1 = (int(x0 + 2000*(-b)), int(y0 + 2000*(a)))
-            pt2 = (int(x0 - 2000*(-b)), int(y0 - 2000*(a)))
-
-            #draw line
-            cv2.line(img, pt1, pt2, color, 3, cv2.LINE_AA)
-
-            #draw text
-            pt1_text = (int(x0 + 1000*(-b)), int(y0 + 1000*(a)))
-            pt2_text = (int(x0 - 1000*(-b)), int(y0 - 1000*(a)))
-            text_pos = (int((pt1_text[0] + pt2_text[0]) /2), int((pt1_text[1] + pt2_text[1]) /2) + random.randint(5,50))
-            cv2.putText(img, f"r:{rho}, ang:{theta}", text_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1, cv2.LINE_AA)
-    return img
-
-def show_result(result_img, writeToFile=False):
-
-    #write result image to file
-    if (writeToFile):
-        out_path = sys.argv[2]
-        Path(out_path).mkdir(parents=True, exist_ok=True)
-        filename = sys.argv[1].split("/")[-1]
-        final_path = out_path + filename
-        cv2.imwrite(final_path, result_img)
-
-    #popup window with result
-    cv2.imshow('Result Image', result_img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
 
 # !!
 # Experencia a tentar meter as retas numa regressao linear, mas n é eficiente e n funciona direito

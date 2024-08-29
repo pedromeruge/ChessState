@@ -30,42 +30,6 @@ def warp_image(img, corner_points, inner_length=400, top_margin=150, other_margi
 
     return im_out, pts_dst, h
 
-def show_result(chess_squares, writeToFile=False):
-
-    #write result squares to file
-    if (writeToFile):
-        out_path = sys.argv[2]
-        Path(out_path).mkdir(parents=True, exist_ok=True)
-
-        for i, square in enumerate(chess_squares):
-            final_path = out_path + "save/" + int(i)
-            cv2.imwrite(final_path, square)
-
-    grid_rows = grid_cols = 8
-    
-    _, axes = plt.subplots(grid_rows, grid_cols, figsize=(8,8))
-    axes = axes.flatten()
-    
-    for idx, img in enumerate(chess_squares):
-        if idx >= grid_rows * grid_cols:
-            break
-        
-        #swap images to RGB
-        resized_img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        
-        # display img
-        axes[idx].imshow(resized_img_rgb)
-        axes[idx].axis('off')
-    
-    # Turn off axes for any remaining empty subplots
-    for i in range(idx + 1, grid_rows * grid_cols):
-        axes[i].axis('off')
-    
-    plt.tight_layout()
-    plt.show()
-
-    print("Square size (WxH):", chess_squares[0].shape[1], "x", chess_squares[0].shape[0])
-
 #  ordenar cantos e labels de tabuleiro, para ficar posicionado corretamente com peças na vertical
 def reorder_chessboard(corners, piece_labels):
     ordered_corners, top_left_idx = sort_corners(corners)

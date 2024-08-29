@@ -23,8 +23,3 @@ line_clusters_min_samples = 1 # mínimo de samples para ponto não ser considera
 #find_best_lines 
 #Sorted
 sorted_theta_threshold = 0.1 # maximo de variação de ângulo de reta entre linhas consecutivas de grelha
-
-#draw objects
-color_red = (0,0,255)
-color_green = (0,255,0)
-color_blue = (255,0,0)

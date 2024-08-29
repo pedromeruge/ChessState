@@ -1,7 +1,7 @@
 image_size = 224 # homography_square_length = image_size / 2 # this size because resnet50 receives this input
 
 #training parameters
-batch_size = 128 # com 32/64 ficava sem memória!
+batch_size = 128
 shuffle_buffer_size = 3000 # acho que isto não afeta grande coisa
 
 #vanilla CNN params

@@ -7,6 +7,7 @@ import process_datasets.squares_datasets as ProcSquaresData
 import process_datasets.chessred_dataset as ProcChRed
 import process_datasets.osf_dataset as ProcOsf
 import board_recognition.parameters as BoardParams
+import print_funcs.print_funcs as Prints
 import sys
 import cv2
 import time
@@ -23,7 +24,7 @@ def get_img():
 
 def print_array_in_chess_format(array):
     i = 0
-    while( i < len(array)):
+    while(i < len(array)):
         print(array[i:(i + 8)])
         i += 8
     
@@ -39,6 +40,8 @@ def main():
 
     square_imgs = ProcSquaresData.process_squares_img(orig_img, corner_points)
 
+    # Prints.show_squares_grid(square_imgs)
+
     predicts = SquaresRecogn.interpret_empty_spaces(square_imgs)
 
     print("Execution time: %s s" % (time.time() - start_time)) # print do tempo decorrido
@@ -46,13 +49,13 @@ def main():
     print_array_in_chess_format(predicts)
 
     #print result image and points
-    cdst = BoardRecogn.print_points(orig_img, corner_points, BoardParams.color_blue)
-    BoardRecogn.show_result(cdst, writeToFile=False)
+    cdst = Prints.print_points(orig_img, corner_points, Prints.color_blue)
+    Prints.show_result(cdst)
     
 if __name__ == "__main__":
     # main()
-    # ProcOsf.process_OSF_dataset_pieces(sys.argv[1],sys.argv[2])
-    ProcChRed.process_ChessReD_dataset_pieces(sys.argv[1],sys.argv[2])
+    ProcOsf.process_OSF_dataset_pieces(sys.argv[1],sys.argv[2])
+    # ProcChRed.process_ChessReD_dataset_pieces(sys.argv[1],sys.argv[2])
     # PiecesRecogn.build_pretrained_CNN(sys.argv[1],sys.argv[2])
     # PiecesRecogn.build_vanilla_CNN(sys.argv[1],sys.argv[2])
     

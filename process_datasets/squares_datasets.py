@@ -38,7 +38,6 @@ def process_squares_img(board_img, corner_points):
             squares.append(tiles)
 
     return np.array(squares)
-    # show_result(squares_imgs, writeToFile=False)
 
 #obtain dataset of split and separated images of squares in OSF dataset as: occupied,empty
 def process_OSF_dataset_squares(input_folder_path, output_folder_path):
