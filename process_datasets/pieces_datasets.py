@@ -1,4 +1,4 @@
-from numpy import square
+from numpy import sin, square
 from process_datasets.includes import *
 import pieces_recognition.parameters as PiecesParams
 import process_datasets.parameters as Params
@@ -10,20 +10,19 @@ import print_funcs.print_funcs as Prints
     Functions related to creating the pieces dataset that contains images from OSF_dataset and Chess_ReD dataset
 """
 
-homography_square_length = int(PiecesParams.image_size_width / 2) # tamanho de quadrado em que peça se encontra
+homography_square_length = int(PiecesParams.image_size_width / 2) # size of each chessboard square where piece stande
 
-
-homography_inner_length = homography_square_length * 8
-homography_top_margin = homography_square_length * 5 # tamanho excessivamente grande (50*5), para garantir que não se corta peças altas no fundo do tabuleiro
-homography_other_margins = homography_square_length
+homography_inner_length = homography_square_length * 8 # side length of chessboard, aka 8 squares
+homography_top_margin = homography_square_length * 5 # excessive large top margin of final image, guarantee tall pieces on end of chessboard aren't cropped
+homography_other_margins = homography_square_length # left,right, and bottom margins of final image
 
 # margins/limits of cropped pieces
 min_height_increase = 1
-max_base_height_increase = 3 # height from multiplying a base height by the current line
-max_height_increase = 5 # max height, considering the previous base_height increase, plus the disp_vector increase
+max_base_height_increase = 1.8 # height from multiplying a base height by the current line
+max_height_increase = 3 # max height, considering the previous base_height increase, plus the disp_vector increase
 
-min_width_increase = 0
-max_base_width_increase = .5 # height from multilpying a base width for the current col
+min_width_increase = .25
+max_base_width_increase = .8 # height from multilpying a base width for the current col
 max_width_increase = 1 # max_height, considering the perivous base_width, plus the rotation increase
 
 out_height = (1 + max_height_increase) * homography_square_length # output height
@@ -31,7 +30,7 @@ out_width = (1 + max_width_increase) * homography_square_length # output width
 
 # crop board pieces based on:
 # estimated rotation from comparing before and after chessboard top line slopes
-# estimated scale from comparing max y value of vector difference between original and final corner points
+# estimated scale from comparing max y value of displacement vectors between original and final corner points
 # efficient
 # decent results
 
@@ -44,39 +43,47 @@ def process_pieces_img(board_img, corner_points, vec_labels):
         
         pieces = []
         square_size = homography_square_length # size of each square on the board
-        chessboard_size = homography_inner_length
         top_left = pts_dst[0] # top left point
 
         #scalars to calculate extra margins for each piece crop
         horiz_scalar, vert_scalar =  calculate_image_scalars(board_img, corner_points, warped_img, pts_dst)
 
+        print("Current image: ", corner_points, vert_scalar, horiz_scalar)
+
         for y in range(8):
 
-            vert_increase = min_height_increase + ((max_height_increase - min_height_increase) + (vert_scalar / chessboard_size)) * (1 - y/7)  # more height for elements further back, since they are generally more distorted
-            vert_increase = min(vert_increase, max_height_increase)
-
+            vert_increase = min_height_increase + (max_base_height_increase - min_height_increase) * (1 - y/7)  # more height for elements further back, since they are generally more distorted
+            vert_increase = vert_increase + vert_scalar * (max_height_increase - max_base_height_increase) * (1 - y*y/49) # more height for elements with more vertical displacement
+            
             for x in range(8):
                 
                 if (vec_labels[y*8 + x] == 0.0): # if square is empty, ignore
                     pieces.append(None)
                     continue
         
-                if ( x < 4): # more left width for elements further left, since they are generally more distorted
+                if (x < 4): # more left width for elements further left, since they are generally more distorted
                     left_increase = min_width_increase + (max_base_width_increase - min_width_increase) * (1 - x/3)
                     right_increase = 0
                 else: # more right width for elements further right, since they are generally more distorted
                     left_increase = 0
                     right_increase = min_width_increase + (max_base_width_increase - min_width_increase) * ((x - 4)/3)
 
-                if (horiz_scalar > 0): # more left width, due to positive rotation
-                    horiz_scalar_increase = max(horiz_scalar * (1 - x/7), max_width_increase - max_base_width_increase) # guarantees that the extra width from the rotation does not surpass the max_width_allowed
-                    left_increase = left_increase + horiz_scalar_increase
-                else:
-                    horiz_scalar_increase = max(abs(horiz_scalar) * (x/7), max_width_increase - max_base_width_increase) # guarantees that the extra width from the rotation does not surpass the max_width_allowed
-                    right_increase = right_increase + horiz_scalar_increase
+                horiz_scalar_increase = 0
 
-                start_x = int(square_size * (x - left_increase) + top_left[0]) # posição inicial deste quadrado, menos uma margem para a esquerda
-                end_x = int(square_size * (x + 1 + right_increase) + top_left[0]) # posição final deste quadrado, mais uma margem para a direita
+                if (horiz_scalar < 0): # more left width, reduce right width if any
+                    # horiz_scalar_increase = min(abs(horiz_scalar) * (1 - x/7), max_width_increase - max_base_width_increase) # guarantees that the extra width from the rotation does not surpass the max_width_allowed
+                    horiz_scalar_increase = abs(horiz_scalar) * (max_width_increase - max_base_width_increase) * (1 - x/7)
+                    left_increase = max(left_increase, left_increase + horiz_scalar_increase)
+                    right_increase = max(0, right_increase - horiz_scalar_increase)
+
+                else:
+                    # horiz_scalar_increase = min(horiz_scalar * (x/7), max_width_increase - max_base_width_increase) # guarantees that the extra width from the rotation does not surpass the max_width_allowed
+                    horiz_scalar_increase = horiz_scalar * (max_width_increase - max_base_width_increase) * (x/7)
+                    left_increase = max(0 , left_increase - horiz_scalar_increase)
+                    right_increase = max(right_increase, right_increase + horiz_scalar_increase)
+
+                start_x = int(square_size * (x - left_increase + horiz_scalar_increase) + top_left[0]) # posição inicial deste quadrado, menos uma margem para a esquerda, mais margem de rotação (pode ser negativa esta última)
+                end_x = int(square_size * (x + 1 + right_increase) + top_left[0]) # posição final deste quadrado, mais margem de direita
 
                 start_y = int((y - vert_increase) * square_size + top_left[1]) # posição inicial deste quadrado, menos uma margem para cima
                 end_y = int((y + 1) * square_size + top_left[1]) # posição final do quadrado
@@ -113,10 +120,15 @@ def calculate_image_scalars(orig_img, orig_points, final_img, final_points):
     
     final_points = final_points @ scale_matrix
 
-    displacement_vectors = final_points - orig_points # vetores que indicam quanto cada canto foi distorcido na foto final, tendo em conta escala das imagens antes e depois
-    sum_disp_vectors = np.sum(displacement_vectors, axis=0) # sum x and y
+    displc_vectors = final_points - orig_points # vetores que indicam quanto cada canto foi distorcido na foto final, tendo em conta escala das imagens antes e depois
+    
+    # top and bottom vertices tend to have similar y, so add max abs y of top and bottom
+    # max_indices = np.array([np.argmax(np.abs(displc_vectors[:2, 1])), np.argmax(np.abs(displc_vectors[2:, 1])) + 2]) 
+    # vertical_scalar = abs(np.sum(displc_vectors[max_indices])) / homography_inner_length
 
-    vertical_scalar = abs(sum_disp_vectors[1])
+    #
+    vert_scalar = abs((displc_vectors[0][1] + displc_vectors[1][1]) - (displc_vectors[2][1] + displc_vectors[3][1])) / (homography_inner_length * homography_square_length) * 100
+    vert_scalar = min(vert_scalar + 0.20, 1)
 
 # horiz margin scalar, calculated from estimated rotation of top corner of before and after images
     orig_top_vec = orig_points[1] - orig_points[0]
@@ -125,9 +137,13 @@ def calculate_image_scalars(orig_img, orig_points, final_img, final_points):
     normal_orig_top_vec = orig_top_vec / np.linalg.norm(orig_top_vec) # assumed that vectors have non null norm
     normal_final_top_vec = final_top_vec / np.linalg.norm(final_top_vec)
 
-    horiz_scalar = np.cross(normal_orig_top_vec, normal_final_top_vec) # cross product gives scalar that reflects angle of rotation of warp
+    horiz_scalar = np.cross(normal_orig_top_vec, normal_final_top_vec) / 0.85 # cross product gives scalar that reflects angle of rotation of warp
+    horiz_scalar = min(horiz_scalar, 1)
 
-    return horiz_scalar, vertical_scalar
+    # negative if rotation to left, positive if rotation to right
+    # divided by 0.85 since max cross-product is for 45 degrees positive on negative ~= 0.85
+
+    return horiz_scalar, vert_scalar
 
 #obtain dataset of split and separated images of differente piece types in OSF dataset
 def process_OSF_dataset_pieces(input_folder_path, output_folder_path):
