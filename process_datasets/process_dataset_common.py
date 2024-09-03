@@ -32,11 +32,14 @@ def warp_image(img, corner_points, inner_length=400, top_margin=150, other_margi
 
 #  ordenar cantos e labels de tabuleiro, para ficar posicionado corretamente com peças na vertical
 def reorder_chessboard(corners, piece_labels):
-    ordered_corners, top_left_idx = sort_corners(corners)
+    ordered_corners, top_left_idx = sort_corners2(corners)
     ordered_labels = sort_labels(piece_labels, top_left_idx)
     return ordered_corners, ordered_labels
 
 #dados 4 cantos no formato [[x,y],[x,y],..], ordenar de forma a obter peças na vertical apos warp
+#returns:
+#  top-left, top-right, bottom-left, bottom-right points ordered
+#  idx of top-left
 def sort_corners(corners):
     sums = corners.sum(axis=1, keepdims=True) # somar x+y de cada ponto
     min_sum_idx = np.argmin(sums)
@@ -59,6 +62,24 @@ def sort_corners(corners):
         ordered_points[2] = corners[idx1]
 
     return ordered_points, min_sum_idx
+
+#alternative to sort corners
+#top-left, top-right, bottom-left, bottom-right points ordered
+#  idx of top-left
+def sort_corners2(corners):
+
+    #sort by increasing y then x
+    sorted_indices = np.lexsort((corners[:, 0], corners[:, 1]))
+    
+    #separate top and bottom
+    top_indices = sorted_indices[:2]
+    bottom_indices = sorted_indices[2:]
+    
+    #for each group, less x is first
+    top_left_idx, top_right_idx = top_indices[np.argsort(corners[top_indices, 0])]
+    bottom_left_idx, bottom_right_idx = bottom_indices[np.argsort(corners[bottom_indices, 0])]
+    
+    return corners[[top_left_idx, top_right_idx, bottom_left_idx, bottom_right_idx]], top_left_idx
 
 #com base na posição onde cima-esq fica, concluir que rotação do tabuleiro foi realizada e ordenar as labels
 def sort_labels(piece_labels, top_left_idx):
