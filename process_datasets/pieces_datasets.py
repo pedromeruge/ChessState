@@ -19,16 +19,16 @@ homography_top_margin = homography_square_length * 5 # excessive large top margi
 homography_other_margins = homography_square_length # left,right, and bottom margins of final image
 
 # margins/limits of cropped pieces
-min_height_increase = 1.1
-max_base_height_increase = 2 # height from multiplying a base height by the current line
+min_height_increase = 1.25
+max_base_height_increase = 2.75 # height from multiplying a base height by the current line
 max_height_increase = 4 # max height, considering the previous base_height increase, plus the disp_vector increase
 
-min_width_increase = .55
-max_base_width_increase = .80 # height from multilpying a base width for the current col
+min_width_increase = .35
+max_base_width_increase = .7 # height from multilpying a base width for the current col
 max_width_increase = 2 # max_height, considering the perivous base_width, plus the rotation increase
 
-extra_horiz_weight = 2.2 # [0..] # multiplier to give more weight to horizontal margin obtained from rotation # max_width is capped regardless of this value
-extra_vert_weight = 0.17 # [0..] # multiplier to give more weight to vert margin obtained from vector displacement # max_height is capped regardless of this value
+extra_horiz_weight = 6.2 # [0..] # multiplier to give more weight to horizontal margin obtained from rotation # max_width is capped regardless of this value
+extra_vert_weight = 0.65 # [0..] # multiplier to give more weight to vert margin obtained from vector displacement # max_height is capped regardless of this value
 
 out_height = (1 + max_height_increase) * homography_square_length # output height
 out_width = (1 + max_width_increase) * homography_square_length # output width
@@ -148,7 +148,7 @@ def calculate_image_scalars(orig_img, orig_points, final_img, final_points):
     normal_final_top_vec = final_top_vec / np.linalg.norm(final_top_vec)
 
     horiz_scalar = np.cross(normal_orig_top_vec, normal_final_top_vec) / 0.70 # cross product gives scalar that reflects angle of rotation of warp
-    horiz_scalar_final = (horiz_scalar + 0.08) * extra_horiz_weight
+    horiz_scalar_final = horiz_scalar * extra_horiz_weight
 
     # print(f"orig top vec {orig_top_vec} final top vec {final_top_vec} normal orig {normal_orig_top_vec} normal final {normal_final_top_vec} horiz_scalar {horiz_scalar} horiz_scalar_final {horiz_scalar_final}")
     # negative if rotation to left, positive if rotation to right
