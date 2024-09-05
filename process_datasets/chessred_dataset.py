@@ -41,7 +41,7 @@ def process_ChessReD_dataset_pieces(input_folder_path, output_folder_path):
         piece_subfolder.mkdir(parents=True, exist_ok=True)
         output_subfolders.append(piece_subfolder)
     
-    split_ChessReD_dataset(input_folder, output_subfolders, PiecesData.split_board_pieces, PiecesData.augment_piece_image)
+    split_ChessReD_dataset(input_folder, output_subfolders, PiecesData.split_board_pieces, PiecesData.augment_image)
 
 def split_ChessReD_dataset(input_folder, output_subfolders, split_func, augment_func=None):
     json_path = input_folder / "annotations.json"

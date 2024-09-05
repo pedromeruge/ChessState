@@ -15,3 +15,4 @@ import shutil # copiar,mover ficheiros
 import re
 import print_funcs.print_funcs as Prints
 import traceback
+import random

@@ -78,9 +78,9 @@ def show_result(result_img, output_path=""):
             print("Failed to write to path", str(final_path))
 
     #popup window with result
-    # cv2.imshow('Result Image', result_img)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    cv2.imshow('Result Image', result_img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 def show_squares_grid(chess_squares, output_path=""):
 

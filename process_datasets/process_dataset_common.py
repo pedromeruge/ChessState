@@ -1,4 +1,3 @@
-from numpy import square
 from process_datasets.includes import *
 import squares_recognition.parameters as SquaresParams
 import process_datasets.parameters as Params
@@ -128,7 +127,7 @@ def find_range(objects, field, given_id):
     
     return objects[left_index:right_index + 1]
 
-#criar novas entradas
+# augment images 
 def augment_images_in_dir(input_dataset_folder, output_augmented_folder, augment_func, num_new_img_per_original=1, max_files_augmented=0):
     input_folder = Path(input_dataset_folder)
     output_folder = Path(output_augmented_folder)
@@ -149,17 +148,15 @@ def augment_images_in_dir(input_dataset_folder, output_augmented_folder, augment
 
     # image_paths = [path for path in image_paths if needs_augmentation(path)]
 
-    # print(image_paths[:1000])
-
     with ProcessPoolExecutor(max_workers=10) as executor:
         futures = [
-            executor.submit(process_and_save_image, image_path, output_folder, augment_func, num_new_img_per_original)
+            executor.submit(process_and_save_image, image_path, output_folder, num_new_img_per_original, augment_func)
             for image_path in image_paths
         ]
         for future in  tqdm(as_completed(futures), total=len(futures), desc="Augmenting images"):
             future.result()
 
-#augment images for files specified in lines of folder
+#augment images for files specified in lines of file
 def augment_images_in_file(input_folder, file_path, augment_func, image_size=None, num_new_img_per_original=1):
     with open(file_path, 'r') as file:
         image_paths_complex = file.read().splitlines() #cada linha é um path
@@ -186,19 +183,21 @@ def augment_images_in_file(input_folder, file_path, augment_func, image_size=Non
 
 #augment de uma só imagem
 def process_and_save_image(image_path, output_dir, num_augmented_images_per_original, augment_func, image_size=None):
+    try:
+        image = cv2.imread(str(image_path))
+        if image is None:
+            print(f"Failed to read image: {image_path}")
+            return
+        
+        if image_size:
+            image = cv2.resize(image, (image_size[0], image_size[1]))  # resize image (if needed)
 
-    image = cv2.imread(str(image_path))
-    if image is None:
-        print(f"Failed to read image: {image_path}")
-        return
-    
-    if image_size:
-        image = cv2.resize(image, (image_size[0], image_size[1]))  # resize image (if needed)
-
-    for j in range(num_augmented_images_per_original):
-        aug_image = augment_func(image)
-        cv2.imwrite(str(output_dir / f'{image_path.stem}_aug02_{j}{image_path.suffix}'), aug_image)
-        # print("image path:", image_path, "Image before:", image, "Image after:", aug_image)
+        for j in range(num_augmented_images_per_original):
+            aug_image = augment_func(image)
+            cv2.imwrite(str(output_dir / f'{image_path.stem}_aug02_{j}{image_path.suffix}'), aug_image)
+            # print("image path:", image_path, "Image before:", image, "Image after:", aug_image)
+    except Exception as e:
+        traceback.print_exc()
 
 def split_train_val_test_data(input_path, output_path, copy=True):
     
@@ -241,6 +240,75 @@ def split_data(class_name, input_dir, train_val_dir, test_dir, copy=True):
             futures.extend([executor.submit(shutil.copy if copy else shutil.move, img, test_dir / class_name / img.name) for img in test_images])
             for future in tqdm(as_completed(futures), total=len(futures), desc=f"Processing {class_name}", unit="file"):
                 future.result()
+
+# given an image, with empty (black) space to its right/top, warp it a random amount, maintaing original image size
+# threshold represents leway of rgb for the black part, due to brightness, hue, saturation operations ..., instead of 0,0,0
+def augment_random_warp(image, threshold=50):
+    height, width, _ = image.shape
+    
+    #mask each pixel as black or not, if rgb > threshold
+    non_black_mask = np.any(image > threshold, axis=2)
+
+    #reduce mask to 1d vector, where each bool represents if the entire row is black, find first True
+    first_non_black_row = np.argmax(np.any(non_black_mask, axis=1))
+
+    #reduce mask to 1d vector, where each bool represents if the entire column is black, find first False
+    first_black_col = np.argmax(~np.any(non_black_mask, axis=0))
+
+    if first_black_col == 0: # exception when whole image is black
+        return image 
+    
+    orig_last_X = first_black_col - 1
+    orig_start_Y = first_non_black_row
+    
+    x_warp = random.randint(- first_black_col // 4, width - orig_last_X)
+    y_warp = random.randint(- first_non_black_row // 4, orig_start_Y - 1)
+
+    orig_points = np.array([
+        [0, orig_start_Y], # cima - esq
+        [orig_last_X, orig_start_Y], # cima-dir
+        [0, height - 1], # baixo-esq
+        [orig_last_X, height - 1] # baixo-dir
+    ], dtype=np.float32)
+
+    warped_points = orig_points + np.array([
+        [0, y_warp], # cima - esq
+        [x_warp, y_warp], # cima-dir
+        [0, 0], # baixo-esq
+        [x_warp, 0] # baixo-dir
+    ], dtype=np.float32)
+
+    H = cv2.getPerspectiveTransform(orig_points, warped_points)
+
+    new_last_X = orig_last_X + x_warp
+    new_start_Y = orig_start_Y + y_warp
+
+    print("first_row:", first_non_black_row, "first_col", first_black_col, "new_height", new_start_Y, "new_width", new_last_X, "orig_points", orig_points, "final_points", warped_points)
+
+    warped_img = cv2.warpPerspective(image, H, (width,height))
+
+    regular_sized_tile = np.zeros((height,width,3), dtype=warped_img.dtype) # blank image of fixed size, to fit other image into, so output is always equal
+
+    regular_sized_tile[new_start_Y: ,:new_last_X] = warped_img[new_start_Y: ,:new_last_X] 
+    
+    return regular_sized_tile
+
+#perform augment operation to image, changing brightness, hue, stauration, noise, warp..
+def augment_image(image):
+    base_seed = np.random.randint(0, 2**32 - 1)
+    seed = tf.constant([0, base_seed], dtype=tf.int64)
+    image = tf.image.stateless_random_brightness(image, max_delta=Params.brightness_max_delta, seed=seed)
+    image = tf.image.stateless_random_contrast(image, lower=1-Params.contrast_delta, upper=1+Params.contrast_delta, seed=seed)
+    image = tf.image.stateless_random_saturation(image, lower=1-Params.saturation_delta, upper=1+Params.saturation_delta, seed=seed)
+    image = tf.image.stateless_random_hue(image, max_delta=Params.hue_max_delta, seed=seed)
+    image = tf.image.random_jpeg_quality(image, min_jpeg_quality=100 - Params.noise_max_delta, max_jpeg_quality=100)
+    image = image.numpy().astype(np.uint8)
+    return image
+
+def augment_image_with_warp(image):
+    image = augment_random_warp(image)
+    return image
+    return augment_image(image)
 
 def inbetween(minv, val, maxv):
     return min(maxv, max(minv, val))

@@ -113,8 +113,7 @@ def process_pieces_img(board_img, corner_points, vec_labels):
         return np.array(pieces, dtype=object)
     
     except Exception as e:
-        pass
-        # traceback.print_exc()
+        traceback.print_exc()
 
 #calculate left,right and top margins to add to cropped piece of the image:
 def calculate_image_scalars(orig_img, orig_points, final_img, final_points):
@@ -170,7 +169,7 @@ def process_OSF_dataset_pieces(input_folder_path, output_folder_path):
         piece_subfolder.mkdir(parents=True, exist_ok=True)
         output_subfolders.append(piece_subfolder)
     
-    CommonData.split_OSF_dataset(input_folder, output_subfolders, split_board_pieces, augment_piece_image)
+    CommonData.split_OSF_dataset(input_folder, output_subfolders, split_board_pieces, CommonData.augment_image)
  
 def split_board_pieces(image_path, board_img, corners, vec_labels, output_subfolders, augment_func):
 
@@ -183,19 +182,6 @@ def split_board_pieces(image_path, board_img, corners, vec_labels, output_subfol
         output_folder = output_subfolders[list(Params.fen_to_name.keys()).index(str(int(vec_labels[i])))] # meio pesado, mas funciona
         piece_photo_path = output_folder / f'{image_path.stem}_{i+1}{image_path.suffix}'
         cv2.imwrite(str(piece_photo_path), piece_photo)
-   
-#perform augment operation to image
-def augment_piece_image(image):
-    base_seed = np.random.randint(0, 2**32 - 1)
-    seed = tf.constant([0, base_seed], dtype=tf.int64)
-    image = tf.image.stateless_random_brightness(image, max_delta=Params.brightness_max_delta, seed=seed)
-    image = tf.image.stateless_random_contrast(image, lower=1-Params.contrast_delta, upper=1+Params.contrast_delta, seed=seed)
-    image = tf.image.stateless_random_saturation(image, lower=1-Params.saturation_delta, upper=1+Params.saturation_delta, seed=seed)
-    image = tf.image.stateless_random_hue(image, max_delta=Params.hue_max_delta, seed=seed)
-    image = tf.image.random_jpeg_quality(image, min_jpeg_quality=100 - Params.noise_max_delta, max_jpeg_quality=100)
-    #tp.image. warp??
-    image = image.numpy().astype(np.uint8)
-    return image
 
 #aux funcs 
 
@@ -216,7 +202,6 @@ def calculate_displacement_vector(col, row, disp_vectors: np.array):
     final_disp = (1 - y_normalized) * top_disp + y_normalized * bottom_disp
 
     return final_disp
-
 
 
 # IDEA 2:

@@ -6,6 +6,7 @@ import process_datasets.pieces_datasets as ProcPiecesData
 import process_datasets.squares_datasets as ProcSquaresData
 import process_datasets.chessred_dataset as ProcChRed
 import process_datasets.osf_dataset as ProcOsf
+import process_datasets.process_dataset_common as ProcCommon
 import board_recognition.parameters as BoardParams
 import print_funcs.print_funcs as Prints
 import sys
@@ -55,7 +56,7 @@ def main():
 if __name__ == "__main__":
     # main()
     # ProcOsf.process_OSF_dataset_pieces(sys.argv[1],sys.argv[2])
-    ProcChRed.process_ChessReD_dataset_pieces(sys.argv[1],sys.argv[2])
+    # ProcChRed.process_ChessReD_dataset_pieces(sys.argv[1],sys.argv[2])
     # PiecesRecogn.build_pretrained_CNN(sys.argv[1],sys.argv[2])
     # PiecesRecogn.build_vanilla_CNN(sys.argv[1],sys.argv[2])
-    
+    ProcCommon.augment_images_in_dir(sys.argv[1],sys.argv[2], ProcCommon.augment_image_with_warp)
