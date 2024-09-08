@@ -1,0 +1,15 @@
+7761/7761 ━━━━━━━━━━━━━━━━━━━━ 0s 205ms/step - accuracy: 0.6065 - loss: 1.0674   
+Epoch 1: val_accuracy improved from -inf to 0.82660, saving model to model_results/pieces/Vanilla_3_3_3/vanilla_3_3_3_pieces.keras
+7761/7761 ━━━━━━━━━━━━━━━━━━━━ 1674s 215ms/step - accuracy: 0.6065 - loss: 1.0674 - val_accuracy: 0.8266 - val_loss: 0.5000
+Epoch 2/3
+7761/7761 ━━━━━━━━━━━━━━━━━━━━ 0s 204ms/step - accuracy: 0.9174 - loss: 0.2400     
+Epoch 2: val_accuracy improved from 0.82660 to 0.88644, saving model to model_results/pieces/Vanilla_3_3_3/vanilla_3_3_3_pieces.keras
+7761/7761 ━━━━━━━━━━━━━━━━━━━━ 1664s 214ms/step - accuracy: 0.9174 - loss: 0.2400 - val_accuracy: 0.8864 - val_loss: 0.3260
+Epoch 3/3
+7761/7761 ━━━━━━━━━━━━━━━━━━━━ 0s 204ms/step - accuracy: 0.9573 - loss: 0.1258   
+Epoch 3: val_accuracy improved from 0.88644 to 0.89846, saving model to model_results/pieces/Vanilla_3_3_3/vanilla_3_3_3_pieces.keras
+7761/7761 ━━━━━━━━━━━━━━━━━━━━ 1664s 214ms/step - accuracy: 0.9573 - loss: 0.1258 - val_accuracy: 0.8985 - val_loss: 0.3221
+1522/1522 ━━━━━━━━━━━━━━━━━━━━ 87s 57ms/step - accuracy: 0.9277 - loss: 0.2294  
+Test Loss: 0.21397371590137482, Test Accuracy: 0.93250572681427
+
+Batch size used was 64

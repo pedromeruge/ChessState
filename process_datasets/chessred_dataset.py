@@ -1,6 +1,6 @@
 from numpy import square
 from process_datasets.includes import *
-import squares_recognition.parameters as PiecesParams
+import models.parameters as PiecesParams
 import process_datasets.parameters as Params
 import process_datasets.pieces_datasets as PiecesData
 import process_datasets.squares_datasets as SquaresData

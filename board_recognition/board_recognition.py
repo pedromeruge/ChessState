@@ -156,7 +156,7 @@ def get_intersection_points(rho1: np.ndarray, theta1: np.ndarray, rho2: np.ndarr
     sin_t2 = np.sin(theta2)
     x = (sin_t1 * rho2 - sin_t2 * rho1) / (cos_t2 * sin_t1 - cos_t1 * sin_t2)
     y = (cos_t1 * rho2 - cos_t2 * rho1) / (sin_t2 * cos_t1 - sin_t1 * cos_t2)
-    return np.stack((x,y), axis=-1) # meter em pares 2 a 2, em vez de listas separadas
+    return np.stack((x,y), axis=-1, dtype=np.float32) # meter em pares 2 a 2, em vez de listas separadas
 
 def find_best_lines_sorted(lines, theta_threshold=0.5, max_lines=9):
     # sort lines by theta
@@ -233,7 +233,7 @@ def find_corner_points(horiz_lines, vert_lines):
     vert_lines_rhos, vert_lines_thetas = filtered_vert_lines.T #transposta
 
     intersections = get_intersection_points(horiz_lines_rhos, horiz_lines_thetas, vert_lines_rhos, vert_lines_thetas)
-    # print(intersections)
+
     return intersections
 
 # !!

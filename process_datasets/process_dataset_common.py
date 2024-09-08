@@ -1,16 +1,10 @@
 from process_datasets.includes import *
-import squares_recognition.parameters as SquaresParams
+import models.parameters as ModelsParams
 import process_datasets.parameters as Params
 
 """
     Common functions related to processing images to build datasets
 """
-
-homography_square_length = int(SquaresParams.image_size / 2)  # tamanho de quadrado
-homography_inner_length = homography_square_length * 8
-homography_top_margin = 150 # tamanho excessivamente grande (50*3), para garantir que não se corta peças altas no fundo do tabuleiro
-homography_other_margins = int(homography_square_length / 2)
-
 
 def warp_image(img, corner_points, inner_length=400, top_margin=150, other_margin=25):
 
@@ -21,9 +15,9 @@ def warp_image(img, corner_points, inner_length=400, top_margin=150, other_margi
         [right_col, top_margin], # cima-dir
         [other_margin, bottom_row], # baixo-esq
         [right_col, bottom_row] # baixo-dir
-    ], dtype=float)
+    ], dtype=np.float32)
 
-    H, _ = cv2.getPerspectiveTransform(corner_points, pts_dst)
+    H = cv2.getPerspectiveTransform(corner_points, pts_dst)
 
     im_out = cv2.warpPerspective(img, H, (right_col + other_margin, bottom_row + other_margin))
 

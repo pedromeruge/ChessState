@@ -1,6 +1,6 @@
 from numpy import square
 from process_datasets.includes import *
-import squares_recognition.parameters as SquaresParams
+import models.parameters as ModelsParams
 import process_datasets.parameters as Params
 import process_datasets.process_dataset_common as CommonData
 
@@ -8,15 +8,15 @@ import process_datasets.process_dataset_common as CommonData
     Functions related to creating the squares dataset that contains images from OSF_dataset and Chess_ReD dataset
 """
 
-homography_square_length = int(SquaresParams.image_size / 2)  # tamanho de quadrado
+homography_square_length = int(ModelsParams.squares_image_size / 2)  # tamanho de quadrado
 homography_inner_length = homography_square_length * 8
-homography_top_margin = 150 # tamanho excessivamente grande (50*3), para garantir que não se corta peças altas no fundo do tabuleiro
+homography_top_margin = homography_square_length * 3 # tamanho excessivamente grande (50*3), para garantir que não se corta peças altas no fundo do tabuleiro
 homography_other_margins = int(homography_square_length / 2)
 
 #corner_points = [top_left, top_right, bottom_left, bottom_right]
 def process_squares_img(board_img, corner_points):
 
-    warped_img, pts_dst, homography_mat = CommonData.warp_image(board_img, corner_points, 
+    warped_img, pts_dst, H = CommonData.warp_image(board_img, corner_points, 
                                      inner_length=homography_inner_length, 
                                      top_margin=homography_top_margin, 
                                      other_margin=homography_other_margins)

@@ -15,7 +15,7 @@ import random
 import heapq
 from sklearn.linear_model import RANSACRegressor
 import time
-from squares_recognition.squares_recognition import *
+from models.squares_recognition import *
 import sys
 import typing
 import print_funcs.print_funcs as Prints

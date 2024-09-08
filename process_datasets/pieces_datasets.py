@@ -2,7 +2,7 @@ from numpy import sin, square
 import rich
 import board_recognition
 from process_datasets.includes import *
-import pieces_recognition.parameters as PiecesParams
+import models.parameters as ModelParams
 import process_datasets.parameters as Params
 import process_datasets.process_dataset_common as CommonData
 import print_funcs.print_funcs as Prints
@@ -12,11 +12,11 @@ import print_funcs.print_funcs as Prints
     Functions related to creating the pieces dataset that contains images from OSF_dataset and Chess_ReD dataset
 """
 
-homography_square_length = int(PiecesParams.image_size_width / 2) # size of each chessboard square where pieces stand
+homography_square_length = int(ModelParams.squares_image_size / 2) # size of each chessboard square where pieces stand
 
 homography_inner_length = homography_square_length * 8 # side length of chessboard, aka 8 squares
 homography_top_margin = homography_square_length * 5 # excessive large top margin of final image, guarantee tall pieces on end of chessboard aren't cropped
-homography_other_margins = homography_square_length # left,right, and bottom margins of final image
+homography_other_margins = homography_square_length * 2 # left,right, and bottom margins of final image
 
 # margins/limits of cropped pieces
 min_height_increase = 1.25
@@ -36,17 +36,17 @@ out_width = (1 + max_width_increase) * homography_square_length # output width
 # crop board pieces based on:
 # estimated rotation from comparing before and after chessboard top line slopes
 # estimated scale from comparing max y value of displacement vectors between original and final corner points
-# efficient
-# decent results
-
+# efficient, decent results
+# returns list of piece imgs, mask of corresponding positions for images
 def process_pieces_img(board_img, corner_points, vec_labels):
     try:
         warped_img, pts_dst, H = CommonData.warp_image(board_img, corner_points, 
                                         inner_length=homography_inner_length, 
                                         top_margin=homography_top_margin, 
-                                        other_margin=homography_other_margins * 2)
+                                        other_margin=homography_other_margins)
         
         pieces = []
+
         square_size = homography_square_length # size of each square on the board
         top_left = pts_dst[0] # top left point
 
@@ -63,11 +63,11 @@ def process_pieces_img(board_img, corner_points, vec_labels):
             # print(f"vert_scalar: {vert_scalar} vert increase before: {vert_increase} , after: {vert_increase_final}")
 
             for x in range(8):
-                
-                if (vec_labels[y*8 + x] == 0.0): # if square is empty, ignore
-                    pieces.append(None)
+                curr_index = y*8 + x
+
+                if (vec_labels[curr_index] == 0.0): # if square is empty, ignore
                     continue
-        
+
                 if (x < 4): # more left width for elements further left, since they are generally more distorted
                     left_increase = min_width_increase + (max_base_width_increase - min_width_increase) * (1 - x/3)
                     right_increase = 0
@@ -109,8 +109,7 @@ def process_pieces_img(board_img, corner_points, vec_labels):
 
                 pieces.append(regular_sized_tile)
 
-        # Prints.show_result(warped_img, output_path="~/Desktop/save/")
-        return np.array(pieces, dtype=object)
+        return np.array(pieces), vec_labels.astype(bool)
     
     except Exception as e:
         traceback.print_exc()
@@ -176,8 +175,6 @@ def split_board_pieces(image_path, board_img, corners, vec_labels, output_subfol
     pieces = process_pieces_img(board_img, corners, vec_labels)
 
     for i, piece_photo in enumerate(pieces):
-        if piece_photo is None: # só guardar fotos com peças, excluir espaços vazios
-            continue
         piece_photo = augment_func(piece_photo) # aplicar modificações às imagens
         output_folder = output_subfolders[list(Params.fen_to_name.keys()).index(str(int(vec_labels[i])))] # meio pesado, mas funciona
         piece_photo_path = output_folder / f'{image_path.stem}_{i+1}{image_path.suffix}'

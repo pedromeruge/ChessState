@@ -120,3 +120,6 @@ def show_squares_grid(chess_squares, output_path=""):
     plt.show()
 
     print("Square size (WxH):", chess_squares[0].shape[1], "x", chess_squares[0].shape[0])
+
+def print_array_in_chess_format(array):
+    print(np.array2string(array.reshape(8,8)))
