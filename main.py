@@ -38,19 +38,30 @@ def main():
 
         # Prints.show_squares_grid(square_imgs)
 
-        square_predicts = ModelsSquares.interpret_empty_spaces(square_imgs)
+        square_predicts, uncertain_square_predicts = ModelsSquares.interpret_empty_spaces(square_imgs)
 
         # Prints.print_array_in_chess_format(square_predicts)
-        # print("Execution time: %s s" % (time.time() - start_time)) # print do tempo decorrido
+        print("Execution time: %s s" % (time.time() - start_time)) # print do tempo decorrido
         
         piece_imgs, occupation_mask = ProcPiecesData.process_pieces_img(orig_img,corner_points, square_predicts)
-        piece_predicts = ModelsPieces.interpret_pieces(piece_imgs, occupation_mask)
+        piece_predicts, uncertain_piece_predicts = ModelsPieces.interpret_pieces(piece_imgs, occupation_mask)
 
-        DrawBoard.draw_chessboard(piece_predicts)
+        print("Execution time: %s s" % (time.time() - start_time)) # print do tempo decorrido
+
+        # print("before:", Prints.print_array_in_chess_format(piece_predicts))
+
+        piece_predicts[uncertain_piece_predicts] = 14
+        piece_predicts[uncertain_square_predicts] = 13
+
+        # print("after:", Prints.print_array_in_chess_format(piece_predicts))
 
         #print result image and points
         # cdst = Prints.print_points(orig_img, corner_points, Prints.color_blue)
         # Prints.show_result(cdst)
+
+        #draw resulting chessboard
+        DrawBoard.draw_chessboard(piece_predicts)
+
     except Exception as e:
         print(e)
     
@@ -59,7 +70,7 @@ if __name__ == "__main__":
     # ProcOsf.process_OSF_dataset_pieces(sys.argv[1],sys.argv[2])
     # ProcChRed.process_ChessReD_dataset_pieces(sys.argv[1],sys.argv[2])
 
-    # ModelsPieces.build_MobileNetV2_CNN(sys.argv[1],sys.argv[2])
+    # ModelsPieces.build_InceptionV3_CNN(sys.argv[1],sys.argv[2])
     # ModelsPieces.build_vanilla_CNN_3_3_3(sys.argv[1],sys.argv[2])
 
     # ProcCommon.augment_images_in_dataset_dirs(sys.argv[1],sys.argv[2], ProcCommon.augment_image_with_warp,goal_count=27050)

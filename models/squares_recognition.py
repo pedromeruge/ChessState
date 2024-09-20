@@ -21,12 +21,10 @@ def interpret_empty_spaces(square_img_list):
             verbose=2)
 
     predicts = np.argmax(pred_result, axis=1)
-    # max_indices = np.argmax(predicts, axis=1)
 
-    # result = np.where(max_values < Params.square_threshold_predict, -1, max_indices) # substituir resultados que n se tem muita certeza por -1
+    uncertain_predicts = np.max(pred_result, axis=1) < Params.square_threshold_predict # register which predicts are uncertain
 
-    # return result
-    return predicts
+    return predicts, uncertain_predicts
 
 #tenativa de CNN vanilla, mas tem resultados fracos
 def build_vanilla_CNN(input_shape=(100, 100, 3), num_classes=2):

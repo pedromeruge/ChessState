@@ -1,15 +1,19 @@
-7761/7761 ━━━━━━━━━━━━━━━━━━━━ 0s 205ms/step - accuracy: 0.6065 - loss: 1.0674   
-Epoch 1: val_accuracy improved from -inf to 0.82660, saving model to model_results/pieces/Vanilla_3_3_3/vanilla_3_3_3_pieces.keras
-7761/7761 ━━━━━━━━━━━━━━━━━━━━ 1674s 215ms/step - accuracy: 0.6065 - loss: 1.0674 - val_accuracy: 0.8266 - val_loss: 0.5000
-Epoch 2/3
-7761/7761 ━━━━━━━━━━━━━━━━━━━━ 0s 204ms/step - accuracy: 0.9174 - loss: 0.2400     
-Epoch 2: val_accuracy improved from 0.82660 to 0.88644, saving model to model_results/pieces/Vanilla_3_3_3/vanilla_3_3_3_pieces.keras
-7761/7761 ━━━━━━━━━━━━━━━━━━━━ 1664s 214ms/step - accuracy: 0.9174 - loss: 0.2400 - val_accuracy: 0.8864 - val_loss: 0.3260
-Epoch 3/3
-7761/7761 ━━━━━━━━━━━━━━━━━━━━ 0s 204ms/step - accuracy: 0.9573 - loss: 0.1258   
-Epoch 3: val_accuracy improved from 0.88644 to 0.89846, saving model to model_results/pieces/Vanilla_3_3_3/vanilla_3_3_3_pieces.keras
-7761/7761 ━━━━━━━━━━━━━━━━━━━━ 1664s 214ms/step - accuracy: 0.9573 - loss: 0.1258 - val_accuracy: 0.8985 - val_loss: 0.3221
-1522/1522 ━━━━━━━━━━━━━━━━━━━━ 87s 57ms/step - accuracy: 0.9277 - loss: 0.2294  
-Test Loss: 0.21397371590137482, Test Accuracy: 0.93250572681427
 
-Batch size used was 64
+3881/3881 ━━━━━━━━━━━━━━━━━━━━ 0s 350ms/step - accuracy: 0.5966 - loss: 1.0945   
+Epoch 1: val_accuracy improved from -inf to 0.86140, saving model to model_results/pieces/Vanilla_3_3_3_new/vanilla_3_3_3_pieces.keras
+3881/3881 ━━━━━━━━━━━━━━━━━━━━ 1439s 370ms/step - accuracy: 0.5967 - loss: 1.0944 - val_accuracy: 0.8614 - val_loss: 0.4040
+Epoch 2/3
+3881/3881 ━━━━━━━━━━━━━━━━━━━━ 0s 348ms/step - accuracy: 0.9326 - loss: 0.1991   
+Epoch 2: val_accuracy improved from 0.86140 to 0.90944, saving model to model_results/pieces/Vanilla_3_3_3_new/vanilla_3_3_3_pieces.keras
+3881/3881 ━━━━━━━━━━━━━━━━━━━━ 1429s 368ms/step - accuracy: 0.9326 - loss: 0.1991 - val_accuracy: 0.9094 - val_loss: 0.2700
+Epoch 3/3
+3881/3881 ━━━━━━━━━━━━━━━━━━━━ 0s 349ms/step - accuracy: 0.9690 - loss: 0.0910   
+Epoch 3: val_accuracy improved from 0.90944 to 0.91872, saving model to model_results/pieces/Vanilla_3_3_3_new/vanilla_3_3_3_pieces.keras
+3881/3881 ━━━━━━━━━━━━━━━━━━━━ 1432s 369ms/step - accuracy: 0.9690 - loss: 0.0910 - val_accuracy: 0.9187 - val_loss: 0.2649
+761/761 ━━━━━━━━━━━━━━━━━━━━ 84s 111ms/step - accuracy: 0.9448 - loss: 0.1751 
+Test Loss: 0.18164658546447754, Test Accuracy: 0.9439960718154907
+
+Batch size: 128
+validation: 0.15%
+Adam optimizer, lr:1e-3
+3 epochs

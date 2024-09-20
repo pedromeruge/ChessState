@@ -17,7 +17,7 @@ def cannyPF(img, sigma=0.25):
 def process_board(orig_img):
 
     #transform to greyscale
-    grey_img = cv2.cvtColor(orig_img, cv2.COLOR_BGR2GRAY)
+    grey_img = cv2.cvtColor(orig_img, cv2.COLOR_RGB2GRAY)
 
     # Apply Sigmoid contrast adjustment
     # bilateral_filter_img = sigmoid_contrast(grey_img, cutoff=0.70, gain=7)
@@ -29,7 +29,7 @@ def process_board(orig_img):
     # explicação deste algoritmo: https://docs.opencv.org/4.x/da/d22/tutorial_py_canny.html#:~:text=Canny%20Edge%20Detection%20in%20OpenCV&text=Fourth%20argument%20is%20aperture_size.,By%20default%20it%20is%203.
     canny_edge_filter_img = cannyPF(bilateral_filter_img, sigma=0.25)
 
-    cdst = cv2.cvtColor(canny_edge_filter_img, cv2.COLOR_GRAY2BGR)
+    cdst = cv2.cvtColor(canny_edge_filter_img, cv2.COLOR_GRAY2RGB)
 
     #apply Hough line Transform
     # explicação deste algoritmo: https://docs.opencv.org/3.4/d9/db0/tutorial_hough_lines.html

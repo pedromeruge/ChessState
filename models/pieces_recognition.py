@@ -23,14 +23,13 @@ def interpret_pieces(pieces_img_list, occupation_mask):
     final_list = np.zeros(64,dtype=np.int32)
     final_list[occupation_mask] = predicts
 
-    # max_indices = np.argmax(predicts, axis=1)
-
-    # result = np.where(predicts < Params.square_threshold_predict, -1, max_indices) # substituir resultados que n se tem muita certeza por -1
-
-    return final_list
+    uncertain_predicts = np.zeros(64,dtype=bool)
+    uncertain_predicts[occupation_mask] = np.max(pred_result, axis=1) < Params.square_threshold_predict # register which predicts are uncertain
+    
+    return final_list, uncertain_predicts
 
 #tested
-def build_vanilla_CNN_3_3_3(input_dataset_folder, output_folder, input_shape=(150, 250, 3), num_classes=12):
+def build_vanilla_CNN_3_3_3(input_dataset_folder, output_folder, input_shape=(250, 150, 3), num_classes=12):
     try:
 
         model = Sequential()
@@ -59,17 +58,16 @@ def build_vanilla_CNN_3_3_3(input_dataset_folder, output_folder, input_shape=(15
 
         model.compile(
             optimizer=Adam(learning_rate=1e-3), 
-            loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+            loss=tf.keras.losses.CategoricalCrossentropy(),
             metrics=['accuracy'])
 
         print("Model built")
-
-        Common.train_vanilla_CNN(input_dataset_folder, output_folder, model, "vanilla_3_3_3_pieces",3)
+        Common.train_vanilla_pieces_CNN(input_dataset_folder, output_folder, model, "vanilla_3_3_3_pieces_2", 4)
         
     except Exception as e:
         print(e)
 
-def build_vanilla_CNN_3_3_2(input_dataset_folder, output_folder, input_shape=(150, 250, 3), num_classes=12):
+def build_vanilla_CNN_3_3_2(input_dataset_folder, output_folder, input_shape=(250, 150, 3), num_classes=12):
     try:
 
         model = Sequential()
@@ -98,42 +96,42 @@ def build_vanilla_CNN_3_3_2(input_dataset_folder, output_folder, input_shape=(15
 
         model.compile(
             optimizer=Adam(learning_rate=1e-3), 
-            loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+            loss=tf.keras.losses.CategoricalCrossentropy(),
             metrics=['accuracy'])
 
         print("Model built")
 
-        Common.train_vanilla_CNN(input_dataset_folder, output_folder, model, "vanilla_3_3_2_pieces",3)
+        Common.train_vanilla_pieces_CNN(input_dataset_folder, output_folder, model, "vanilla_3_3_2_pieces",4)
         
     except Exception as e:
         print(e)
 
 # tested, stopped mid-way through
-def build_ResNet50V2_CNN(input_dataset_folder, output_folder, input_shape=(150,250, 3), num_classes=12):
+def build_ResNet50V2_CNN(input_dataset_folder, output_folder, input_shape=(250,150, 3), num_classes=12):
     try :
-        model = Common.build_fine_tuned_keras_CNN(input_shape, num_classes, tf.keras.applications.ResNet50V2)
-        Common.train_prebuilt_pieces_CNN(input_dataset_folder, output_folder, model, "ResNet50V2_pieces")
+        model = Common.build_fine_tuned_keras_CNN(input_shape, num_classes, tf.keras.applications.resnet_v2.ResNet50V2)
+        Common.train_prebuilt_pieces_CNN(input_dataset_folder, output_folder, model, tf.keras.applications.resnet_v2.preprocess_input, 249, "ResNet50V2_pieces")
     except Exception as e:
         print(e)
 
-def build_MobileNetV2_CNN(input_dataset_folder, output_folder, input_shape=(150,250, 3), num_classes=12):
+def build_MobileNetV2_CNN(input_dataset_folder, output_folder, input_shape=(250,150, 3), num_classes=12):
     try :
-        model = Common.build_fine_tuned_keras_CNN(input_shape, num_classes, tf.keras.applications.MobileNetV2)
-        Common.train_prebuilt_pieces_CNN(input_dataset_folder, output_folder, model, "MobileNetV2_pieces")
+        model = Common.build_fine_tuned_keras_CNN(input_shape, num_classes, tf.keras.applications.mobilenet_v2.MobileNetV2)
+        Common.train_prebuilt_pieces_CNN(input_dataset_folder, output_folder, model, tf.keras.applications.mobilenet_v2.preprocess_input, 249, "MobileNetV2_pieces")
     except Exception as e:
         print(e)
 
-def build_InceptionV3_CNN(input_dataset_folder, output_folder, input_shape=(150,250, 3), num_classes=12):
+def build_InceptionV3_CNN(input_dataset_folder, output_folder, input_shape=(250,150, 3), num_classes=12):
     try :
-        model = Common.build_fine_tuned_keras_CNN(input_shape, num_classes, tf.keras.applications.InceptionV3)
-        Common.train_prebuilt_pieces_CNN(input_dataset_folder, output_folder, model, "InceptionV3_pieces")
+        model = Common.build_fine_tuned_keras_CNN(input_shape, num_classes, tf.keras.applications.inception_v3.InceptionV3)
+        Common.train_prebuilt_pieces_CNN(input_dataset_folder, output_folder, model, tf.keras.applications.inception_v3.preprocess_input, 249, "InceptionV3_pieces")
     except Exception as e:
         print(e)
 
 #heavy model - not suited for mobile 
-def build_VGG16_CNN(input_dataset_folder, output_folder, input_shape=(150,250, 3), num_classes=12):
+def build_VGG16_CNN(input_dataset_folder, output_folder, input_shape=(250,150, 3), num_classes=12):
     try :
-        model = Common.build_fine_tuned_keras_CNN(input_shape, num_classes, tf.keras.applications.VGG16)
-        Common.train_prebuilt_pieces_CNN(input_dataset_folder, output_folder, model, "VGG16_pieces")
+        model = Common.build_fine_tuned_keras_CNN(input_shape, num_classes, tf.keras.applications.vgg_16.VGG16)
+        Common.train_prebuilt_pieces_CNN(input_dataset_folder, output_folder, model,tf.keras.applications.vgg_16.preprocess_input, 249, "VGG16_pieces")
     except Exception as e:
         print(e)

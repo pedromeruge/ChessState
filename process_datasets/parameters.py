@@ -22,4 +22,4 @@ fen_to_name = {"1": "white_pawn", "2": "white_knight", "3":"white_bishop", "4":"
              "-1": "black_pawn", "-2": "black_knight", "-3":"black_bishop", "-4":"black_rook", "-5":"black_queen", "-6":"black_king"}
 
 models_predict_to_name = {0 :'empty', 1 : 'black_bishop', 2: 'black_king', 3: 'black_knight', 4: 'black_pawn', 5: 'black_queen', 6: 'black_rook', 
-                          7: 'white_bishop', 8: 'white_king', 9: 'white_knight', 10: 'white_pawn', 11: 'white_queen', 12: 'white_rook' }
+                          7: 'white_bishop', 8: 'white_king', 9: 'white_knight', 10: 'white_pawn', 11: 'white_queen', 12: 'white_rook', 13: 'unknown_occupation', 14:'unknown_piece' }

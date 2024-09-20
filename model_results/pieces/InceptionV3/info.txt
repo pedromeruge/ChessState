@@ -1,0 +1,44 @@
+
+15522/15522 ━━━━━━━━━━━━━━━━━━━━ 2377s 153ms/step - accuracy: 0.3615 - loss: 1.8334 - val_accuracy: 0.4726 - val_loss: 1.5476
+Epoch 2/4
+15522/15522 ━━━━━━━━━━━━━━━━━━━━ 2353s 152ms/step - accuracy: 0.4296 - loss: 1.6429 - val_accuracy: 0.4846 - val_loss: 1.5275
+Epoch 3/4
+15522/15522 ━━━━━━━━━━━━━━━━━━━━ 2416s 156ms/step - accuracy: 0.4357 - loss: 1.6406 - val_accuracy: 0.4709 - val_loss: 1.5711
+Epoch 4/4
+15522/15522 ━━━━━━━━━━━━━━━━━━━━ 2417s 156ms/step - accuracy: 0.4389 - loss: 1.6409 - val_accuracy: 0.4774 - val_loss: 1.6143
+Epoch 1/6
+15522/15522 ━━━━━━━━━━━━━━━━━━━━ 3586s 230ms/step - accuracy: 0.4587 - loss: 1.5522 - val_accuracy: 0.6245 - val_loss: 1.0872
+Epoch 2/6
+15522/15522 ━━━━━━━━━━━━━━━━━━━━ 3752s 242ms/step - accuracy: 0.5789 - loss: 1.1914 - val_accuracy: 0.6701 - val_loss: 0.9558
+Epoch 3/6
+15522/15522 ━━━━━━━━━━━━━━━━━━━━ 3987s 257ms/step - accuracy: 0.6297 - loss: 1.0558 - val_accuracy: 0.6915 - val_loss: 0.8955
+Epoch 4/6
+15522/15522 ━━━━━━━━━━━━━━━━━━━━ 3953s 255ms/step - accuracy: 0.6598 - loss: 0.9751 - val_accuracy: 0.7082 - val_loss: 0.8567
+Epoch 5/6
+15522/15522 ━━━━━━━━━━━━━━━━━━━━ 4312s 278ms/step - accuracy: 0.6847 - loss: 0.9097 - val_accuracy: 0.7237 - val_loss: 0.8110
+Epoch 6/6
+15522/15522 ━━━━━━━━━━━━━━━━━━━━ 3725s 240ms/step - accuracy: 0.7020 - loss: 0.8599 - val_accuracy: 0.7333 - val_loss: 0.7927
+1522/1522 ━━━━━━━━━━━━━━━━━━━━ 391s 255ms/step - accuracy: 0.7548 - loss: 0.7007
+Test Loss: 0.6310147047042847, Test Accuracy: 0.7855544090270996
+
+Batch size used was 32
+
+
+>>Structure:
+Base model InceptionV3
+GlobalAvgPool2D
+dense(1024, 'relu')
+dense(12,'softmax')
+
+>>Fitting
+Stage 1:
+'Rmsprop',
+Default learning rate -> so 1e-3 i think?,
+4 epochs
+
+
+Stage 2:
+'SGD', lr 1e-4, momentum=0.9,
+6 epochs
+
+

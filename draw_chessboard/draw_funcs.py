@@ -17,6 +17,8 @@ piece_images = {
     10: Image.open('draw_chessboard/pieces/light_pawn.png').resize((square_size,square_size)),
     11: Image.open('draw_chessboard/pieces/light_queen.png').resize((square_size,square_size)),
     12: Image.open('draw_chessboard/pieces/light_rook.png').resize((square_size,square_size)),
+    13: Image.open('draw_chessboard/pieces/unknown_occupation.png').resize((square_size,square_size)),
+    14: Image.open('draw_chessboard/pieces/unknown_piece.png').resize((square_size,square_size)),
 }
 
 def draw_chessboard(piece_positions: np.ndarray, square_size = square_size, save_path=""):
@@ -43,7 +45,6 @@ def draw_grid(square_size: int = square_size, rows: int = 8, cols: int = 8) -> I
     return img_base
 
 def paste_pieces(chessboard: Image,  piece_positions: np.ndarray) -> Image:
-    print(piece_positions)
     for i, piece in enumerate(piece_positions):
         if piece != 0:
             (row, col) = divmod(i,8)
