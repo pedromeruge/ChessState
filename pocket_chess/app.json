@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "scheme": "acme",
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-font",
+        {
+          "fonts": ["assets/fonts/Inter-Variable_opsz,wght.ttf"]
+        }
+
+      ]
+    ],
+    "name": "pocket_chess",
+    "slug": "pocket_chess",
+    "newArchEnabled": true
+  }
+}
