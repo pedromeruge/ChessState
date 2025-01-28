@@ -8,4 +8,6 @@ export default {
   play: require("../assets/icons/pawn.png"),
   scan: require("../assets/icons/qrcode.png"),
   storage: require("../assets/icons/box.png"),
+  no_camera: require("../assets/icons/no_camera.png"),
+  camera: require("../assets/icons/camera.png")
 };

@@ -17,15 +17,15 @@ const IconComponent = ({ source, width, height, tintColor}) => {
 //         uri={source}
 //         fill={tintColor}
 //       />
-//   );
-const styles = StyleSheet.create({
-  icon: {
-    width: width,
-    height: height,
-    tintColor: tintColor,
-    objectFit: 'contain',
-  },
-});
+//   );j
+  const styles = StyleSheet.create({
+    icon: {
+      width: width,
+      height: height,
+      tintColor: tintColor,
+      objectFit: 'contain',
+    },
+  });
 
 return (
   <Image 

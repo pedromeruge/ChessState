@@ -1,7 +1,8 @@
 import { Stack } from 'expo-router';
 import { useFonts } from "expo-font";
 import * as SplashScreen from 'expo-splash-screen';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
+import { View } from 'react-native';
 
 SplashScreen.preventAutoHideAsync(); // Prevent the splash screen from auto-hiding // ????
 const Layout = () => {
@@ -11,23 +12,28 @@ const Layout = () => {
     Inter: require('../assets/fonts/Inter-Variable_opsz,wght.ttf'),
   });
 
-  // Hide the splash screen when the fonts are loaded
+  useEffect(() => {
+    (async () => {
+      await SplashScreen.preventAutoHideAsync();
+    })();
+  }, []);
+
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
       await SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) {
-    // If the fonts haven't loaded yet, return null so the splash screen remains visible
-    return null;
-  }
+  if (!fontsLoaded) return null;
 
-    return (
-        <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
-    )
+
+  return (
+    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack>
+    </View>
+  )
 }
 
 export default Layout;

@@ -9,13 +9,34 @@
       [
         "expo-font",
         {
-          "fonts": ["assets/fonts/Inter-Variable_opsz,wght.ttf"]
+          "fonts": [
+            "assets/fonts/Inter-Variable_opsz,wght.ttf"
+          ]
         }
-
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
       ]
     ],
     "name": "pocket_chess",
     "slug": "pocket_chess",
-    "newArchEnabled": true
+    "newArchEnabled": true,
+    "android": {
+      "permissions": [
+        "android.permission.CAMERA"
+      ],
+      "package": "com.anonymous.pocket_chess"
+    },
+    "ios": {
+      "infoPlist": {
+        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera."
+      },
+      "bundleIdentifier": "com.anonymous.pocket-chess"
+    }
   }
 }
