@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, StyleSheet, Text, TextStyle, TouchableOpacity, View } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { COLORS, icons } from '../../constants';
+import * as Constants from '../../constants';
 import IconComponent from '../../components/common/IconComponent.jsx';
+import React from 'react';
 // import CameraPermissionPage from '../../components/CameraPermissionPage';
 // import NoCameraDeviceError from '../../components/NoCameraDeviceError';
 
@@ -13,71 +15,130 @@ const Scan = () => {
   
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
-  
-  if (!permission) {
-    // Camera permissions are still loading.
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
+
+  function openHelpBox() {
+    console.log('help box'); 
   }
 
-  if (!permission.granted) {
-    // Camera permissions are not granted yet.
-    return (
-      <View style={styles.container}>
-        <IconComponent source={icons.camera} width={100} height={100} tintColor={COLORS.text_grey} />
-        <Text style={styles.message}>We need your permission to show the camera</Text>
-        <Button onPress={requestPermission} title="grant permission" />
-      </View>
-    );
+  function openSettings() {
+    console.log('settings');
   }
 
-  function toggleCameraFacing() {
-    setFacing(current => (current === 'back' ? 'front' : 'back'));
+  function openGallery() {
+    console.log('gallery');
+  }
+
+  function scanCamera() {
+    console.log('scan');
+  }
+
+  function toggleFlash() {
+    console.log('flash');
   }
 
   return (
     <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <Text style={styles.text}>Flip Camera</Text>
-          </TouchableOpacity>
-        </View>
-      </CameraView>
+      {/* Conditionally render the camera feed if permission is granted */}
+      {permission?.granted && 
+        <CameraView style={StyleSheet.absoluteFill} />}
+
+        {/* Ui content in safe visible areas */}
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.iconRowTop}>
+            <TouchableOpacity style={styles.button} onPress={openHelpBox}>
+              <IconComponent source={Constants.icons.help} width={30} height={30}/>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={openSettings}>
+              <IconComponent source={Constants.icons.settings} width={30} height={30}/>
+            </TouchableOpacity>
+          </View>
+
+          {/* Permission explanation and button if not granted */}
+          {!permission?.granted && (
+            <View style={styles.permissionContainer}>
+              <IconComponent source={Constants.icons.no_camera} width={100} height={100} tintColor={Constants.COLORS.text_grey} />
+              <Text style={styles.message}>
+                <Text> Without permission to access camera, </Text>
+                <Text style={styles.bold_text}>Pocket Chess </Text>
+                <Text>can't scan chessboard</Text>
+              </Text>
+              <Button onPress={requestPermission} title="Grant Permission" />
+            </View>
+          )}
+
+          <View style={styles.iconRowBottom}>
+            <TouchableOpacity style={styles.button} onPress={openGallery}>
+              <IconComponent source={Constants.icons.gallery} width={30} height={30}/>
+            </TouchableOpacity>
+            {/* Conditionally render scan and flash buttons
+              NOTE: the <> is needed to group >=2 components in one conditional statement*/}
+            {permission?.granted && (
+              <>
+                <TouchableOpacity style={styles.button} onPress={scanCamera}>
+                  <IconComponent source={Constants.icons.scan_button} width={75} height={75} opacity={0.8}/>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={toggleFlash}>
+                  <IconComponent source={Constants.icons.flash} width={30} height={30}/>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </SafeAreaView>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: Constants.COLORS.text_dark
   },
+  
+  safeArea: {
+    flex: 1,
+    justifyContent: 'center'
+  },
+  
+  permissionContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    padding: 100
+  },
+
   message: {
     textAlign: 'center',
-    paddingBottom: 10,
+    lineHeight: 19,
+    color: Constants.COLORS.text_grey,
+    fontFamily: Constants.FONTS.BASE_FONT_NAME,
+    fontSize: Constants.SIZES.large,
+    fontWeight: Constants.FONTS.regular as TextStyle['fontWeight']
   },
-  camera: {
-    flex: 1,
+
+  bold_text: {
+    fontWeight: Constants.FONTS.bold as TextStyle['fontWeight'], 
+    color: Constants.COLORS.line_light_grey
   },
-  buttonContainer: {
-    flex: 1,
+  
+  iconRowTop: {
+    position: 'absolute',
+    top: 0,
     flexDirection: 'row',
-    backgroundColor: 'transparent',
-    margin: 64,
+    justifyContent: 'space-between',
+    width: '100%',
+    padding: 30,
   },
+  iconRowBottom: {
+    position: 'absolute',
+    bottom: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    padding: 30,
+  },
+  
   button: {
-    flex: 1,
-    alignSelf: 'flex-end',
     alignItems: 'center',
-  },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
   },
 });
 

@@ -12,5 +12,7 @@ web-build/
 package-lock.json
 .expo
 .vscode/
+.idea
+
 # macOS
 .DS_Store

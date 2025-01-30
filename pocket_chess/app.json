@@ -7,14 +7,6 @@
     "plugins": [
       "expo-router",
       [
-        "expo-font",
-        {
-          "fonts": [
-            "assets/fonts/Inter-Variable_opsz,wght.ttf"
-          ]
-        }
-      ],
-      [
         "expo-camera",
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",

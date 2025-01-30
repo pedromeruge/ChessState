@@ -19,7 +19,7 @@ const BottomNavBar = () => {
                   tabBarIcon: ({ focused }) => (
                       <IconComponent
                         source={icons.play}
-                        width={15}
+                        width={20}
                         height={24}
                         tintColor={focused ? COLORS.contrast_red_light : COLORS.text_grey}
                       />

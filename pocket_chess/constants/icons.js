@@ -9,5 +9,10 @@ export default {
   scan: require("../assets/icons/qrcode.png"),
   storage: require("../assets/icons/box.png"),
   no_camera: require("../assets/icons/no_camera.png"),
-  camera: require("../assets/icons/camera.png")
+  camera: require("../assets/icons/camera.png"),
+  flash: require("../assets/icons/flash.png"),
+  gallery: require("../assets/icons/gallery.png"),
+  help: require("../assets/icons/help.png"),
+  scan_button: require("../assets/icons/scan_button.png"),
+  settings: require("../assets/icons/settings.png")
 };

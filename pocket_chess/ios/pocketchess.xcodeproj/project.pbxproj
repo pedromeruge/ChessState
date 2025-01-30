@@ -1,0 +1,556 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
+		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
+		96905EF65AED1B983A6B3ABC /* libPods-pocketchess.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 58EEBF8E8E6FB1BC6CAF49B5 /* libPods-pocketchess.a */; };
+		B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */; };
+		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
+		0DD3FCB35A9F4B628F2F7CE1 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE0869CFA2D8441CB69E1942 /* noop-file.swift */; };
+		F2D4D99474BA4D1EA41ABB71 /* Inter-Variable_opsz,wght.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43ADBAE7B9F04CD9A916F12B /* Inter-Variable_opsz,wght.ttf */; };
+		312820B30A2948A1B2C48A35 /* inter_18pt_black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1EB53E8B8B7B429DB8EC4115 /* inter_18pt_black.ttf */; };
+		2A395FDD2C0D47D5AB929B50 /* inter_18pt_blackitalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F1FA14AA8447489B8EFECCD7 /* inter_18pt_blackitalic.ttf */; };
+		35F4F11EB8274924AE36CEA8 /* inter_18pt_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2C008B750EC644F5B218EFE4 /* inter_18pt_bold.ttf */; };
+		E890A7D99D9F4EFA8EE04F9E /* inter_18pt_bolditalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7B1420E8D50447D1BB793FA5 /* inter_18pt_bolditalic.ttf */; };
+		AC9E8AE25EEE49FAB188CCC7 /* inter_18pt_extrabold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 16C11553988F49FAA0BBBB6E /* inter_18pt_extrabold.ttf */; };
+		BEE8162129BF41548278E4F4 /* inter_18pt_extrabolditalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 453A35240155477994681FEA /* inter_18pt_extrabolditalic.ttf */; };
+		4DE28168F49745A085BD298E /* inter_18pt_extralight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 685AD8ADA2F04D879857BB99 /* inter_18pt_extralight.ttf */; };
+		3706BA4D94C24661B46C27B3 /* inter_18pt_extralightitalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9F40F6F33207439ABECE9A58 /* inter_18pt_extralightitalic.ttf */; };
+		AEF18861A2964C069E638BCE /* inter_18pt_italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 15C25FBB61D34378956F57EF /* inter_18pt_italic.ttf */; };
+		2E4B9EC565334948B8CD8D29 /* inter_18pt_light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0025D1868CBD4B80B66EB486 /* inter_18pt_light.ttf */; };
+		03D10233207748549A1F7015 /* inter_18pt_lightitalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 34390F1BF966452F82AF890C /* inter_18pt_lightitalic.ttf */; };
+		76A0EF90B000430E85293CB4 /* inter_18pt_medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0C9E8C90A8D34937AFC9E654 /* inter_18pt_medium.ttf */; };
+		122E63E86D2C44C99F693C45 /* inter_18pt_mediumitalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CDDCACACA63A4A238C9466D7 /* inter_18pt_mediumitalic.ttf */; };
+		47EE04E5712C47F9B62FD035 /* inter_18pt_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0BAD69A28E6D4FA094FA191F /* inter_18pt_regular.ttf */; };
+		17BC7E9721F54FB986BCB26F /* inter_18pt_semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 986AD23CE3424A71A2D1F021 /* inter_18pt_semibold.ttf */; };
+		0C8ACBE9C1A04C4180FBDC5B /* inter_18pt_semibolditalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 231C1D8EEF134A0B9DF2C170 /* inter_18pt_semibolditalic.ttf */; };
+		4811B170BD4345F887F4C442 /* inter_18pt_thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3D07983D67D7461DB29A510E /* inter_18pt_thin.ttf */; };
+		653F17DE0065401D9B9FEB5D /* inter_18pt_thinitalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4E123AA45D8A46CBAFC4F842 /* inter_18pt_thinitalic.ttf */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		13B07F961A680F5B00A75B9A /* pocketchess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = pocketchess.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = pocketchess/AppDelegate.h; sourceTree = "<group>"; };
+		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = pocketchess/AppDelegate.mm; sourceTree = "<group>"; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = pocketchess/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = pocketchess/Info.plist; sourceTree = "<group>"; };
+		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = pocketchess/main.m; sourceTree = "<group>"; };
+		58EEBF8E8E6FB1BC6CAF49B5 /* libPods-pocketchess.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-pocketchess.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6C2E3173556A471DD304B334 /* Pods-pocketchess.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pocketchess.debug.xcconfig"; path = "Target Support Files/Pods-pocketchess/Pods-pocketchess.debug.xcconfig"; sourceTree = "<group>"; };
+		7A4D352CD337FB3A3BF06240 /* Pods-pocketchess.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pocketchess.release.xcconfig"; path = "Target Support Files/Pods-pocketchess/Pods-pocketchess.release.xcconfig"; sourceTree = "<group>"; };
+		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = pocketchess/SplashScreen.storyboard; sourceTree = "<group>"; };
+		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
+		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-pocketchess/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		DE0869CFA2D8441CB69E1942 /* noop-file.swift */ = {isa = PBXFileReference; name = "noop-file.swift"; path = "pocketchess/noop-file.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		CB204C28D3E04BEBBFE975B1 /* pocketchess-Bridging-Header.h */ = {isa = PBXFileReference; name = "pocketchess-Bridging-Header.h"; path = "pocketchess/pocketchess-Bridging-Header.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
+		43ADBAE7B9F04CD9A916F12B /* Inter-Variable_opsz,wght.ttf */ = {isa = PBXFileReference; name = "Inter-Variable_opsz,wght.ttf"; path = "../assets/fonts/Inter-Variable_opsz,wght.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		1EB53E8B8B7B429DB8EC4115 /* inter_18pt_black.ttf */ = {isa = PBXFileReference; name = "inter_18pt_black.ttf"; path = "../assets/fonts/inter_18pt_black.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		F1FA14AA8447489B8EFECCD7 /* inter_18pt_blackitalic.ttf */ = {isa = PBXFileReference; name = "inter_18pt_blackitalic.ttf"; path = "../assets/fonts/inter_18pt_blackitalic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		2C008B750EC644F5B218EFE4 /* inter_18pt_bold.ttf */ = {isa = PBXFileReference; name = "inter_18pt_bold.ttf"; path = "../assets/fonts/inter_18pt_bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		7B1420E8D50447D1BB793FA5 /* inter_18pt_bolditalic.ttf */ = {isa = PBXFileReference; name = "inter_18pt_bolditalic.ttf"; path = "../assets/fonts/inter_18pt_bolditalic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		16C11553988F49FAA0BBBB6E /* inter_18pt_extrabold.ttf */ = {isa = PBXFileReference; name = "inter_18pt_extrabold.ttf"; path = "../assets/fonts/inter_18pt_extrabold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		453A35240155477994681FEA /* inter_18pt_extrabolditalic.ttf */ = {isa = PBXFileReference; name = "inter_18pt_extrabolditalic.ttf"; path = "../assets/fonts/inter_18pt_extrabolditalic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		685AD8ADA2F04D879857BB99 /* inter_18pt_extralight.ttf */ = {isa = PBXFileReference; name = "inter_18pt_extralight.ttf"; path = "../assets/fonts/inter_18pt_extralight.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		9F40F6F33207439ABECE9A58 /* inter_18pt_extralightitalic.ttf */ = {isa = PBXFileReference; name = "inter_18pt_extralightitalic.ttf"; path = "../assets/fonts/inter_18pt_extralightitalic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		15C25FBB61D34378956F57EF /* inter_18pt_italic.ttf */ = {isa = PBXFileReference; name = "inter_18pt_italic.ttf"; path = "../assets/fonts/inter_18pt_italic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		0025D1868CBD4B80B66EB486 /* inter_18pt_light.ttf */ = {isa = PBXFileReference; name = "inter_18pt_light.ttf"; path = "../assets/fonts/inter_18pt_light.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		34390F1BF966452F82AF890C /* inter_18pt_lightitalic.ttf */ = {isa = PBXFileReference; name = "inter_18pt_lightitalic.ttf"; path = "../assets/fonts/inter_18pt_lightitalic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		0C9E8C90A8D34937AFC9E654 /* inter_18pt_medium.ttf */ = {isa = PBXFileReference; name = "inter_18pt_medium.ttf"; path = "../assets/fonts/inter_18pt_medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		CDDCACACA63A4A238C9466D7 /* inter_18pt_mediumitalic.ttf */ = {isa = PBXFileReference; name = "inter_18pt_mediumitalic.ttf"; path = "../assets/fonts/inter_18pt_mediumitalic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		0BAD69A28E6D4FA094FA191F /* inter_18pt_regular.ttf */ = {isa = PBXFileReference; name = "inter_18pt_regular.ttf"; path = "../assets/fonts/inter_18pt_regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		986AD23CE3424A71A2D1F021 /* inter_18pt_semibold.ttf */ = {isa = PBXFileReference; name = "inter_18pt_semibold.ttf"; path = "../assets/fonts/inter_18pt_semibold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		231C1D8EEF134A0B9DF2C170 /* inter_18pt_semibolditalic.ttf */ = {isa = PBXFileReference; name = "inter_18pt_semibolditalic.ttf"; path = "../assets/fonts/inter_18pt_semibolditalic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		3D07983D67D7461DB29A510E /* inter_18pt_thin.ttf */ = {isa = PBXFileReference; name = "inter_18pt_thin.ttf"; path = "../assets/fonts/inter_18pt_thin.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		4E123AA45D8A46CBAFC4F842 /* inter_18pt_thinitalic.ttf */ = {isa = PBXFileReference; name = "inter_18pt_thinitalic.ttf"; path = "../assets/fonts/inter_18pt_thinitalic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		13B07F8C1A680F5B00A75B9A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96905EF65AED1B983A6B3ABC /* libPods-pocketchess.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		13B07FAE1A68108700A75B9A /* pocketchess */ = {
+			isa = PBXGroup;
+			children = (
+				BB2F792B24A3F905000567C9 /* Supporting */,
+				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
+				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
+				13B07FB51A68108700A75B9A /* Images.xcassets */,
+				13B07FB61A68108700A75B9A /* Info.plist */,
+				13B07FB71A68108700A75B9A /* main.m */,
+				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
+				DE0869CFA2D8441CB69E1942 /* noop-file.swift */,
+				CB204C28D3E04BEBBFE975B1 /* pocketchess-Bridging-Header.h */,
+			);
+			name = pocketchess;
+			sourceTree = "<group>";
+		};
+		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
+				58EEBF8E8E6FB1BC6CAF49B5 /* libPods-pocketchess.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Libraries;
+			sourceTree = "<group>";
+		};
+		83CBB9F61A601CBA00E9B192 = {
+			isa = PBXGroup;
+			children = (
+				13B07FAE1A68108700A75B9A /* pocketchess */,
+				832341AE1AAA6A7D00B99B32 /* Libraries */,
+				83CBBA001A601CBA00E9B192 /* Products */,
+				2D16E6871FA4F8E400B85C8A /* Frameworks */,
+				D65327D7A22EEC0BE12398D9 /* Pods */,
+				D7E4C46ADA2E9064B798F356 /* ExpoModulesProviders */,
+				E73ECFF2BBEE42BDA8A39B9C /* Resources */,
+			);
+			indentWidth = 2;
+			sourceTree = "<group>";
+			tabWidth = 2;
+			usesTabs = 0;
+		};
+		83CBBA001A601CBA00E9B192 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				13B07F961A680F5B00A75B9A /* pocketchess.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		92DBD88DE9BF7D494EA9DA96 /* pocketchess */ = {
+			isa = PBXGroup;
+			children = (
+				FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */,
+			);
+			name = pocketchess;
+			sourceTree = "<group>";
+		};
+		BB2F792B24A3F905000567C9 /* Supporting */ = {
+			isa = PBXGroup;
+			children = (
+				BB2F792C24A3F905000567C9 /* Expo.plist */,
+			);
+			name = Supporting;
+			path = pocketchess/Supporting;
+			sourceTree = "<group>";
+		};
+		D65327D7A22EEC0BE12398D9 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				6C2E3173556A471DD304B334 /* Pods-pocketchess.debug.xcconfig */,
+				7A4D352CD337FB3A3BF06240 /* Pods-pocketchess.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		D7E4C46ADA2E9064B798F356 /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				92DBD88DE9BF7D494EA9DA96 /* pocketchess */,
+			);
+			name = ExpoModulesProviders;
+			sourceTree = "<group>";
+		};
+		E73ECFF2BBEE42BDA8A39B9C /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				43ADBAE7B9F04CD9A916F12B /* Inter-Variable_opsz,wght.ttf */,
+				1EB53E8B8B7B429DB8EC4115 /* inter_18pt_black.ttf */,
+				F1FA14AA8447489B8EFECCD7 /* inter_18pt_blackitalic.ttf */,
+				2C008B750EC644F5B218EFE4 /* inter_18pt_bold.ttf */,
+				7B1420E8D50447D1BB793FA5 /* inter_18pt_bolditalic.ttf */,
+				16C11553988F49FAA0BBBB6E /* inter_18pt_extrabold.ttf */,
+				453A35240155477994681FEA /* inter_18pt_extrabolditalic.ttf */,
+				685AD8ADA2F04D879857BB99 /* inter_18pt_extralight.ttf */,
+				9F40F6F33207439ABECE9A58 /* inter_18pt_extralightitalic.ttf */,
+				15C25FBB61D34378956F57EF /* inter_18pt_italic.ttf */,
+				0025D1868CBD4B80B66EB486 /* inter_18pt_light.ttf */,
+				34390F1BF966452F82AF890C /* inter_18pt_lightitalic.ttf */,
+				0C9E8C90A8D34937AFC9E654 /* inter_18pt_medium.ttf */,
+				CDDCACACA63A4A238C9466D7 /* inter_18pt_mediumitalic.ttf */,
+				0BAD69A28E6D4FA094FA191F /* inter_18pt_regular.ttf */,
+				986AD23CE3424A71A2D1F021 /* inter_18pt_semibold.ttf */,
+				231C1D8EEF134A0B9DF2C170 /* inter_18pt_semibolditalic.ttf */,
+				3D07983D67D7461DB29A510E /* inter_18pt_thin.ttf */,
+				4E123AA45D8A46CBAFC4F842 /* inter_18pt_thinitalic.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		13B07F861A680F5B00A75B9A /* pocketchess */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "pocketchess" */;
+			buildPhases = (
+				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
+				13B07F871A680F5B00A75B9A /* Sources */,
+				13B07F8C1A680F5B00A75B9A /* Frameworks */,
+				13B07F8E1A680F5B00A75B9A /* Resources */,
+				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
+				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = pocketchess;
+			productName = pocketchess;
+			productReference = 13B07F961A680F5B00A75B9A /* pocketchess.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		83CBB9F71A601CBA00E9B192 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1130;
+				TargetAttributes = {
+					13B07F861A680F5B00A75B9A = {
+						LastSwiftMigration = 1250;
+					};
+				};
+			};
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "pocketchess" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 83CBB9F61A601CBA00E9B192;
+			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				13B07F861A680F5B00A75B9A /* pocketchess */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		13B07F8E1A680F5B00A75B9A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
+				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
+				4C6666F0FDDF45879AFA3DDF /* pocketchess-Bridging-Header.h in Resources */,
+				F2D4D99474BA4D1EA41ABB71 /* Inter-Variable_opsz,wght.ttf in Resources */,
+				312820B30A2948A1B2C48A35 /* inter_18pt_black.ttf in Resources */,
+				2A395FDD2C0D47D5AB929B50 /* inter_18pt_blackitalic.ttf in Resources */,
+				35F4F11EB8274924AE36CEA8 /* inter_18pt_bold.ttf in Resources */,
+				E890A7D99D9F4EFA8EE04F9E /* inter_18pt_bolditalic.ttf in Resources */,
+				AC9E8AE25EEE49FAB188CCC7 /* inter_18pt_extrabold.ttf in Resources */,
+				BEE8162129BF41548278E4F4 /* inter_18pt_extrabolditalic.ttf in Resources */,
+				4DE28168F49745A085BD298E /* inter_18pt_extralight.ttf in Resources */,
+				3706BA4D94C24661B46C27B3 /* inter_18pt_extralightitalic.ttf in Resources */,
+				AEF18861A2964C069E638BCE /* inter_18pt_italic.ttf in Resources */,
+				2E4B9EC565334948B8CD8D29 /* inter_18pt_light.ttf in Resources */,
+				03D10233207748549A1F7015 /* inter_18pt_lightitalic.ttf in Resources */,
+				76A0EF90B000430E85293CB4 /* inter_18pt_medium.ttf in Resources */,
+				122E63E86D2C44C99F693C45 /* inter_18pt_mediumitalic.ttf in Resources */,
+				47EE04E5712C47F9B62FD035 /* inter_18pt_regular.ttf in Resources */,
+				17BC7E9721F54FB986BCB26F /* inter_18pt_semibold.ttf in Resources */,
+				0C8ACBE9C1A04C4180FBDC5B /* inter_18pt_semibolditalic.ttf in Resources */,
+				4811B170BD4345F887F4C442 /* inter_18pt_thin.ttf in Resources */,
+				653F17DE0065401D9B9FEB5D /* inter_18pt_thinitalic.ttf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Bundle React Native code and images";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n# The project root by default is one level up from the ios directory\nexport PROJECT_ROOT=\"$PROJECT_DIR\"/..\n\nif [[ \"$CONFIGURATION\" = *Debug* ]]; then\n  export SKIP_BUNDLING=1\nfi\nif [[ -z \"$ENTRY_FILE\" ]]; then\n  # Set the entry JS file using the bundler's entry resolution.\n  export ENTRY_FILE=\"$(\"$NODE_BINARY\" -e \"require('expo/scripts/resolveAppEntry')\" \"$PROJECT_ROOT\" ios absolute | tail -n 1)\"\nfi\n\nif [[ -z \"$CLI_PATH\" ]]; then\n  # Use Expo CLI\n  export CLI_PATH=\"$(\"$NODE_BINARY\" --print \"require.resolve('@expo/cli', { paths: [require.resolve('expo/package.json')] })\")\"\nfi\nif [[ -z \"$BUNDLE_COMMAND\" ]]; then\n  # Default Expo CLI command for bundling\n  export BUNDLE_COMMAND=\"export:embed\"\nfi\n\n# Source .xcode.env.updates if it exists to allow\n# SKIP_BUNDLING to be unset if needed\nif [[ -f \"$PODS_ROOT/../.xcode.env.updates\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.updates\"\nfi\n# Source local changes to allow overrides\n# if needed\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n`\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'\"`\n\n";
+		};
+		08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-pocketchess-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-pocketchess/Pods-pocketchess-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/EXConstants/EXConstants.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/EXUpdates/EXUpdates.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/RCTI18nStrings.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EXConstants.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EXUpdates.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RCTI18nStrings.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-pocketchess/Pods-pocketchess-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		13B07F871A680F5B00A75B9A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
+				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */,
+				0DD3FCB35A9F4B628F2F7CE1 /* noop-file.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		13B07F941A680F5B00A75B9A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6C2E3173556A471DD304B334 /* Pods-pocketchess.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_BITCODE = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"FB_SONARKIT_ENABLED=1",
+				);
+				INFOPLIST_FILE = pocketchess/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.anonymous.pocket-chess";
+				PRODUCT_NAME = "pocketchess";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				TARGETED_DEVICE_FAMILY = "1";
+				SWIFT_OBJC_BRIDGING_HEADER = pocketchess/pocketchess-Bridging-Header.h;
+				CODE_SIGN_ENTITLEMENTS = pocketchess/pocketchess.entitlements;
+			};
+			name = Debug;
+		};
+		13B07F951A680F5B00A75B9A /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7A4D352CD337FB3A3BF06240 /* Pods-pocketchess.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = pocketchess/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.anonymous.pocket-chess";
+				PRODUCT_NAME = "pocketchess";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				TARGETED_DEVICE_FAMILY = "1";
+				SWIFT_OBJC_BRIDGING_HEADER = pocketchess/pocketchess-Bridging-Header.h;
+				CODE_SIGN_ENTITLEMENTS = pocketchess/pocketchess.entitlements;
+			};
+			name = Release;
+		};
+		83CBBA201A601CBA00E9B192 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
+				LIBRARY_SEARCH_PATHS = "\"$(inherited)\"";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		83CBBA211A601CBA00E9B192 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
+				LIBRARY_SEARCH_PATHS = "\"$(inherited)\"";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "pocketchess" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				13B07F941A680F5B00A75B9A /* Debug */,
+				13B07F951A680F5B00A75B9A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "pocketchess" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				83CBBA201A601CBA00E9B192 /* Debug */,
+				83CBBA211A601CBA00E9B192 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 83CBB9F71A601CBA00E9B192 /* Project object */;
+}

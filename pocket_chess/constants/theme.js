@@ -11,7 +11,7 @@ const COLORS = {
 };
 
 const FONTS = {
-  BASE_FONT_NAME: "Inter",
+  BASE_FONT_NAME: "Inter 18pt",
   light: "100",
   regular: "300",
   medium: "400",
