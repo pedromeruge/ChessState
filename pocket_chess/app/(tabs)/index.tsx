@@ -5,6 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import * as Constants from '../../constants';
 import IconComponent from '../../components/common/IconComponent.jsx';
+import ActionButton from '../../components/common/ActionButton';
+
 import React from 'react';
 // import CameraPermissionPage from '../../components/CameraPermissionPage';
 // import NoCameraDeviceError from '../../components/NoCameraDeviceError';
@@ -13,7 +15,6 @@ import React from 'react';
 
 const Scan = () => {
   
-  const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
 
   function openHelpBox() {
@@ -46,39 +47,39 @@ const Scan = () => {
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.iconRowTop}>
             <TouchableOpacity style={styles.button} onPress={openHelpBox}>
-              <IconComponent source={Constants.icons.help} width={30} height={30}/>
+              <IconComponent source={Constants.icons.help} width={35}/>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={openSettings}>
-              <IconComponent source={Constants.icons.settings} width={30} height={30}/>
+              <IconComponent source={Constants.icons.settings} width={35}/>
             </TouchableOpacity>
           </View>
 
           {/* Permission explanation and button if not granted */}
           {!permission?.granted && (
             <View style={styles.permissionContainer}>
-              <IconComponent source={Constants.icons.no_camera} width={100} height={100} tintColor={Constants.COLORS.text_grey} />
+              <IconComponent source={Constants.icons.no_camera} width={100} tintColor={Constants.COLORS.text_grey} />
               <Text style={styles.message}>
                 <Text> Without permission to access camera, </Text>
                 <Text style={styles.bold_text}>Pocket Chess </Text>
                 <Text>can't scan chessboard</Text>
               </Text>
-              <Button onPress={requestPermission} title="Grant Permission" />
+              <ActionButton source={Constants.icons.camera} text="Give access" onPress={requestPermission} size={35}/>
             </View>
           )}
 
           <View style={styles.iconRowBottom}>
             <TouchableOpacity style={styles.button} onPress={openGallery}>
-              <IconComponent source={Constants.icons.gallery} width={30} height={30}/>
+              <IconComponent source={Constants.icons.gallery} width={35}/>
             </TouchableOpacity>
             {/* Conditionally render scan and flash buttons
               NOTE: the <> is needed to group >=2 components in one conditional statement*/}
             {permission?.granted && (
               <>
                 <TouchableOpacity style={styles.button} onPress={scanCamera}>
-                  <IconComponent source={Constants.icons.scan_button} width={75} height={75} opacity={0.8}/>
+                  <IconComponent source={Constants.icons.scan_button} width={75} opacity={0.8}/>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={toggleFlash}>
-                  <IconComponent source={Constants.icons.flash} width={30} height={30}/>
+                  <IconComponent source={Constants.icons.flash} width={35}/>
                 </TouchableOpacity>
               </>
             )}
@@ -108,11 +109,13 @@ const styles = StyleSheet.create({
 
   message: {
     textAlign: 'center',
-    lineHeight: 19,
+    lineHeight: 20,
     color: Constants.COLORS.text_grey,
     fontFamily: Constants.FONTS.BASE_FONT_NAME,
     fontSize: Constants.SIZES.large,
-    fontWeight: Constants.FONTS.regular as TextStyle['fontWeight']
+    fontWeight: Constants.FONTS.regular as TextStyle['fontWeight'],
+    marginTop: 10,
+    marginBottom: 50
   },
 
   bold_text: {
@@ -126,7 +129,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    padding: 30,
+    padding: 35,
   },
   iconRowBottom: {
     position: 'absolute',
@@ -134,7 +137,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
-    padding: 30,
+    paddingBottom: 40,
   },
   
   button: {

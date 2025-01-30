@@ -12,13 +12,13 @@ const COLORS = {
 
 const FONTS = {
   BASE_FONT_NAME: "Inter 18pt",
-  light: "100",
-  regular: "300",
-  medium: "400",
-  semi_bold: "500",
-  bold: "600",
-  extra_bold: "700",
-  black: "800"
+  light: "300",
+  regular: "400",
+  medium: "500",
+  semi_bold: "600",
+  bold: "700",
+  extra_bold: "800",
+  black: "900"
 };
 
 const SIZES = {
