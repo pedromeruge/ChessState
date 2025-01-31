@@ -1,3 +1,6 @@
+
+import {StyleSheet } from 'react-native';
+
 const COLORS = {
   text_dark: "#1E1E1E",
   text_dark_2: "#434343",
@@ -32,27 +35,17 @@ const SIZES = {
   xxxLarge: 60
 };
 
-const SHADOWS = {
+const SHADOWS = StyleSheet.create({
   small: {
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 2,
+    boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2), 0px 5px 30px rgba(0, 0, 0, 0.19)',
   },
+
   medium: {
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
+    shadowOffset: {width: 0, height: -2},
     shadowRadius: 5.84,
-    elevation: 5,
-  },
-};
+    shadowOpacity: 0.25
+  }
+})
 
 export { COLORS, FONTS, SIZES, SHADOWS };

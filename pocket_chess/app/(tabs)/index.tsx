@@ -8,8 +8,6 @@ import IconComponent from '../../components/common/IconComponent.jsx';
 import ActionButton from '../../components/common/ActionButton';
 
 import React from 'react';
-// import CameraPermissionPage from '../../components/CameraPermissionPage';
-// import NoCameraDeviceError from '../../components/NoCameraDeviceError';
 
 // based on https://docs.expo.dev/versions/latest/sdk/camera/
 
@@ -46,40 +44,40 @@ const Scan = () => {
         {/* Ui content in safe visible areas */}
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.iconRowTop}>
-            <TouchableOpacity style={styles.button} onPress={openHelpBox}>
-              <IconComponent source={Constants.icons.help} width={35}/>
+            <TouchableOpacity onPress={openHelpBox}>
+              <IconComponent source={Constants.icons.help} width={30}/>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={openSettings}>
-              <IconComponent source={Constants.icons.settings} width={35}/>
+            <TouchableOpacity onPress={openSettings}>
+              <IconComponent source={Constants.icons.settings} width={30}/>
             </TouchableOpacity>
           </View>
 
           {/* Permission explanation and button if not granted */}
           {!permission?.granted && (
             <View style={styles.permissionContainer}>
-              <IconComponent source={Constants.icons.no_camera} width={100} tintColor={Constants.COLORS.text_grey} />
+              <IconComponent source={Constants.icons.no_camera} width={90} tintColor={Constants.COLORS.text_grey} />
               <Text style={styles.message}>
                 <Text> Without permission to access camera, </Text>
                 <Text style={styles.bold_text}>Pocket Chess </Text>
                 <Text>can't scan chessboard</Text>
               </Text>
-              <ActionButton source={Constants.icons.camera} text="Give access" onPress={requestPermission} size={35}/>
+              <ActionButton source={Constants.icons.camera} text="Give access" onPress={requestPermission} size={36}/>
             </View>
           )}
 
-          <View style={styles.iconRowBottom}>
-            <TouchableOpacity style={styles.button} onPress={openGallery}>
-              <IconComponent source={Constants.icons.gallery} width={35}/>
+          <View style={[styles.iconRowBottom, permission?.granted ? styles.iconRowBottomPermissionGranted : null]}>
+            <TouchableOpacity onPress={openGallery}>
+              <IconComponent source={Constants.icons.gallery} width={30}/>
             </TouchableOpacity>
             {/* Conditionally render scan and flash buttons
               NOTE: the <> is needed to group >=2 components in one conditional statement*/}
             {permission?.granted && (
               <>
-                <TouchableOpacity style={styles.button} onPress={scanCamera}>
+                <TouchableOpacity onPress={scanCamera}>
                   <IconComponent source={Constants.icons.scan_button} width={75} opacity={0.8}/>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={toggleFlash}>
-                  <IconComponent source={Constants.icons.flash} width={35}/>
+                <TouchableOpacity onPress={toggleFlash}>
+                  <IconComponent source={Constants.icons.flash} width={30}/>
                 </TouchableOpacity>
               </>
             )}
@@ -129,8 +127,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    padding: 35,
+    padding: 30,
   },
+
   iconRowBottom: {
     position: 'absolute',
     bottom: 0,
@@ -138,11 +137,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     width: '100%',
     paddingBottom: 40,
+    alignItems: 'center'
   },
-  
-  button: {
-    alignItems: 'center',
-  },
+  iconRowBottomPermissionGranted: {
+    paddingBottom: (40 - 17.5)
+  }
 });
 
 export default Scan

@@ -8,7 +8,6 @@ const IconComponent = ({ source, width, tintColor=null, opacity=1.0}) => {
     console.warn("Icon source is missing!");
     return null;
   }
-
 //   return (
 //       <SvgUri
 //         width={width}
