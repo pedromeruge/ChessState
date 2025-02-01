@@ -9,10 +9,10 @@ import ActionButton from '../../components/common/ActionButton';
 
 import React from 'react';
 
-// based on https://docs.expo.dev/versions/latest/sdk/camera/
+// camera based on https://docs.expo.dev/versions/latest/sdk/camera/
 
 const Scan = () => {
-  
+  const [flashMode, setFlashMode] = useState(false); // track camera flash state
   const [permission, requestPermission] = useCameraPermissions();
 
   function openHelpBox() {
@@ -32,14 +32,14 @@ const Scan = () => {
   }
 
   function toggleFlash() {
-    console.log('flash');
+    setFlashMode(!flashMode);
   }
 
   return (
     <View style={styles.container}>
       {/* Conditionally render the camera feed if permission is granted */}
       {permission?.granted && 
-        <CameraView style={StyleSheet.absoluteFill} />}
+        <CameraView style={StyleSheet.absoluteFill} enableTorch={flashMode}/>}
 
         {/* Ui content in safe visible areas */}
         <SafeAreaView style={styles.safeArea}>
@@ -77,7 +77,7 @@ const Scan = () => {
                   <IconComponent source={Constants.icons.scan_button} width={75} opacity={0.8}/>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={toggleFlash}>
-                  <IconComponent source={Constants.icons.flash} width={30}/>
+                  <IconComponent source={flashMode ? Constants.icons.flash_on : Constants.icons.flash_off} width={30}/>
                 </TouchableOpacity>
               </>
             )}
