@@ -15,5 +15,11 @@ export default {
   gallery: require("../assets/icons/gallery.png"),
   help: require("../assets/icons/help.png"),
   scan_button: require("../assets/icons/scan_button.png"),
-  settings: require("../assets/icons/settings.png")
+  settings: require("../assets/icons/settings.png"),
+  hourglass: require("../assets/icons/hourglass.png"),
+  preset_bullet: require("../assets/icons/preset_bullet.png"),
+  preset_custom: require("../assets/icons/preset_custom.png"),
+  preset_rapid: require("../assets/icons/preset_rapid.png"),
+  preset_standard: require("../assets/icons/preset_standard.png"),
+  plus: require("../assets/icons/plus.png")
 };

@@ -26,7 +26,8 @@ const TabLayout = () => {
     }, []);
 
     return (
-        <Tabs tabBar={props => <BottomNavBar {...props}/>}
+        <Tabs 
+          tabBar={props => <BottomNavBar {...props}/>}
           screenOptions={{
             headerShown: false,
             animation: 'fade',

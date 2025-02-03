@@ -1,12 +1,9 @@
-import {StyleSheet } from 'react-native';
+import { useEffect, useState } from 'react';
+import { StyleSheet,View, } from 'react-native';
 
 import * as Constants from '../constants/index.js';
-
-import { View, LayoutChangeEvent } from 'react-native';
 import IconComponent from './common/IconComponent.jsx';
 import { BottomNavBarItem } from './BottomNavBarItem.jsx';
-import {useState} from 'react'
-import { useEffect } from 'react';
 import Animated, { useAnimatedStyle, withSpring, withDecay, withTiming, useSharedValue } from 'react-native-reanimated';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
@@ -56,7 +53,7 @@ function BottomNavBar({ state, descriptors, navigation }) {
     }
 
     return (
-        <View onLayout ={onTabbarLayout} style={[styles.tabBar, Constants.SHADOWS.small]}>
+        <View onLayout ={onTabbarLayout} style={[styles.tabBar, Constants.SHADOWS.navbar]}>
             <Animated.View style ={[animatedStyle, styles.indicator]}/>
             {state.routes.map((route, index) => {
                 const { options } = descriptors[route.key];

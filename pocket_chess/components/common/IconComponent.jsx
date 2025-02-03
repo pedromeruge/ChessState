@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { SvgUri } from 'react-native-svg';
 import { Image } from 'react-native';
 
-const IconComponent = ({ source, width, tintColor=null, opacity=1.0}) => {
+const IconComponent = ({ source, width, tintColor=null, opacity=1.0, addStyle=null, ...props}) => {
   if (!source) {
     console.warn("Icon source is missing!");
     return null;
@@ -27,8 +27,9 @@ const IconComponent = ({ source, width, tintColor=null, opacity=1.0}) => {
 return (
   <Image 
     source={source} 
-    style={[styles.icon, tintColor ? {tintColor: tintColor} : null, width ? {width: width} : null]}
+    style={[styles.icon, addStyle, tintColor ? {tintColor: tintColor} : null, width ? {width: width} : null]}
     resizeMode="contain"
+    {...props} // pass any other props to the Image component
   />
 );
 

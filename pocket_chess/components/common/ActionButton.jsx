@@ -5,7 +5,7 @@ import * as Constants from '../../constants';
 
 //default button to be used throughout the app 
 
-const ActionButton = ({ source, text, onPress, size=36, textColor=Constants.COLORS.white, backColor=Constants.COLORS.contrast_red_dark}) => {
+const ActionButton = ({ source, text, onPress, size=36, textColor=Constants.COLORS.white, backColor=Constants.COLORS.contrast_red_dark, componentStyle=null, textStyle=null}) => {
   if (!source) {
     console.warn("Icon source is missing!");
     return null;
@@ -37,11 +37,11 @@ const ActionButton = ({ source, text, onPress, size=36, textColor=Constants.COLO
   });
 
 return (
-  <TouchableOpacity onPress={onPress} style={[styles.button, {backgroundColor: backColor}]}>
+  <TouchableOpacity onPress={onPress} style={[styles.button, {backgroundColor: backColor}, componentStyle]}>
     <IconComponent style={styles.icon} source={source} width={size * 0.6} height={size/2} tintColor={textColor}/>
-    <Text style={styles.text}>{text}</Text>
+    <Text style={[styles.text, textStyle]}>{text}</Text>
   </TouchableOpacity>
 );
 
 };
-export default ActionButton;
+export default ActionButton ;

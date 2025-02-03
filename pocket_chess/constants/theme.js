@@ -10,7 +10,11 @@ const COLORS = {
   contrast_red_light: "#BB8588",
   contrast_red_dark: "#B7555B",
   contrast_blue_light: "#6BC7CB",
-  contrast_blue_dark: "#4C526F"
+  contrast_blue_dark: "#4C526F",
+  preset_blue: "#6BC7CB",
+  preset_yellow: "#E4CC52",
+  preset_green: "#51A250",
+  preset_red: "#BB8588"
 };
 
 const FONTS = {
@@ -27,6 +31,7 @@ const FONTS = {
 const SIZES = {
   xxSmall: 8,
   xSmall: 10,
+  mSmall: 11,
   small: 12,
   medium: 14,
   large: 16,
@@ -36,8 +41,12 @@ const SIZES = {
 };
 
 const SHADOWS = StyleSheet.create({
-  small: {
-    boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2), 0px 5px 30px rgba(0, 0, 0, 0.19)',
+  navbar: {
+    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2), 0px 5px 30px rgba(0, 0, 0, 0.19)',
+  },
+  
+  timer: {
+    boxShadow: '0 4 8 rgba(0, 0, 0, 0.2)',
   },
 
   medium: {
