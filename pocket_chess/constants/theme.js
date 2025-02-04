@@ -14,7 +14,8 @@ const COLORS = {
   preset_blue: "#6BC7CB",
   preset_yellow: "#E4CC52",
   preset_green: "#51A250",
-  preset_red: "#BB8588"
+  preset_red: "#BB8588",
+  transparent: "rgba(0,0,0,0)"
 };
 
 const FONTS = {
@@ -50,10 +51,11 @@ const SHADOWS = StyleSheet.create({
   },
 
   medium: {
-    shadowColor: "#000",
-    shadowOffset: {width: 0, height: -2},
-    shadowRadius: 5.84,
-    shadowOpacity: 0.25
+    elevation: 3, // shadow on Android
+    shadowColor: '#000', // shadow on iOS
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
   }
 })
 

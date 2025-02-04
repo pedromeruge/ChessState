@@ -1,10 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, Dimensions } from 'react-native'
 import * as Constants from '../constants/index.js';
 import TimerPreset from './TimerPreset.jsx';
 import IconComponent from './common/IconComponent.jsx';
 import {LinearGradient} from 'expo-linear-gradient';
-import { convertToRGBA } from 'react-native-reanimated';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
@@ -20,7 +19,7 @@ const TimerPresetSection = ({icon, title, timers}) =>{
       };
 
     const flatListRef = useRef(null);
-
+    
     const handleScroll = (event) => {
         const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
         const bufferDistance = 30 // how far away from the end of a list we want to show the gradient
@@ -49,7 +48,7 @@ const TimerPresetSection = ({icon, title, timers}) =>{
                 renderItem={({item}) => (<TimerPreset timer={item} onPress={() => onPressTimer(item)}/>)}
                 onScroll={handleScroll}
                 onContentSizeChange={handleContentSizeChange}
-                scrollEventThrottle={32} // delay scroll events
+                scrollEventThrottle={16} // delay scroll events
                 contentContainerStyle={styles.presetsSectionContent}
                 style={styles.flatList} // allow shadows of timers to overflow
             />
@@ -103,7 +102,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: '50%',
         right: -30,
-        width: '25%',
+        width: '22%',
         height: '140%',
         transform: [{translateY: '-50%'}],
         zIndex: 1

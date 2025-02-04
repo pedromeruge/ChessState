@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef} from 'react';
 import { View, Text, StyleSheet, TextStyle, TouchableOpacity} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -6,6 +6,7 @@ import * as Constants from '../../constants';
 import IconComponent from '../../components/common/IconComponent.jsx';
 import {Stage, Timer} from '../../classes/Timer';
 import TimerPresetSection from '../../components/TimerPresetSection';
+import NewTimerModal from '../../components/NewTimerModal';
 
 const Play = () => {
 
@@ -18,7 +19,7 @@ const Play = () => {
   }
 
   function onPressNewTimer() {
-    console.log('new timer');
+    modalRef.current?.showModal();
   }
 
   const defaultTimers = {
@@ -72,6 +73,8 @@ const Play = () => {
     }
   }
 
+  const modalRef = useRef(null);
+
   return (
     <SafeAreaView style={styles.container}>
        <View style={styles.iconRowTop}>
@@ -91,7 +94,7 @@ const Play = () => {
           <View style={styles.presetsContainerHeader}>
             <Text style={styles.textPresetsContainerHeader}>Presets</Text>
             <TouchableOpacity onPress={onPressNewTimer} style={styles.newTimerButton}>
-              <IconComponent source={Constants.icons.plus} width={11} tintColor={Constants.COLORS.text_dark_2} />
+              <IconComponent source={Constants.icons.plus} width={12} tintColor={Constants.COLORS.text_dark_2} />
               <Text style={styles.newTimerButtonText}>New timer</Text>
             </TouchableOpacity>
           </View>
@@ -101,6 +104,7 @@ const Play = () => {
             })}
           </View>
         </View>
+        <NewTimerModal ref={modalRef}/>
     </SafeAreaView>
   )
 }

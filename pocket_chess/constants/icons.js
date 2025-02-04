@@ -21,5 +21,9 @@ export default {
   preset_custom: require("../assets/icons/preset_custom.png"),
   preset_rapid: require("../assets/icons/preset_rapid.png"),
   preset_standard: require("../assets/icons/preset_standard.png"),
-  plus: require("../assets/icons/plus.png")
+  plus: require("../assets/icons/plus.png"),
+  plus_thick: require("../assets/icons/plus_thick.png"),
+  cross: require("../assets/icons/cross.png"),
+  clock_lines: require("../assets/icons/clock_lines.png"),
+  clock_full: require("../assets/icons/clock_full.png")
 };
