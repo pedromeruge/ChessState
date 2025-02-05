@@ -61,7 +61,7 @@ const Scan = () => {
                 <Text style={styles.bold_text}>Pocket Chess </Text>
                 <Text>can't scan chessboard</Text>
               </Text>
-              <ActionButton source={Constants.icons.camera} text="Give access" onPress={requestPermission} size={36}/>
+              <ActionButton source={Constants.icons.camera} text="Give access" height={45} width={145} fontSize={Constants.SIZES.large} iconSize={20} onPress={requestPermission}/>
             </View>
           )}
 

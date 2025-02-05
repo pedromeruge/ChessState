@@ -5,7 +5,7 @@ import * as Constants from '../../constants';
 
 //default button to be used throughout the app 
 
-const ActionButton = ({ source, text, onPress, size=36, iconSize=null, fontSize=Constants.FONTS.xLarge, textColor=Constants.COLORS.white, backColor=Constants.COLORS.contrast_red_light, componentStyle=null, textStyle=null}) => {
+const ActionButton = ({ source, text, onPress,  height=45, width=null, iconSize=null, fontSize=Constants.SIZES.medium, textColor=Constants.COLORS.white, backColor=Constants.COLORS.contrast_red_light, componentStyle=null, textStyle=null}) => {
   if (!source) {
     console.warn("Icon source is missing!");
     return null;
@@ -14,24 +14,24 @@ const ActionButton = ({ source, text, onPress, size=36, iconSize=null, fontSize=
   const styles = StyleSheet.create({
     button: {
       flexDirection: 'row',
-      height: size,
-      width: 3*size,
+      height: height,
+      width: width? width : 3*height,
       backgroundColor: backColor,
       textColor: textColor,
-      paddingVertical: 0.05 * size,
-      paddingHorizontal: 0.4 * size,
+      paddingVertical: 0.05 * height,
+      paddingHorizontal: 0.4 * height,
       alignItems: 'center',
       justifyContent: 'center',
       borderRadius: 10
 
     },
     icon: {
-      width: iconSize? iconSize : 0.7 * size,
-      height: iconSize? iconSize : 0.7 * size,
+      width: iconSize? iconSize : 0.5 * height,
+      height: iconSize? iconSize : 0.5 * height,
       tintColor: textColor
     },
     text: {
-      marginLeft: 0.3 * size,
+      marginLeft: 0.3 * height,
       color: textColor,
       fontSize: fontSize,
       fontWeight: Constants.FONTS.medium,
@@ -43,7 +43,7 @@ const ActionButton = ({ source, text, onPress, size=36, iconSize=null, fontSize=
 
 return (
   <TouchableOpacity onPress={onPress} style={[styles.button, {backgroundColor: backColor}, componentStyle, Constants.SHADOWS.medium]}>
-    <IconComponent style={styles.icon} source={source} width={size * 0.6} height={size/2} tintColor={textColor}/>
+    <IconComponent style={styles.icon} source={source} tintColor={textColor}/>
     <Text style={[styles.text, textStyle]}>{text}</Text>
   </TouchableOpacity>
 );
