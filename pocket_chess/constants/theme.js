@@ -20,6 +20,7 @@ const COLORS = {
 
 const FONTS = {
   BASE_FONT_NAME: "Inter 18pt",
+  extra_light: "200",
   light: "300",
   regular: "400",
   medium: "500",
@@ -38,7 +39,8 @@ const SIZES = {
   large: 16,
   xLarge: 20,
   xxLarge: 25,
-  xxxLarge: 60
+  xxxLarge: 35,
+  veryLarge: 60
 };
 
 const SHADOWS = StyleSheet.create({

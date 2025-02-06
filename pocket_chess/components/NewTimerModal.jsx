@@ -79,7 +79,7 @@ const NewTimerModal = forwardRef(({}, ref) => { // expose the ref to the parent 
                         width={modalSize.width} 
                         height={modalSize.height} 
                         onConfirm={hideTimePicker} 
-                        onClose={hideTimePicker}
+                        onBack={hideTimePicker}
                     />
                 )}
                 {incrementPickerVisible && modalSize.width > 0 && modalSize.height > 0 && (
@@ -87,8 +87,9 @@ const NewTimerModal = forwardRef(({}, ref) => { // expose the ref to the parent 
                         ref={incrementPickerRef} 
                         width={modalSize.width} 
                         height={modalSize.height} 
+                        hideHours={true}
                         onConfirm={hideTimePicker} 
-                        onClose={hideTimePicker}
+                        onBack={hideTimePicker}
                     />
                 )}
             </View>

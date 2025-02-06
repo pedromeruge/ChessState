@@ -67,18 +67,14 @@ const NewTimerScreen1 = forwardRef(({onClose, onShowBaseTimePicker, onShowIncrem
                                 <IconComponent source={Constants.icons.clock_full} width={15} />
                                 <Text style={styles.timeTitleText}>Base time</Text>
                             </View>
-                            <TouchableOpacity >
-                                <TextInput placeholder="00:00:00" editable={false} selectTextOnFocus={false} placeholderTextColor={Constants.COLORS.line_light_grey} style={styles.timeInput}/>
-                            </TouchableOpacity>
+                            <TextInput placeholder="00:00:00" editable={false} selectTextOnFocus={false} placeholderTextColor={Constants.COLORS.line_light_grey} style={styles.timeInput}/>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.time} onPress={onShowIncrementPicker}>
                             <View style={styles.timeTitle}>
                                 <IconComponent source={Constants.icons.plus_thick} width={12} tintColor={Constants.COLORS.contrast_blue_light}/>
                                 <Text style={styles.timeTitleText}>Increment</Text>
                             </View>
-                            <TouchableOpacity >
-                                <TextInput placeholder="00:00" editable={false} selectTextOnFocus={false} placeholderTextColor={Constants.COLORS.line_light_grey} style={styles.timeInput}/>
-                            </TouchableOpacity>
+                            <TextInput placeholder="00:00" editable={false} selectTextOnFocus={false} placeholderTextColor={Constants.COLORS.line_light_grey} style={styles.timeInput}/>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.title}>
@@ -124,6 +120,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         minHeight: 40,
     },
+    
     containerHeaderLeft: {
         flexDirection: 'row',
         justifyContent: 'flex-start',

@@ -26,5 +26,6 @@ export default {
   cross: require("../assets/icons/cross.png"),
   clock_lines: require("../assets/icons/clock_lines.png"),
   clock_full: require("../assets/icons/clock_full.png"),
-  arrow_left: require("../assets/icons/arrow_left.png")
+  arrow_left: require("../assets/icons/arrow_left.png"),
+  check: require("../assets/icons/check.png"),
 };

@@ -7,7 +7,7 @@ import TimerPickerRoulette from './TimerPickerRoulette.jsx';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
-const NewTimerScreenPicker = forwardRef(({width, height, onConfirm, onBack}, ref) => { // expose the ref to the parent component
+const NewTimerScreenPicker = forwardRef(({width, height, hideHours=false, onConfirm, onBack}, ref) => { // expose the ref to the parent component
 
     const [titleText, setTitleText] = useState('');
     
@@ -25,17 +25,22 @@ const NewTimerScreenPicker = forwardRef(({width, height, onConfirm, onBack}, ref
     
     return (
         <SafeAreaView style={[styles(width, height).container, Constants.SHADOWS.medium]}>
-            <View style={styles.containerHeader}>
-                <View style={styles.containerHeaderLeft}>
+            <View style={styles(width, height).containerHeader}>
+                <View style={styles(width, height).containerHeaderLeft}>
                     <IconComponent source={Constants.icons.clock_lines} width={20} tintColor={Constants.COLORS.black}/>
-                    <Text style={styles.containerHeaderText}>New timer</Text>
+                    <Text style={styles(width, height).containerHeaderText}>New timer</Text>
                 </View>
-                <TouchableOpacity style={styles.containerHeaderRight} onPress={onBack}>
-                    <IconComponent source={Constants.icons.arrow_left} width={14} tintColor={Constants.COLORS.black}/>
+                <TouchableOpacity onPress={onBack}>
+                    <IconComponent source={Constants.icons.arrow_left} width={16} tintColor={Constants.COLORS.black}/>
                 </TouchableOpacity>
             </View>
-            <View>
-
+            <View style={styles(width, height).body}>
+                <View style={styles(width, height).roulette}>
+                    <TimerPickerRoulette hideHours={hideHours}/>
+                </View>
+                <TouchableOpacity style={styles(width,height).confirm} onPressOut={onConfirm}>
+                    <IconComponent source={Constants.icons.check} width={30} tintColor={Constants.COLORS.text_dark_2}/>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     )
@@ -46,12 +51,10 @@ const styles = (width,height) => StyleSheet.create({
     container: {
         backgroundColor: Constants.COLORS.white,
         borderRadius: 10,
-        justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
         width: width,
-        height: height
-
+        height: height,
     },
 
     containerHeader: {
@@ -62,6 +65,8 @@ const styles = (width,height) => StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 10,
         minHeight: 40,
+        borderBottomWidth: 1,
+        borderColor: Constants.COLORS.line_light_grey,
     },
     containerHeaderLeft: {
         flexDirection: 'row',
@@ -75,62 +80,36 @@ const styles = (width,height) => StyleSheet.create({
         fontColor: Constants.COLORS.text_dark,
         marginLeft: 8
     },     
-    containerHeaderRight: {
-    },
 
-    counter: {
+    body: {
         flexDirection: 'column',
-        paddingHorizontal: 25,
-        paddingVertical: 20,
-        alignItems: 'center',
-        width: '100%'
-    },
-
-    numberInputs: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        columnGap: '10%'
-    },
-
-    time: {
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'space-around',
+        borderColor: Constants.COLORS.line_light_grey,
         borderWidth: 1,
-        borderColor: Constants.COLORS.line_light_grey,
-        borderRadius: 10,
-        paddingHorizontal: 12,
-        paddingTop: 5,
-        paddingBottom: 10,
-        rowGap: 7
+        flex: 1,
+        width: '100%',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        position: 'relative',
+        paddingHorizontal: 20,
+        paddingVertical: 30,
     },
 
-    timeTitle: {
-        flexDirection: 'row',
-        alignItems: 'center'
+    roulette: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 
-    timeTitleText: {
-        fontFamily: Constants.FONTS.BASE_FONT_NAME,
-        fontSize: Constants.SIZES.large,
-        fontWeight: Constants.FONTS.medium,
-        fontColor: Constants.COLORS.text_grey,
-        marginLeft: 7,
+    confirm: {
+        position: 'absolute',
+        bottom: 30,
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 40,
+        width: 40,
+        borderRadius: 20,
         borderColor: Constants.COLORS.line_light_grey,
-    },
-
-    timeInput: {
-        fontFamily: Constants.FONTS.BASE_FONT_NAME,
-        fontSize: Constants.SIZES.large,
-        fontWeight: Constants.FONTS.medium,
-        fontColor: Constants.COLORS.text_grey,
-        borderBottomWidth: 1,
-        paddingBottom: 0,
-        borderColor: Constants.COLORS.line_light_grey,
-    },
-    startButton: {
-        marginTop: 30
+        borderWidth: 1,
     }
 });
 
