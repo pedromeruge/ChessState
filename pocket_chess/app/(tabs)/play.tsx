@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import * as Constants from '../../constants';
 import IconComponent from '../../components/common/IconComponent.jsx';
-import {Stage, Timer} from '../../classes/Timer';
+import {Stage, Timer, Time} from '../../classes/Timer';
 import TimerPresetSection from '../../components/TimerPresetSection';
 import NewTimerModal from '../../components/NewTimerModal';
 
@@ -28,12 +28,12 @@ const Play = () => {
       "title": "Bullet",
       "timers":
       [
-        new Timer([new Stage(MINUTE,0)],"1|0", Constants.COLORS.white, Constants.COLORS.preset_blue),
-        new Timer([new Stage(MINUTE, SECOND)],"1|1"),
-        new Timer([new Stage(2 * MINUTE, SECOND)],"2|1"),
-        new Timer([new Stage(2 * MINUTE, 5 * SECOND)],"2|5"),
-        new Timer([new Stage(2 * MINUTE, 5 * SECOND)],"2|5"),
-        new Timer([new Stage(2 * MINUTE, 5 * SECOND)],"2|5"),
+        new Timer([new Stage(new Time(0, 1, 0))],"1|0", Constants.COLORS.white, Constants.COLORS.preset_blue),
+        new Timer([new Stage(new Time(0, 1, 0), new Time(0, 0, 1))],"1|1"),
+        new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 1))],"2|1"),
+        new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 5))],"2|5"),
+        new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 5))],"2|5"),
+        new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 5))],"2|5")
       ]
     },
 
@@ -42,10 +42,10 @@ const Play = () => {
       "title": "Blitz",
       "timers":
       [
-        new Timer([new Stage(3 * MINUTE, 0)],"3|0", Constants.COLORS.white, Constants.COLORS.preset_yellow),
-        new Timer([new Stage(3 * MINUTE, 2 * SECOND)],"3|2"),
-        new Timer([new Stage(5 * MINUTE, 0)],"5|0"),
-        new Timer([new Stage(5 * MINUTE, 3 * SECOND)],"5|3"),
+        new Timer([new Stage(new Time(0, 3, 0))],"3|0", Constants.COLORS.white, Constants.COLORS.preset_yellow),
+        new Timer([new Stage(new Time(0, 3, 0), new Time(0, 0, 2))],"3|2"),
+        new Timer([new Stage(new Time(0, 5, 0))],"5|0"),
+        new Timer([new Stage(new Time(0, 5, 0), new Time(0, 0, 3))],"5|3"),
       ]
     },
     "rapid": {
@@ -53,10 +53,10 @@ const Play = () => {
       "title": "Rapid",
       "timers":
       [
-        new Timer([new Stage(10 * MINUTE, 0)],"10|0", Constants.COLORS.white, Constants.COLORS.preset_green),
-        new Timer([new Stage(10 * MINUTE, 5 * SECOND)],"10|5"),
-        new Timer([new Stage(15 * MINUTE, 10)],"15|10"),
-        new Timer([new Stage(25 * MINUTE, 10 * SECOND)],"25|10"),
+        new Timer([new Stage(new Time(0, 10, 0))],"10|0", Constants.COLORS.white, Constants.COLORS.preset_green),
+        new Timer([new Stage(new Time(0, 10, 0), new Time(0, 0, 5))],"10|5"),
+        new Timer([new Stage(new Time(0, 15, 0), new Time(0, 0, 10))],"15|10"),
+        new Timer([new Stage(new Time(0, 25, 0), new Time(0, 0, 10))],"25|10"),
       ]
     },
     "standard": {
@@ -65,10 +65,13 @@ const Play = () => {
       "timers":
       [ 
         new Timer(
-              [new Stage(90 * MINUTE, 0, 40), new Stage(30 * MINUTE, 0)],
+              [new Stage(new Time(0, 90, 0), new Time(0, 0, 0), 40), 
+                new Stage(new Time(0, 30, 0))],
               "90+30|30", Constants.COLORS.white, Constants.COLORS.preset_red
             ),
-        new Timer([new Stage(90 * MINUTE, 30 * SECOND)],"90|30"),
+        new Timer(
+          [new Stage(new Time(0, 90, 0), new Time(0, 0, 30))]
+          ,"90|30"),
       ]
     }
   }
@@ -196,7 +199,7 @@ const styles = StyleSheet.create({
 
 // time in milliseconds
 const SECOND = 1000
-const MINUTE = 60 * SECOND
-const HOUR = 60 * MINUTE
+const MINUTE = 60
+const HOUR = 60
 
 export default Play

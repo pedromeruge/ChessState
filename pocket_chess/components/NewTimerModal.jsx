@@ -1,9 +1,10 @@
-import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { SafeAreaView, View, StyleSheet, Modal, Pressable} from 'react-native'
 
 import * as Constants from '../constants/index.js';
-import NewTimerScreen1 from './NewTimerScreen1.jsx';
+import NewTimerScreenBase from './NewTimerScreenBase.jsx';
 import NewTimerScreenPicker from './NewTimerScreenPicker.jsx';
+import { Time } from '../classes/Timer.js';
 
 const NewTimerModal = forwardRef(({}, ref) => { // expose the ref to the parent component
 
@@ -11,14 +12,17 @@ const NewTimerModal = forwardRef(({}, ref) => { // expose the ref to the parent 
     const [visible, setVisible] = useState(false); // state to show/hide the modal
     const [baseTimePickerVisible, setBaseTimePickerVisible] = useState(false);
     const [incrementPickerVisible, setIncrementPickerVisible] = useState(false);
+
     const [modalSize, setModalSize] = useState({ width: 0, height: 0 }); // width and height of the modal, to keep consistent across modal sections
-    
+    const [baseTime, setBaseTime] = useState(new Time()); // track base time
+    const [incrementTime, setIncrementTime] = useState(new Time()); // track increment time
+    const [titleText, setTitleText] = useState('');
 
     // refs for the time picker roulettes for base time and increment
     const startScreenRef = useRef(null);
     const baseTimePickerRef = useRef(null);
     const incrementPickerRef = useRef(null);
-      
+    
     const showModal = () => {
         setVisible(true);
         startScreenRef.current?.showScreen();
@@ -65,11 +69,15 @@ const NewTimerModal = forwardRef(({}, ref) => { // expose the ref to the parent 
             <View style={styles.container}>
                 <Pressable style={styles.overlay} onPress={hideModal} />
                 {(!baseTimePickerVisible && !incrementPickerVisible) && (
-                    <NewTimerScreen1 
+                    <NewTimerScreenBase
                         ref={startScreenRef} 
                         onClose={hideModal} 
                         onShowBaseTimePicker={showBaseTimePicker} 
                         onShowIncrementPicker={showIncrementPicker} 
+                        baseTime={baseTime}
+                        increment={incrementTime}
+                        titleText={titleText}
+                        setTitleText={setTitleText}
                         onLayout={setModalSize}
                     />
                 )}
@@ -80,6 +88,7 @@ const NewTimerModal = forwardRef(({}, ref) => { // expose the ref to the parent 
                         height={modalSize.height} 
                         onConfirm={hideTimePicker} 
                         onBack={hideTimePicker}
+                        timer={baseTime}
                     />
                 )}
                 {incrementPickerVisible && modalSize.width > 0 && modalSize.height > 0 && (
@@ -90,6 +99,7 @@ const NewTimerModal = forwardRef(({}, ref) => { // expose the ref to the parent 
                         hideHours={true}
                         onConfirm={hideTimePicker} 
                         onBack={hideTimePicker}
+                        timer={incrementTime}
                     />
                 )}
             </View>

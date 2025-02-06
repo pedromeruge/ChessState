@@ -6,8 +6,65 @@ import * as Constants from '../constants';
  * @param {*} increment - increment per move in miliseconds
  * @param {*} moves - max moves, if null it's infinite
  */
+
+export class Time {
+    constructor(hours=0, minutes=0, seconds=0) {
+        this.hours = hours;
+        this.minutes = minutes;
+        this.seconds = seconds;
+    }
+
+    setHours(hours) {
+        this.hours = hours;
+    }
+
+    setMinutes(minutes) {
+        this.minutes = minutes;
+    }
+
+    setSeconds(seconds) {
+        this.seconds = seconds;
+    }
+
+    toStringClean() {
+        let timeParts = []
+
+        if (this.hours !== 0) {
+            timeParts.push(this.hours.toString().padStart(2, "0"));
+        }
+        if (this.minutes !== 0) {
+            timeParts.push(this.minutes.toString().padStart(2, "0"));
+        }
+
+        timeParts.push(this.seconds.toString().padStart(2, "0"));
+        
+        return timeParts.join(":");
+    }
+
+    toStringComplete() {
+        return `${this.hours.toString().padStart(2, "0")}:` +
+                `${this.minutes.toString().padStart(2, "0")}:`+
+                `${this.seconds.toString().padStart(2, "0")}`;
+    }
+
+    toStringMinSecs() {
+        return `${this.minutes.toString().padStart(2, "0")}:`+
+                `${this.seconds.toString().padStart(2, "0")}`; 
+    }
+
+    toMilliseconds() {
+        return (this.hours * 60 * 60 + 
+                this.minutes * 60 + 
+                this.seconds) * 1000;
+    }
+
+    isDefault() {
+        return this.hours === 0 && this.minutes === 0 && this.seconds === 0;
+    }
+}
+
 export class Stage {
-    constructor(time, increment, moves=null) {
+    constructor(time = new Time(0,0,0), increment= new Time(0,0,0), moves=null) {
         this.time = time;
         this.increment = increment;
         this.moves = moves;

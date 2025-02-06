@@ -1,6 +1,6 @@
 
 
-import React, { useState, forwardRef } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { TimerPicker } from "react-native-timer-picker";
 import { LinearGradient } from "expo-linear-gradient"; // or `import LinearGradient from "react-native-linear-gradient"`
@@ -10,40 +10,17 @@ import * as Haptics from "expo-haptics"; // for haptic feedback
 import * as Constants from '../constants/index.js';
 import { transform } from 'typescript';
 import { hide } from 'expo-router/build/utils/splash.js';
-
-const MILLISECONDS_PER_MINUTE = 60 * 1000;
-const MILLISECONDS_PER_HOUR = 60 * 60 * 1000;
-const MILLISECONDS_PER_DAY = 24 * MILLISECONDS_PER_HOUR;
+import { Time } from '../classes/Timer.js';
 
 //based on https://www.npmjs.com/package/react-native-timer-picker
-const TimerPickerRoulette = forwardRef(({hideHours=false}, ref) => {
-    const [alarmString, setAlarmString] = useState(null);
-
-    const formatTime = ({
-        hours,
-        minutes,
-        seconds,
-    }) => {
-        const timeParts = [];
-    
-        if (hours !== undefined) {
-            timeParts.push(hours.toString().padStart(2, "0"));
-        }
-        if (minutes !== undefined) {
-            timeParts.push(minutes.toString().padStart(2, "0"));
-        }
-        if (seconds !== undefined) {
-            timeParts.push(seconds.toString().padStart(2, "0"));
-        }
-    
-        return timeParts.join(":");
-    };
+const TimerPickerRoulette = ({timer, hideHours=false}) => {
 
     return (
         <View style={styles.container}>
             <TimerPicker
                 padWithNItems={2}
                 hideHours={hideHours}
+                initialValue={{hours: timer.hours, minutes: timer.minutes, seconds: timer.seconds}}
                 hourLabel="h"
                 minuteLabel="m"
                 secondLabel="s"
@@ -53,11 +30,20 @@ const TimerPickerRoulette = forwardRef(({hideHours=false}, ref) => {
                 aggressivelyGetLatestDuration={true}
                 allowFontScaling
                 padHoursWithZero
+                onDurationChange={({hours,minutes,seconds}) => {
+                    try {
+                        timer.setHours(hours);
+                        timer.setMinutes(minutes);
+                        timer.setSeconds(seconds);
+                    } catch (error) {
+                        console.error("Error setting timer: ", error);
+                    }
+                }}
                 styles={styles.roulette}
             />
         </View>
     )
-})
+}
 
 const styles = StyleSheet.create({
     container: {

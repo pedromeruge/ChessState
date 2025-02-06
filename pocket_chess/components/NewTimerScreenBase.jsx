@@ -6,11 +6,18 @@ import ActionButton from './common/ActionButton.jsx';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
-const NewTimerScreen1 = forwardRef(({onClose, onShowBaseTimePicker, onShowIncrementPicker, onLayout}, ref) => { // expose the ref to the parent component
+const NewTimerScreenBase = forwardRef(({
+        onClose, 
+        onShowBaseTimePicker, 
+        onShowIncrementPicker, 
+        baseTime, 
+        increment, 
+        titleText, 
+        setTitleText, 
+        onLayout}
+        , ref) => { // expose the ref to the parent component
 
     const [isKeyboardVisible, setIsKeyboardVisible] = useState(false); // state to alter container layout when keyboard is visible
-
-    const [titleText, setTitleText] = useState('');
     
     const showScreen = () => {
         setIsKeyboardVisible(false);
@@ -24,7 +31,7 @@ const NewTimerScreen1 = forwardRef(({onClose, onShowBaseTimePicker, onShowIncrem
     useImperativeHandle(ref, () => ({ // expose functions to the parent component
         showScreen,
         hideScreen,
-        // titleText,
+        titleText,
         // width,
         // height
     }));
@@ -67,27 +74,29 @@ const NewTimerScreen1 = forwardRef(({onClose, onShowBaseTimePicker, onShowIncrem
                                 <IconComponent source={Constants.icons.clock_full} width={15} />
                                 <Text style={styles.timeTitleText}>Base time</Text>
                             </View>
-                            <TextInput placeholder="00:00:00" editable={false} selectTextOnFocus={false} placeholderTextColor={Constants.COLORS.line_light_grey} style={styles.timeInput}/>
+                            <Text style={[styles.timeInput, {color: baseTime.isDefault() ? Constants.COLORS.line_light_grey : Constants.COLORS.text_dark_2}]}>{baseTime.toStringComplete()}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.time} onPress={onShowIncrementPicker}>
                             <View style={styles.timeTitle}>
                                 <IconComponent source={Constants.icons.plus_thick} width={12} tintColor={Constants.COLORS.contrast_blue_light}/>
                                 <Text style={styles.timeTitleText}>Increment</Text>
                             </View>
-                            <TextInput placeholder="00:00" editable={false} selectTextOnFocus={false} placeholderTextColor={Constants.COLORS.line_light_grey} style={styles.timeInput}/>
+                            <Text style={[styles.timeInput, {color: increment.isDefault() ? Constants.COLORS.line_light_grey : Constants.COLORS.text_dark_2}]}>{increment.toStringMinSecs()}</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.title}>
                         <Text style={styles.titleText}>Title:</Text>
-                        <TextInput style={styles.titleInput} placeholder="New timer" placeholderTextColor={Constants.COLORS.line_light_grey}
+                        <TextInput style={[styles.titleInput, {fontColor: titleText ? Constants.COLORS.text_dark_2 : Constants.COLORS.line_light_grey}]} placeholder="New timer" placeholderTextColor={Constants.COLORS.line_light_grey}
                             onFocus={() => setIsKeyboardVisible(true)}
                             onBlur={() => setIsKeyboardVisible(false)}
+                            onChangeText={setTitleText}
+                            value={titleText}
                         />
                     </View>
                     <ActionButton source={Constants.icons.hourglass} text="Start" height={45} iconSize={20} fontSize={Constants.SIZES.xxLarge} componentStyle={styles.startButton}
-                        onPress={() => onStartTimer()}
+                        onPress={onStartTimer}
                     />
-                    <TouchableOpacity style={styles.moreOptionsButton} onPress={() => onAdvancedOptions()}>
+                    <TouchableOpacity style={styles.moreOptionsButton} onPress={onAdvancedOptions}>
                         <Text style={styles.moreOptionsButtonText}>Advanced options</Text>
                     </TouchableOpacity>
                 </View>
@@ -185,7 +194,6 @@ const styles = StyleSheet.create({
         fontFamily: Constants.FONTS.BASE_FONT_NAME,
         fontSize: Constants.SIZES.large,
         fontWeight: Constants.FONTS.medium,
-        fontColor: Constants.COLORS.text_grey,
         marginLeft: 7,
         borderColor: Constants.COLORS.line_light_grey,
     },
@@ -194,7 +202,6 @@ const styles = StyleSheet.create({
         fontFamily: Constants.FONTS.BASE_FONT_NAME,
         fontSize: Constants.SIZES.large,
         fontWeight: Constants.FONTS.medium,
-        fontColor: Constants.COLORS.text_grey,
         borderBottomWidth: 1,
         paddingBottom: 0,
         borderColor: Constants.COLORS.line_light_grey,
@@ -239,4 +246,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default NewTimerScreen1;
+export default NewTimerScreenBase;

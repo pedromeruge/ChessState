@@ -2,12 +2,11 @@ import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Screen, Image, Pressable, TextInput, Keyboard } from 'react-native'
 import * as Constants from '../constants/index.js';
 import IconComponent from './common/IconComponent.jsx';
-import ActionButton from './common/ActionButton.jsx';
 import TimerPickerRoulette from './TimerPickerRoulette.jsx';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
-const NewTimerScreenPicker = forwardRef(({width, height, hideHours=false, onConfirm, onBack}, ref) => { // expose the ref to the parent component
+const NewTimerScreenPicker = forwardRef(({width, height, hideHours=false, onConfirm, onBack, timer}, ref) => { // expose the ref to the parent component
 
     const [titleText, setTitleText] = useState('');
     
@@ -19,10 +18,9 @@ const NewTimerScreenPicker = forwardRef(({width, height, hideHours=false, onConf
     
     useImperativeHandle(ref, () => ({ // expose functions to the parent component
         showScreen,
-        hideScreen
+        hideScreen,
     }));
 
-    
     return (
         <SafeAreaView style={[styles(width, height).container, Constants.SHADOWS.medium]}>
             <View style={styles(width, height).containerHeader}>
@@ -36,7 +34,7 @@ const NewTimerScreenPicker = forwardRef(({width, height, hideHours=false, onConf
             </View>
             <View style={styles(width, height).body}>
                 <View style={styles(width, height).roulette}>
-                    <TimerPickerRoulette hideHours={hideHours}/>
+                    <TimerPickerRoulette timer={timer} hideHours={hideHours}/>
                 </View>
                 <TouchableOpacity style={styles(width,height).confirm} onPressOut={onConfirm}>
                     <IconComponent source={Constants.icons.check} width={30} tintColor={Constants.COLORS.text_dark_2}/>
