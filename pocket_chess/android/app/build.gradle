@@ -124,6 +124,18 @@ android {
     androidResources {
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
     }
+
+    buildFeatures {
+        compose true
+    }
+    
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.15"
+    }
+    // existing config
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 }
 
 // Apply static values from `gradle.properties` to the `android.packagingOptions`
@@ -173,4 +185,8 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    implementation "androidx.compose.ui:ui:1.7.7"
+    implementation "androidx.compose.material:material:1.7.7"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.7.7"
 }

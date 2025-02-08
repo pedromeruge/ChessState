@@ -4,9 +4,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import * as Constants from '../../constants';
 import IconComponent from '../../components/common/IconComponent.jsx';
-import {Stage, Timer, Time} from '../../classes/Timer';
 import TimerPresetSection from '../../components/TimerPresetSection';
 import NewTimerModal from '../../components/NewTimerModal';
+import storage from '../../classes/Storage';
 
 const Play = () => {
 
@@ -22,59 +22,10 @@ const Play = () => {
     modalRef.current?.showModal();
   }
 
-  const defaultTimers = {
-    "bullet": {
-      "icon": Constants.icons.preset_bullet,
-      "title": "Bullet",
-      "timers":
-      [
-        new Timer([new Stage(new Time(0, 1, 0))],"1|0", Constants.COLORS.white, Constants.COLORS.preset_blue),
-        new Timer([new Stage(new Time(0, 1, 0), new Time(0, 0, 1))],"1|1"),
-        new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 1))],"2|1"),
-        new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 5))],"2|5"),
-        new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 5))],"2|5"),
-        new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 5))],"2|5")
-      ]
-    },
-
-    "blitz": {
-      "icon": Constants.icons.flash_on,
-      "title": "Blitz",
-      "timers":
-      [
-        new Timer([new Stage(new Time(0, 3, 0))],"3|0", Constants.COLORS.white, Constants.COLORS.preset_yellow),
-        new Timer([new Stage(new Time(0, 3, 0), new Time(0, 0, 2))],"3|2"),
-        new Timer([new Stage(new Time(0, 5, 0))],"5|0"),
-        new Timer([new Stage(new Time(0, 5, 0), new Time(0, 0, 3))],"5|3"),
-      ]
-    },
-    "rapid": {
-      "icon": Constants.icons.preset_rapid,
-      "title": "Rapid",
-      "timers":
-      [
-        new Timer([new Stage(new Time(0, 10, 0))],"10|0", Constants.COLORS.white, Constants.COLORS.preset_green),
-        new Timer([new Stage(new Time(0, 10, 0), new Time(0, 0, 5))],"10|5"),
-        new Timer([new Stage(new Time(0, 15, 0), new Time(0, 0, 10))],"15|10"),
-        new Timer([new Stage(new Time(0, 25, 0), new Time(0, 0, 10))],"25|10"),
-      ]
-    },
-    "standard": {
-      "icon": Constants.icons.preset_standard,
-      "title": "Standard",
-      "timers":
-      [ 
-        new Timer(
-              [new Stage(new Time(0, 90, 0), new Time(0, 0, 0), 40), 
-                new Stage(new Time(0, 30, 0))],
-              "90+30|30", Constants.COLORS.white, Constants.COLORS.preset_red
-            ),
-        new Timer(
-          [new Stage(new Time(0, 90, 0), new Time(0, 0, 30))]
-          ,"90|30"),
-      ]
-    }
-  }
+  //permanent storage of timers
+  const customTimers = storage.getObject(Constants.storage_names.TIMERS.CUSTOM);
+  const defaultTimers = storage.getObject(Constants.storage_names.TIMERS.DEFAULT);
+  const timers = defaultTimers.concat(customTimers);
 
   const modalRef = useRef(null);
 
@@ -102,7 +53,11 @@ const Play = () => {
             </TouchableOpacity>
           </View>
           <View style={styles.presetsSection}>
-            {Object.entries(defaultTimers).map(([titleSection, timersList]) => {
+            {Object.entries(timers).map(([titleSection, timersList]: [string, { icon: string, title: string, timers: any[] }]) => {
+                if (!timersList || !timersList.icon || !timersList.title || !timersList.timers) {
+                  console.warn(`Missing fields in timersList: ${titleSection}`);
+                  return null;
+                }
                 return <TimerPresetSection key={titleSection} icon={timersList.icon} title={timersList.title} timers={timersList.timers}/>
             })}
           </View>

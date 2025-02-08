@@ -61,6 +61,20 @@ export class Time {
     isDefault() {
         return this.hours === 0 && this.minutes === 0 && this.seconds === 0;
     }
+
+    //serialize object to JSON
+    toJSON() {
+        return {
+            hours: this.hours,
+            minutes: this.minutes,
+            seconds: this.seconds
+        }
+    }
+
+    //deserialize object from JSON
+    static fromJSON(data) {
+        return new Time(data.hours, data.minutes, data.seconds);
+    }
 }
 
 export class Stage {
@@ -68,6 +82,18 @@ export class Stage {
         this.time = time;
         this.increment = increment;
         this.moves = moves;
+    }
+
+    toJSON() {
+        return {
+            time: this.time.toJSON(),
+            increment: this.increment.toJSON(),
+            moves: this.moves
+        }
+    }
+
+    static fromJSON(data) {
+        return new Stage(Time.fromJSON(data.time), Time.fromJSON(data.increment), data.moves);
     }
 }
 
@@ -77,16 +103,16 @@ export class Timer {
      * @param {*} stages - array of Stage objects
      * @param {*} title - title of the timer
      */
-    constructor(stages, title, textColor=Constants.COLORS.text_grey, backColor=Constants.COLORS.white, isCustom=false) {
+    constructor(stages, title, textColor=Constants.COLORS.text_grey, backColor=Constants.COLORS.white, isCustom=false, currentStage=0, id=null) {
         this.stages = stages;
         this.title = title;
         this.textColor = textColor
         this.backColor = backColor
         this.isCustom = isCustom
-        this.currentStage = 0;
-        this.currentStageTime = this.stages[0].time
-        this.currentStageMoves = this.stages[0].moves
-        this.id = Math.random().toString(36).slice(2, 9); // random id
+        this.currentStage = currentStage;
+        this.currentStageTime = this.stages[currentStage].time
+        this.currentStageMoves = this.stages[currentStage].moves
+        this.id = id ? id : Math.random().toString(36).slice(2, 9); // random id
     }
 
     /**
@@ -94,5 +120,29 @@ export class Timer {
      */
     titleStrings() {
         return this.title.split('|').map(item => item.trim())
+    }
+
+    toJSON() {
+        return {
+            stages: this.stages.map(stage => stage.toJSON()),
+            title: this.title,
+            textColor: this.textColor,
+            backColor: this.backColor,
+            isCustom: this.isCustom,
+            currentStage: this.currentStage,
+            id: this.id
+        }
+    }
+
+    static fromJson(data) {
+        return new Timer(
+            data.stages.map(stage => Stage.fromJSON(stage)), 
+            data.title, 
+            data.textColor, 
+            data.backColor, 
+            data.isCustom,
+            data.currentStage,
+            data.id
+        )
     }
 }

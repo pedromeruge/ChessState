@@ -7,6 +7,7 @@ import ActionButton from './common/ActionButton.jsx';
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
 const NewTimerScreenBase = forwardRef(({
+        onStart,
         onClose, 
         onShowBaseTimePicker, 
         onShowIncrementPicker, 

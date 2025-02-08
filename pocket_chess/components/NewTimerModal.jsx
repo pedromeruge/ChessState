@@ -6,9 +6,9 @@ import NewTimerScreenBase from './NewTimerScreenBase.jsx';
 import NewTimerScreenPicker from './NewTimerScreenPicker.jsx';
 import { Time } from '../classes/Timer.js';
 
-const NewTimerModal = forwardRef(({}, ref) => { // expose the ref to the parent component
+const NewTimerModal = forwardRef(({customTimers}, ref) => { // expose the ref to the parent component
 
-    
+    //state of modal
     const [visible, setVisible] = useState(false); // state to show/hide the modal
     const [baseTimePickerVisible, setBaseTimePickerVisible] = useState(false);
     const [incrementPickerVisible, setIncrementPickerVisible] = useState(false);
@@ -59,6 +59,13 @@ const NewTimerModal = forwardRef(({}, ref) => { // expose the ref to the parent 
         setIncrementPickerVisible(false);
     }
 
+    const startTimer = () => {
+        const newTimer = new Timer([new Stage(baseTime, incrementTime)], titleText);
+        customTimers.timers.push(newTimer);
+        storage.set(Constants.storage_names.TIMERS.CUSTOM, JSON.stringify(customTimers));
+        console.log("Timer saved");
+    }
+
     return (
         <Modal
             visible={visible}
@@ -71,6 +78,8 @@ const NewTimerModal = forwardRef(({}, ref) => { // expose the ref to the parent 
                 {(!baseTimePickerVisible && !incrementPickerVisible) && (
                     <NewTimerScreenBase
                         ref={startScreenRef} 
+                        timers={timers}
+                        onStart={startTimer}
                         onClose={hideModal} 
                         onShowBaseTimePicker={showBaseTimePicker} 
                         onShowIncrementPicker={showIncrementPicker} 

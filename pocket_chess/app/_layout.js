@@ -2,8 +2,11 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { View, ActivityIndicator, StyleSheet} from 'react-native';
 import { useEffect, useState} from 'react';
+import { Storage } from '../classes/Storage';
+// app-wide configurations
 
-// focuses on app-wide configurations
+// initialize local storage
+export const storage = new Storage();
 
 SplashScreen.preventAutoHideAsync(); // Prevent the splash screen from auto-hiding // ????
 
@@ -13,7 +16,8 @@ const Layout = () => {
   useEffect(() => {
     async function prepareApp() {
       try {
-        //data fetching, asset loading, ....
+        //initial app setup
+
       } catch (error) {
         console.warn(error);
       } finally {
