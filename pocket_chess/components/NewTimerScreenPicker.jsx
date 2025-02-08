@@ -6,7 +6,7 @@ import TimerPickerRoulette from './TimerPickerRoulette.jsx';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
-const NewTimerScreenPicker = forwardRef(({width, height, hideHours=false, onConfirm, onBack, timer}, ref) => { // expose the ref to the parent component
+const NewTimerScreenPicker = forwardRef(({width, height, hideHours=false, onConfirm, onBack, timer, setTimer}, ref) => { // expose the ref to the parent component
 
     const [titleText, setTitleText] = useState('');
     
@@ -34,7 +34,7 @@ const NewTimerScreenPicker = forwardRef(({width, height, hideHours=false, onConf
             </View>
             <View style={styles(width, height).body}>
                 <View style={styles(width, height).roulette}>
-                    <TimerPickerRoulette timer={timer} hideHours={hideHours}/>
+                    <TimerPickerRoulette timer={timer} setTimer={setTimer} hideHours={hideHours}/>
                 </View>
                 <TouchableOpacity style={styles(width,height).confirm} onPressOut={onConfirm}>
                     <IconComponent source={Constants.icons.check} width={30} tintColor={Constants.COLORS.text_dark_2}/>

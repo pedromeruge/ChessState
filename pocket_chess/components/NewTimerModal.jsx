@@ -4,9 +4,9 @@ import { SafeAreaView, View, StyleSheet, Modal, Pressable} from 'react-native'
 import * as Constants from '../constants/index.js';
 import NewTimerScreenBase from './NewTimerScreenBase.jsx';
 import NewTimerScreenPicker from './NewTimerScreenPicker.jsx';
-import { Time } from '../classes/Timer.js';
+import { Time, Stage, Timer } from '../classes/Timer.js';
 
-const NewTimerModal = forwardRef(({customTimers}, ref) => { // expose the ref to the parent component
+const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the parent component
 
     //state of modal
     const [visible, setVisible] = useState(false); // state to show/hide the modal
@@ -61,11 +61,30 @@ const NewTimerModal = forwardRef(({customTimers}, ref) => { // expose the ref to
 
     const startTimer = () => {
         const newTimer = new Timer([new Stage(baseTime, incrementTime)], titleText);
-        customTimers.timers.push(newTimer);
-        storage.set(Constants.storage_names.TIMERS.CUSTOM, JSON.stringify(customTimers));
+        const customTimers = storage.getCustomTimers();
+
+        customTimers.custom.timers.push(newTimer);
+        storage.setCustomTimers(customTimers);
+
+        onSubmit(customTimers);
         console.log("Timer saved");
+
+        //reset input parameters
+        setBaseTime(new Time());
+        setIncrementTime(new Time());
+        setTitleText('');
+        console.log("Input reset");
     }
 
+    // auto-suggest title based on input time
+    useEffect(() => {
+        // TODO: userHasInputTitle not read correct, even though properly set in other component?
+        if (!startScreenRef.current?.userHasInputTitle && (!baseTime.isDefault())) { 
+            setTitleText(Time.toStringCleanBoth(baseTime, incrementTime));
+            console.log("Title auto-suggested");
+        }
+    }, [baseTime, incrementTime]);
+    
     return (
         <Modal
             visible={visible}
@@ -78,7 +97,6 @@ const NewTimerModal = forwardRef(({customTimers}, ref) => { // expose the ref to
                 {(!baseTimePickerVisible && !incrementPickerVisible) && (
                     <NewTimerScreenBase
                         ref={startScreenRef} 
-                        timers={timers}
                         onStart={startTimer}
                         onClose={hideModal} 
                         onShowBaseTimePicker={showBaseTimePicker} 
@@ -98,6 +116,7 @@ const NewTimerModal = forwardRef(({customTimers}, ref) => { // expose the ref to
                         onConfirm={hideTimePicker} 
                         onBack={hideTimePicker}
                         timer={baseTime}
+                        setTimer={setBaseTime}
                     />
                 )}
                 {incrementPickerVisible && modalSize.width > 0 && modalSize.height > 0 && (
@@ -109,6 +128,7 @@ const NewTimerModal = forwardRef(({customTimers}, ref) => { // expose the ref to
                         onConfirm={hideTimePicker} 
                         onBack={hideTimePicker}
                         timer={incrementTime}
+                        setTimer={setIncrementTime}
                     />
                 )}
             </View>

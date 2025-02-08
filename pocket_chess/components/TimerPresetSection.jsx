@@ -7,7 +7,7 @@ import {LinearGradient} from 'expo-linear-gradient';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
-const TimerPresetSection = ({icon, title, timers}) =>{
+const TimerPresetSection = ({timersList}) =>{
     
     //gradien to appear on right of flatlist to indicate there are more elements to the right, that the user can scroll to
     const [showGradient, setShowGradient] = useState(false);
@@ -35,8 +35,8 @@ const TimerPresetSection = ({icon, title, timers}) =>{
     return (
         <>
         <View style={styles.presetsSectionHeader}>
-            <IconComponent source={icon} width={12} tintColor={timers[0].backColor}/>
-            <Text style={styles.textPresetsSectionHeader}>{title}</Text>
+            <IconComponent source={timersList.icon} width={12} tintColor={timersList.iconColor}/>
+            <Text style={styles.textPresetsSectionHeader}>{timersList.title}</Text>
         </View>
         <View style={styles.listWrapper}>
             <FlatList
@@ -44,7 +44,7 @@ const TimerPresetSection = ({icon, title, timers}) =>{
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item) => item.id}
                 ref={flatListRef}
-                data={timers}
+                data={timersList.timers}
                 renderItem={({item}) => (<TimerPreset timer={item} onPress={() => onPressTimer(item)}/>)}
                 onScroll={handleScroll}
                 onContentSizeChange={handleContentSizeChange}

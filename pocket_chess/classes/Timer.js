@@ -26,19 +26,66 @@ export class Time {
         this.seconds = seconds;
     }
 
+    //to auto-suggest on new timers
     toStringClean() {
         let timeParts = []
 
         if (this.hours !== 0) {
-            timeParts.push(this.hours.toString().padStart(2, "0"));
+            timeParts.push(this.hours.toString())
         }
         if (this.minutes !== 0) {
-            timeParts.push(this.minutes.toString().padStart(2, "0"));
+            timeParts.push(this.minutes.toString())
+        }
+        
+        if ((this.minutes === 0 && this.hours === 0) || this.seconds !== 0) {
+            timeParts.push(this.seconds.toString());
+        }
+        return timeParts.join(":");
+    }
+
+    toStringFieldsPad(incHours, incMinutes, incSeconds, padMinutes, padSeconds) {
+        let timeParts = []
+
+        if (incHours) {
+            timeParts.push(this.hours.toString().padStart(2, "0"))
+        }
+        if (incMinutes) {
+            const minutes = padMinutes ? this.minutes.toString().padStart(2, "0") : this.minutes.toString()
+            timeParts.push(minutes)
+        }
+        
+        if (incSeconds) {
+            const seconds = padSeconds ? this.seconds.toString().padStart(2, "0") : this.seconds.toString()
+            timeParts.push(seconds);
         }
 
-        timeParts.push(this.seconds.toString().padStart(2, "0"));
-        
         return timeParts.join(":");
+    }
+
+    static toStringCleanBoth(baseTime, increment, joiner="|") {
+        
+        let hourClause1 = baseTime.hours !== 0
+        let hourClause2 = increment.hours !== 0
+
+        let minuteClause1 = baseTime.minutes !== 0
+        let minuteClause2 = increment.minutes !== 0
+
+        let secondClause1 = (baseTime.minutes === 0 && baseTime.hours === 0) || baseTime.seconds !== 0
+        let secondClause2 = (increment.minutes === 0 && increment.hours === 0) || increment.seconds !== 0
+
+        hourClause1 = hourClause1 || hourClause2
+        minuteClause1 = minuteClause1 || minuteClause2
+        secondClause1 = secondClause1 || hourClause1
+
+        secondClause2 = secondClause2 || minuteClause2
+        
+        const padMinute = hourClause1
+        const padSecond = secondClause1
+
+        const result = baseTime.toStringFieldsPad(hourClause1, minuteClause1, secondClause1, padMinute, padSecond) 
+                + joiner 
+                + increment.toStringFieldsPad(hourClause2, minuteClause2, secondClause2, padMinute, padSecond)
+        return result
     }
 
     toStringComplete() {
@@ -93,7 +140,10 @@ export class Stage {
     }
 
     static fromJSON(data) {
-        return new Stage(Time.fromJSON(data.time), Time.fromJSON(data.increment), data.moves);
+        return new Stage(
+            Time.fromJSON(data.time), 
+            Time.fromJSON(data.increment), 
+            data.moves);
     }
 }
 
@@ -134,7 +184,7 @@ export class Timer {
         }
     }
 
-    static fromJson(data) {
+    static fromJSON(data) {
         return new Timer(
             data.stages.map(stage => Stage.fromJSON(stage)), 
             data.title, 

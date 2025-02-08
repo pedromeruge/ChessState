@@ -19,7 +19,8 @@ const NewTimerScreenBase = forwardRef(({
         , ref) => { // expose the ref to the parent component
 
     const [isKeyboardVisible, setIsKeyboardVisible] = useState(false); // state to alter container layout when keyboard is visible
-    
+    const [userHasInputTitle, setUserHasInputTitle] = useState(false); // track if user has input a title, to manage auto-suggestions
+
     const showScreen = () => {
         setIsKeyboardVisible(false);
     }
@@ -29,10 +30,20 @@ const NewTimerScreenBase = forwardRef(({
         setIsKeyboardVisible(false);
     }
     
+    const handleKeyboardInputEnd = () => {
+        setIsKeyboardVisible(false);
+        if (titleText !== '') { // if the user has stopped typing, and there is text, then the user has input a title
+            setUserHasInputTitle(true);
+            console.log("User has input a title");
+        }
+        console.log("Keyboard input ended");
+    }
+
     useImperativeHandle(ref, () => ({ // expose functions to the parent component
         showScreen,
         hideScreen,
         titleText,
+        userHasInputTitle
         // width,
         // height
     }));
@@ -44,7 +55,8 @@ const NewTimerScreenBase = forwardRef(({
     };
 
     const onStartTimer = () => {
-        console.log("Timer started");
+        onStart();
+        console.log("Timer saved and started");
     }
 
     const onAdvancedOptions = () => {
@@ -89,13 +101,14 @@ const NewTimerScreenBase = forwardRef(({
                         <Text style={styles.titleText}>Title:</Text>
                         <TextInput style={[styles.titleInput, {fontColor: titleText ? Constants.COLORS.text_dark_2 : Constants.COLORS.line_light_grey}]} placeholder="New timer" placeholderTextColor={Constants.COLORS.line_light_grey}
                             onFocus={() => setIsKeyboardVisible(true)}
-                            onBlur={() => setIsKeyboardVisible(false)}
+                            onBlur={() => handleKeyboardInputEnd()}
                             onChangeText={setTitleText}
                             value={titleText}
                         />
                     </View>
                     <ActionButton source={Constants.icons.hourglass} text="Start" height={45} iconSize={20} fontSize={Constants.SIZES.xxLarge} componentStyle={styles.startButton}
                         onPress={onStartTimer}
+                        disabled={(baseTime.isDefault())|| titleText === ''}
                     />
                     <TouchableOpacity style={styles.moreOptionsButton} onPress={onAdvancedOptions}>
                         <Text style={styles.moreOptionsButtonText}>Advanced options</Text>

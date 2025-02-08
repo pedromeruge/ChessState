@@ -5,7 +5,7 @@ import * as Constants from '../../constants';
 
 //default button to be used throughout the app 
 
-const ActionButton = ({ source, text, onPress,  height=45, width=null, iconSize=null, fontSize=Constants.SIZES.medium, textColor=Constants.COLORS.white, backColor=Constants.COLORS.contrast_red_light, componentStyle=null, textStyle=null}) => {
+const ActionButton = ({ source, text, onPress,  height=45, width=null, iconSize=null, fontSize=Constants.SIZES.medium, textColor=Constants.COLORS.white, backColor=Constants.COLORS.contrast_red_light, componentStyle=null, textStyle=null, disabled=false}) => {
   if (!source) {
     console.warn("Icon source is missing!");
     return null;
@@ -38,11 +38,24 @@ const ActionButton = ({ source, text, onPress,  height=45, width=null, iconSize=
       fontFamily: Constants.FONTS.BASE_FONT_NAME,
       textAlign: 'center',
       paddingBottom: 2 // text seemed too low in the button, with just center
+    },
+    disabled: {
+      opacity: 0.6
     }
+
   });
 
 return (
-  <TouchableOpacity onPress={onPress} style={[styles.button, {backgroundColor: backColor}, componentStyle, Constants.SHADOWS.medium]}>
+  <TouchableOpacity 
+      disabled={disabled} 
+      onPress={onPress} 
+      style={[
+          styles.button, 
+          {backgroundColor: backColor}, 
+          componentStyle, 
+          Constants.SHADOWS.medium,
+          disabled ? styles.disabled : null // if disabled make it less visible
+        ]}>
     <IconComponent style={styles.icon} source={source} tintColor={textColor}/>
     <Text style={[styles.text, textStyle]}>{text}</Text>
   </TouchableOpacity>

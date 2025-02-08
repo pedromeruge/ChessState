@@ -1,5 +1,5 @@
-import React, { useRef} from 'react';
-import { View, Text, StyleSheet, TextStyle, TouchableOpacity} from 'react-native'
+import React, { useState, useRef} from 'react';
+import { View, Text, ScrollView, StyleSheet, TextStyle, TouchableOpacity} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import * as Constants from '../../constants';
@@ -9,6 +9,11 @@ import NewTimerModal from '../../components/NewTimerModal';
 import storage from '../../classes/Storage';
 
 const Play = () => {
+
+  //permanent storage of timers
+  const customTimers = storage.getCustomTimers();
+  const [defaultTimers, _] = useState(storage.getDefaultTimers());
+  const [timers, setTimers] = useState({...customTimers, ...defaultTimers});
 
   function openHelpBox() {
     console.log('help box'); 
@@ -22,10 +27,13 @@ const Play = () => {
     modalRef.current?.showModal();
   }
 
-  //permanent storage of timers
-  const customTimers = storage.getObject(Constants.storage_names.TIMERS.CUSTOM);
-  const defaultTimers = storage.getObject(Constants.storage_names.TIMERS.DEFAULT);
-  const timers = defaultTimers.concat(customTimers);
+  function onSubmitNewTimer(newCustomTimers) {
+    setTimers({... newCustomTimers, ...defaultTimers})
+    modalRef.current?.hideModal();
+
+  }
+
+  console.log("Before serialization:", customTimers);
 
   const modalRef = useRef(null);
 
@@ -52,17 +60,17 @@ const Play = () => {
               <Text style={styles.newTimerButtonText}>New timer</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.presetsSection}>
+          <ScrollView style={styles.presetsSection}>
             {Object.entries(timers).map(([titleSection, timersList]: [string, { icon: string, title: string, timers: any[] }]) => {
-                if (!timersList || !timersList.icon || !timersList.title || !timersList.timers) {
+                if (!timersList || !timersList.icon || !timersList.title || timersList.timers.length === 0) {
                   console.warn(`Missing fields in timersList: ${titleSection}`);
                   return null;
                 }
-                return <TimerPresetSection key={titleSection} icon={timersList.icon} title={timersList.title} timers={timersList.timers}/>
+                return <TimerPresetSection key={titleSection} timersList={timersList}/>
             })}
-          </View>
+          </ScrollView>
         </View>
-        <NewTimerModal ref={modalRef}/>
+        <NewTimerModal ref={modalRef} onSubmit={onSubmitNewTimer}/>
     </SafeAreaView>
   )
 }

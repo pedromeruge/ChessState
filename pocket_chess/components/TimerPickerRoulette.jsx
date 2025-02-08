@@ -13,7 +13,7 @@ import { hide } from 'expo-router/build/utils/splash.js';
 import { Time } from '../classes/Timer.js';
 
 //based on https://www.npmjs.com/package/react-native-timer-picker
-const TimerPickerRoulette = ({timer, hideHours=false}) => {
+const TimerPickerRoulette = ({timer, setTimer, hideHours=false}) => {
 
     return (
         <View style={styles.container}>
@@ -32,9 +32,7 @@ const TimerPickerRoulette = ({timer, hideHours=false}) => {
                 padHoursWithZero
                 onDurationChange={({hours,minutes,seconds}) => {
                     try {
-                        timer.setHours(hours);
-                        timer.setMinutes(minutes);
-                        timer.setSeconds(seconds);
+                        setTimer(new Time(hours,minutes,seconds));
                     } catch (error) {
                         console.error("Error setting timer: ", error);
                     }
