@@ -67,13 +67,11 @@ const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the
         storage.setCustomTimers(customTimers);
 
         onSubmit(customTimers);
-        console.log("Timer saved");
 
         //reset input parameters
         setBaseTime(new Time());
         setIncrementTime(new Time());
         setTitleText('');
-        console.log("Input reset");
     }
 
     // auto-suggest title based on input time

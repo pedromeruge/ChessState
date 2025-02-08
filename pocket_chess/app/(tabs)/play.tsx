@@ -33,8 +33,6 @@ const Play = () => {
 
   }
 
-  console.log("Before serialization:", customTimers);
-
   const modalRef = useRef(null);
 
   return (

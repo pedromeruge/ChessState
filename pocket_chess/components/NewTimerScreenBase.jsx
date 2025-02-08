@@ -51,12 +51,10 @@ const NewTimerScreenBase = forwardRef(({
     const handleLayout = (event) => {
         const { width, height } = event.nativeEvent.layout;
         onLayout({ width, height });
-        console.log("Modal size: ", width, height);
     };
 
     const onStartTimer = () => {
         onStart();
-        console.log("Timer saved and started");
     }
 
     const onAdvancedOptions = () => {

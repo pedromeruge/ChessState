@@ -34,8 +34,6 @@ class Storage {
               new Timer([new Stage(new Time(0, 1, 0))],"1|0", Constants.COLORS.white, Constants.COLORS.preset_blue),
               new Timer([new Stage(new Time(0, 1, 0), new Time(0, 0, 1))],"1|1"),
               new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 1))],"2|1"),
-              new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 5))],"2|5"),
-              new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 5))],"2|5"),
               new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 5))],"2|5")
             ]
           },
@@ -121,7 +119,6 @@ class Storage {
         })
       }
 
-      console.log("Got data from storage: ", data)
       return data
     }
 
