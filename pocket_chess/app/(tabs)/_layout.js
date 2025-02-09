@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native'; // Import useNavigatio
 import BottomNavBar from '../../components/BottomNavBar';
 
 // handles the tab navigation layout
-const TabLayout = () => {
+const TabsLayout = () => {
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -30,7 +30,7 @@ const TabLayout = () => {
           tabBar={props => <BottomNavBar {...props}/>}
           screenOptions={{
             headerShown: false,
-            animation: 'fade',
+            animation: 'shift'
           }}
         >
           <Tabs.Screen name="play" options={{ title: "Play"}} />
@@ -40,4 +40,4 @@ const TabLayout = () => {
     );
 }
 
-export default TabLayout;
+export default TabsLayout;

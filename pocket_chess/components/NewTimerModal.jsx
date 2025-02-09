@@ -79,7 +79,6 @@ const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the
         // TODO: userHasInputTitle not read correct, even though properly set in other component?
         if (!startScreenRef.current?.userHasInputTitle && (!baseTime.isDefault())) { 
             setTitleText(Time.toStringCleanBoth(baseTime, incrementTime));
-            console.log("Title auto-suggested");
         }
     }, [baseTime, incrementTime]);
     
@@ -139,9 +138,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 1,
+        zIndex: 10,
         width: '100%',
         height: '100%'
+
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,

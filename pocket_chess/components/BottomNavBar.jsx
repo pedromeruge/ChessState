@@ -111,7 +111,8 @@ const styles = StyleSheet.create({
         borderRadius: 0,
         backgroundColor: Constants.COLORS.white,
         alignItems: "center",
-        justifyContent: "space-evenly"
+        justifyContent: "space-evenly",
+        zIndex: 10
     },
 
     indicator: {

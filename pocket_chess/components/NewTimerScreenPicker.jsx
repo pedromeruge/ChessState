@@ -3,6 +3,7 @@ import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Screen, Image, 
 import * as Constants from '../constants/index.js';
 import IconComponent from './common/IconComponent.jsx';
 import TimerPickerRoulette from './TimerPickerRoulette.jsx';
+import Header from './Header.jsx';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
@@ -23,15 +24,7 @@ const NewTimerScreenPicker = forwardRef(({width, height, hideHours=false, onConf
 
     return (
         <SafeAreaView style={[styles(width, height).container, Constants.SHADOWS.medium]}>
-            <View style={styles(width, height).containerHeader}>
-                <View style={styles(width, height).containerHeaderLeft}>
-                    <IconComponent source={Constants.icons.clock_lines} width={20} tintColor={Constants.COLORS.black}/>
-                    <Text style={styles(width, height).containerHeaderText}>New timer</Text>
-                </View>
-                <TouchableOpacity onPress={onBack}>
-                    <IconComponent source={Constants.icons.arrow_left} width={16} tintColor={Constants.COLORS.black}/>
-                </TouchableOpacity>
-            </View>
+            <Header leftIcon={Constants.icons.clock_lines} leftIconSize={16} text={'New timer'} rightIcon={Constants.icons.arrow_left} rightIconSize={18} onPressRightIcon={onBack}/>
             <View style={styles(width, height).body}>
                 <View style={styles(width, height).roulette}>
                     <TimerPickerRoulette timer={timer} setTimer={setTimer} hideHours={hideHours}/>

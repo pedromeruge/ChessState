@@ -1,8 +1,11 @@
 import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, Pressable, TextInput, Keyboard } from 'react-native'
+import { Link } from 'expo-router';
+
 import * as Constants from '../constants/index.js';
 import IconComponent from './common/IconComponent.jsx';
 import ActionButton from './common/ActionButton.jsx';
+import Header from './Header.jsx';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
@@ -63,15 +66,7 @@ const NewTimerScreenBase = forwardRef(({
 
     return (
         <SafeAreaView style={[styles.container, Constants.SHADOWS.medium]} onLayout={handleLayout}>
-            <View style={styles.containerHeader}>
-                <View style={styles.containerHeaderLeft}>
-                    <IconComponent source={Constants.icons.clock_lines} width={20} tintColor={Constants.COLORS.black}/>
-                    <Text style={styles.containerHeaderText}>New timer</Text>
-                </View>
-                <TouchableOpacity style={styles.containerHeaderRight} onPress={onClose}>
-                    <IconComponent source={Constants.icons.cross} width={14} tintColor={Constants.COLORS.black}/>
-                </TouchableOpacity>
-            </View>
+            <Header leftIcon={Constants.icons.clock_lines} leftIconSize={20} text="New timer" rightIcon={Constants.icons.cross} rightIconSize={14} onPressRightIcon={onClose}/>
             <View>
                 {!isKeyboardVisible && (
                     <View style={styles.bannerWrapper}>
@@ -108,9 +103,11 @@ const NewTimerScreenBase = forwardRef(({
                         onPress={onStartTimer}
                         disabled={(baseTime.isDefault())|| titleText === ''}
                     />
-                    <TouchableOpacity style={styles.moreOptionsButton} onPress={onAdvancedOptions}>
-                        <Text style={styles.moreOptionsButtonText}>Advanced options</Text>
-                    </TouchableOpacity>
+                    <Link href="./play/new_timer_advanced" asChild>
+                        <TouchableOpacity style={styles.moreOptionsButton} onPress={onAdvancedOptions}>
+                            <Text style={styles.moreOptionsButtonText}>Advanced options</Text>
+                        </TouchableOpacity>
+                    </Link>
                 </View>
             </View>
         </SafeAreaView>
@@ -130,31 +127,6 @@ const styles = StyleSheet.create({
         maxHeight: '90%',
         overflow: 'hidden'
 
-    },
-
-    containerHeader: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        minHeight: 40,
-    },
-    
-    containerHeaderLeft: {
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-    },
-    containerHeaderText: {
-        fontFamily: Constants.FONTS.BASE_FONT_NAME,
-        fontSize: Constants.SIZES.large,
-        fontWeight: Constants.FONTS.bold,
-        fontColor: Constants.COLORS.text_dark,
-        marginLeft: 8
-    },     
-    containerHeaderRight: {
     },
 
     bannerWrapper: {

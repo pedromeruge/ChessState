@@ -2,11 +2,11 @@ import React, { useState, useRef} from 'react';
 import { View, Text, ScrollView, StyleSheet, TextStyle, TouchableOpacity} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import * as Constants from '../../constants';
-import IconComponent from '../../components/common/IconComponent.jsx';
-import TimerPresetSection from '../../components/TimerPresetSection';
-import NewTimerModal from '../../components/NewTimerModal';
-import storage from '../../classes/Storage';
+import * as Constants from '../../../constants';
+import IconComponent from '../../../components/common/IconComponent.jsx';
+import TimerPresetSection from '../../../components/TimerPresetSection';
+import NewTimerModal from '../../../components/NewTimerModal';
+import storage from '../../../classes/Storage';
 
 const Play = () => {
 
@@ -157,10 +157,5 @@ const styles = StyleSheet.create({
   }
 
 })
-
-// time in milliseconds
-const SECOND = 1000
-const MINUTE = 60
-const HOUR = 60
 
 export default Play

@@ -1,6 +1,5 @@
 {
   "expo": {
-    "scheme": "acme",
     "web": {
       "bundler": "metro"
     },
@@ -17,6 +16,7 @@
     ],
     "name": "pocket_chess",
     "slug": "pocket_chess",
+    "scheme": "pocket_chess",
     "newArchEnabled": true,
     "android": {
       "permissions": [
