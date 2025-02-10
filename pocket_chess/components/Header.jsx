@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 10,
         minHeight: 40,
+        backgroundColor: Constants.COLORS.white
     },
     
     containerHeaderLeft: {

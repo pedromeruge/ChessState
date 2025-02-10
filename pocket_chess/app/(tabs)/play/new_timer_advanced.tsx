@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { SafeAreaView, ScrollView, View, StyleSheet, Modal, Pressable, Image, Text } from 'react-native'
-import { router } from 'expo-router';
+import { router} from 'expo-router';
 
 import * as Constants from '../../../constants/index.js';
 import { Time, Stage, Timer } from '../../../classes/Timer.js';
 import Header from '../../../components/Header.jsx';
 import ActionButton from '../../../components/common/ActionButton.jsx';
 import storage from '../../../classes/Storage';
+import TabNavigator from '../../../components/TabNavigator.jsx';
+import StagesSelection from '../../../components/StagesSelection.jsx';
 
 const NewTimerAdvanced = ({}) => { // expose the ref to the parent component
 
@@ -43,12 +45,25 @@ const NewTimerAdvanced = ({}) => { // expose the ref to the parent component
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView>
-                <Header leftIcon={Constants.icons.clock_lines} leftIconSize={16} text={'New timer'} rightIcon={Constants.icons.arrow_left} rightIconSize={18} 
-                    onPressRightIcon={onBack}
-                />
+            <Header leftIcon={Constants.icons.clock_lines} leftIconSize={16} text={'New timer'} rightIcon={Constants.icons.arrow_left} rightIconSize={18} 
+                onPressRightIcon={onBack}
+            />
+            <ScrollView contentContainerStyle={styles.scrollView}> 
                 <View style={styles.bannerWrapper}>
                     <Image source={Constants.images.banner1} style={styles.banner}/>
+                </View>
+                <View style={styles.tabNavigatorWrapper}>
+                    <TabNavigator 
+                        tabs = {{
+                            "Player White": StagesSelection,
+                            "Player Black": StagesSelection
+                        }}
+                        icons = {{
+                            "Player White": Constants.icons.player_white,
+                            "Player Black": Constants.icons.player_black
+                        }}
+                        swipeEnabled={false}
+                    />
                 </View>
                 <Text style={{padding: 20}}>Filler text... asdfkmaskdfaksdfm. ...asd</Text>
                 <ActionButton source={Constants.icons.hourglass} text="Start" height={45} iconSize={20} fontSize={Constants.SIZES.xxLarge} componentStyle={styles.startButton}
@@ -62,11 +77,15 @@ const NewTimerAdvanced = ({}) => { // expose the ref to the parent component
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
-        height: '100%'
+        backgroundColor: Constants.COLORS.white,
+        flex: 1,
+        width: '100%'
+    },
+
+    scrollView: {
+        justifyContent: 'flex-start',
+        flex: 1
     },
     bannerWrapper: {
         width: '100%',
@@ -78,6 +97,11 @@ const styles = StyleSheet.create({
         height: '100%',
         aspectRatio: 16/9.3
     },
+    tabNavigatorWrapper: {
+        flexGrow: 1,
+        width: '100%',
+    },
+
     startButton: {
         marginTop: 30
     },

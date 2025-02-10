@@ -28,4 +28,18 @@ export default {
   clock_full: require("../assets/icons/clock_full.png"),
   arrow_left: require("../assets/icons/arrow_left.png"),
   check: require("../assets/icons/check.png"),
+  player_white: require("../assets/icons/player_white.png"),
+  player_black: require("../assets/icons/player_black.png"),
+  light_pawn: require("../assets/icons/pieces/light_pawn.png"),
+  light_bishop: require("../assets/icons/pieces/light_bishop.png"),
+  light_knight: require("../assets/icons/pieces/light_knight.png"),
+  light_rook: require("../assets/icons/pieces/light_rook.png"),
+  light_queen: require("../assets/icons/pieces/light_queen.png"),
+  light_king: require("../assets/icons/pieces/light_king.png"),
+  dark_pawn: require("../assets/icons/pieces/dark_pawn.png"),
+  dark_bishop: require("../assets/icons/pieces/dark_bishop.png"),
+  dark_knight: require("../assets/icons/pieces/dark_knight.png"),
+  dark_rook: require("../assets/icons/pieces/dark_rook.png"),
+  dark_queen: require("../assets/icons/pieces/dark_queen.png"),
+  dark_king: require("../assets/icons/pieces/dark_king.png")
 };
