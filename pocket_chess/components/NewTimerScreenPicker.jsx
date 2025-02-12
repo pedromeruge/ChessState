@@ -7,9 +7,7 @@ import Header from './Header.jsx';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
-const NewTimerScreenPicker = forwardRef(({width, height, hideHours=false, onConfirm, onBack, timer, setTimer}, ref) => { // expose the ref to the parent component
-
-    const [titleText, setTitleText] = useState('');
+const NewTimerScreenPicker = forwardRef(({width=null, height=null, hideHours=false, onConfirm, onBack, time, setTime}, ref) => { // expose the ref to the parent component
     
     const showScreen = () => {
     }
@@ -23,29 +21,27 @@ const NewTimerScreenPicker = forwardRef(({width, height, hideHours=false, onConf
     }));
 
     return (
-        <SafeAreaView style={[styles(width, height).container, Constants.SHADOWS.medium]}>
-            <Header leftIcon={Constants.icons.clock_lines} leftIconSize={16} text={'New timer'} rightIcon={Constants.icons.arrow_left} rightIconSize={18} onPressRightIcon={onBack}/>
-            <View style={styles(width, height).body}>
-                <View style={styles(width, height).roulette}>
-                    <TimerPickerRoulette timer={timer} setTimer={setTimer} hideHours={hideHours}/>
+        <SafeAreaView style={[styles.container, Constants.SHADOWS.medium, width && height ? {width: width, height: height} : null]}>
+            <Header leftIcon={Constants.icons.clock_lines} leftIconSize={16} text={'New timer'} rightIcon={Constants.icons.arrow_left} rightIconSize={18} onPressRightIcon={onBack} lowBorder={true} curvyTop={true}/>
+            <View style={styles.body}>
+                <View style={styles.roulette}>
+                    <TimerPickerRoulette time={time} setTime={setTime} hideHours={hideHours}/>
                 </View>
-                <TouchableOpacity style={styles(width,height).confirm} onPressOut={onConfirm}>
-                    <IconComponent source={Constants.icons.check} width={30} tintColor={Constants.COLORS.text_dark_2}/>
+                <TouchableOpacity style={[styles.confirm, Constants.SHADOWS.timer]} onPressOut={onConfirm}>
+                    <IconComponent source={Constants.icons.check} width={25} tintColor={Constants.COLORS.white}/>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
     )
 });
 
-const styles = (width,height) => StyleSheet.create({
+const styles = StyleSheet.create({
 
     container: {
         backgroundColor: Constants.COLORS.white,
         borderRadius: 10,
         alignItems: 'center',
         flexDirection: 'column',
-        width: width,
-        height: height,
     },
 
     containerHeader: {
@@ -68,14 +64,12 @@ const styles = (width,height) => StyleSheet.create({
         fontFamily: Constants.FONTS.BASE_FONT_NAME,
         fontSize: Constants.SIZES.large,
         fontWeight: Constants.FONTS.bold,
-        fontColor: Constants.COLORS.text_dark,
+        color: Constants.COLORS.text_dark,
         marginLeft: 8
     },     
 
     body: {
         flexDirection: 'column',
-        borderColor: Constants.COLORS.line_light_grey,
-        borderWidth: 1,
         flex: 1,
         width: '100%',
         justifyContent: 'flex-start',
@@ -99,8 +93,7 @@ const styles = (width,height) => StyleSheet.create({
         height: 40,
         width: 40,
         borderRadius: 20,
-        borderColor: Constants.COLORS.line_light_grey,
-        borderWidth: 1,
+        backgroundColor: Constants.COLORS.contrast_blue_light,
     }
 });
 

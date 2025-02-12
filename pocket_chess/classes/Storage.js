@@ -81,7 +81,7 @@ class Storage {
         }
       
       //store default timers
-      this.storage.set(Constants.storage_names.TIMERS.DEFAULT, JSON.stringify(defaultTimers, this.#serializeTimerGroupFunc));
+      this.storage.set(Constants.storageNames.TIMERS.DEFAULT, JSON.stringify(defaultTimers, this.#serializeTimerGroupFunc));
 
       this.customTimers = {
           "custom": {
@@ -93,7 +93,7 @@ class Storage {
       }
 
       //store custom timers
-      this.storage.set(Constants.storage_names.TIMERS.CUSTOM, JSON.stringify(this.customTimers, this.#serializeTimerGroupFunc));
+      this.storage.set(Constants.storageNames.TIMERS.CUSTOM, JSON.stringify(this.customTimers, this.#serializeTimerGroupFunc));
     }
 
     #getObject(key) {
@@ -124,17 +124,17 @@ class Storage {
 
     //get default timers
     getDefaultTimers() {
-      return this.#getTimers(Constants.storage_names.TIMERS.DEFAULT)
+      return this.#getTimers(Constants.storageNames.TIMERS.DEFAULT)
     }
 
     //get custom timers
     getCustomTimers() {
-      return this.#getTimers(Constants.storage_names.TIMERS.CUSTOM)
+      return this.#getTimers(Constants.storageNames.TIMERS.CUSTOM)
     }
 
     //update custom timers in storage
     setCustomTimers(newTimers) {
-      this.storage.set(Constants.storage_names.TIMERS.CUSTOM, JSON.stringify(newTimers, this.#serializeTimerGroupFunc));
+      this.storage.set(Constants.storageNames.TIMERS.CUSTOM, JSON.stringify(newTimers, this.#serializeTimerGroupFunc));
     }
 }
 

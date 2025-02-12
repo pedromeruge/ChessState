@@ -1,14 +1,25 @@
-import * as Constants from '../constants/index.js';
-import IconComponent from './common/IconComponent.jsx';
+import {useState, useEffect, forwardRef, useImperativeHandle, useRef} from 'react';
 import { StyleSheet, View, Text } from 'react-native'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationContainer, NavigationIndependentTree} from '@react-navigation/native';
-import { PlatformPressable } from '@react-navigation/elements';
+
+import * as Constants from '../constants/index.js';
+import IconComponent from './common/IconComponent.jsx';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
-const TabNavigator = ({tabs, icons, swipeEnabled=true}) => {
+const TabNavigator = forwardRef(({tabs, icons, swipeEnabled=true}, ref) => {
     const Tab = createMaterialTopTabNavigator();
+
+    const tabRefs = useRef({});
+
+    useImperativeHandle(ref, () => ({
+        getRefs: () => tabRefs.current
+    }));
+
+    useEffect(() => {
+        console.log("Updated tabRefs:", tabRefs.current);
+    }, [tabRefs.current]);
 
     function MyTabs() {
         return (
@@ -24,26 +35,37 @@ const TabNavigator = ({tabs, icons, swipeEnabled=true}) => {
                         tabBarInactiveTintColor: Constants.COLORS.text_grey,
                         tabBarPressColor: Constants.COLORS.transparent,
                         lazy: true,
-                        
                     }}
                     
                 >
-                    {Object.entries(tabs).map(([tabName,tabComponent], index) => {
+                    {Object.entries(tabs).map(([tabName,TabComponent], index) => {
                         return (
                             <Tab.Screen 
-                            key={index} 
-                            name={tabName} 
-                            component={tabComponent} 
-                            options={{
-                                tabBarLabel: ({ focused }) => (
-                                  <CustomTabLabel
-                                    focused={focused}
-                                    label={tabName}
-                                    icon={icons[tabName]}
-                                  />
-                                ),
-                            }}
-                        />)
+                                key={index} 
+                                name={tabName} 
+                                options={{
+                                    tabBarLabel: ({ focused }) => (
+                                    <CustomTabLabel
+                                        focused={focused}
+                                        label={tabName}
+                                        icon={icons[tabName]}
+                                    />
+                                    ),
+                                }}
+                            >
+                                {/* Dynamically pass ref to dynamic tab component */}
+                                {() => {
+                                        const tabRef = useRef(null);
+
+                                        // Store ref dynamically
+                                        useEffect(() => {
+                                            tabRefs.current[tabName] = tabRef;
+                                        }, []);
+
+                                        return <TabComponent ref={tabRef} />;
+                                    }}
+                            </Tab.Screen>
+                        )
                     })}
                     </Tab.Navigator>
                 </NavigationContainer>
@@ -54,7 +76,7 @@ const TabNavigator = ({tabs, icons, swipeEnabled=true}) => {
     return (
         <MyTabs />
     )
-};
+});
 
 const CustomTabLabel = ({ focused, label, icon }) => {
     return (

@@ -31,7 +31,6 @@ export function BottomNavBarItem({onPress, onLongPress, isFocused, itemIcon, col
             <Text style={[styles.tabBarItemText, { color: color}]}>{label}</Text>
         </PlatformPressable>
     )
-
 }
 
 const styles = StyleSheet.create({ 

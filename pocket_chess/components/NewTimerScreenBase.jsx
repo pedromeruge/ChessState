@@ -3,6 +3,7 @@ import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, Pressabl
 import { Link } from 'expo-router';
 
 import * as Constants from '../constants/index.js';
+import * as Styles from '../styles/index.js';
 import IconComponent from './common/IconComponent.jsx';
 import ActionButton from './common/ActionButton.jsx';
 import Header from './Header.jsx';
@@ -75,24 +76,24 @@ const NewTimerScreenBase = forwardRef(({
                 )}
                 <View style={styles.counter}>
                     <View style={styles.numberInputs}>
-                        <TouchableOpacity style={styles.time} onPress={onShowBaseTimePicker}>
-                            <View style={styles.timeTitle}>
+                        <TouchableOpacity style={Styles.newTimer.timeContainer} onPress={onShowBaseTimePicker}>
+                            <View style={Styles.newTimer.timeTitle}>
                                 <IconComponent source={Constants.icons.clock_full} width={15} />
-                                <Text style={styles.timeTitleText}>Base time</Text>
+                                <Text style={Styles.newTimer.timeTitleText}>Base time</Text>
                             </View>
-                            <Text style={[styles.timeInput, {color: baseTime.isDefault() ? Constants.COLORS.line_light_grey : Constants.COLORS.text_dark_2}]}>{baseTime.toStringComplete()}</Text>
+                            <Text style={[Styles.newTimer.timeInput, {color: baseTime.isDefault() ? Constants.COLORS.line_light_grey : Constants.COLORS.text_dark_2}]}>{baseTime.toStringComplete()}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.time} onPress={onShowIncrementPicker}>
-                            <View style={styles.timeTitle}>
+                        <TouchableOpacity style={Styles.newTimer.timeContainer} onPress={onShowIncrementPicker}>
+                            <View style={Styles.newTimer.timeTitle}>
                                 <IconComponent source={Constants.icons.plus_thick} width={12} tintColor={Constants.COLORS.contrast_blue_light}/>
-                                <Text style={styles.timeTitleText}>Increment</Text>
+                                <Text style={Styles.newTimer.timeTitleText}>Increment</Text>
                             </View>
-                            <Text style={[styles.timeInput, {color: increment.isDefault() ? Constants.COLORS.line_light_grey : Constants.COLORS.text_dark_2}]}>{increment.toStringMinSecs()}</Text>
+                            <Text style={[Styles.newTimer.timeInput, {color: increment.isDefault() ? Constants.COLORS.line_light_grey : Constants.COLORS.text_dark_2}]}>{increment.toStringMinSecs()}</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={styles.title}>
-                        <Text style={styles.titleText}>Title:</Text>
-                        <TextInput style={[styles.titleInput, {fontColor: titleText ? Constants.COLORS.text_dark_2 : Constants.COLORS.line_light_grey}]} placeholder="New timer" placeholderTextColor={Constants.COLORS.line_light_grey}
+                    <View style={Styles.newTimer.title}>
+                        <Text style={Styles.newTimer.titleText}>Title:</Text>
+                        <TextInput style={[Styles.newTimer.titleInput, {color: titleText ? Constants.COLORS.text_dark_2 : Constants.COLORS.line_light_grey}]} placeholder="New timer" placeholderTextColor={Constants.COLORS.line_light_grey}
                             onFocus={() => setIsKeyboardVisible(true)}
                             onBlur={() => handleKeyboardInputEnd()}
                             onChangeText={setTitleText}
@@ -156,64 +157,6 @@ const styles = StyleSheet.create({
         columnGap: '10%'
     },
 
-    time: {
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        borderWidth: 1,
-        borderColor: Constants.COLORS.line_light_grey,
-        borderRadius: 10,
-        paddingHorizontal: 12,
-        paddingTop: 5,
-        paddingBottom: 10,
-        rowGap: 7
-    },
-
-    timeTitle: {
-        flexDirection: 'row',
-        alignItems: 'center'
-    },
-
-    timeTitleText: {
-        fontFamily: Constants.FONTS.BASE_FONT_NAME,
-        fontSize: Constants.SIZES.large,
-        fontWeight: Constants.FONTS.medium,
-        marginLeft: 7,
-        borderColor: Constants.COLORS.line_light_grey,
-    },
-
-    timeInput: {
-        fontFamily: Constants.FONTS.BASE_FONT_NAME,
-        fontSize: Constants.SIZES.large,
-        fontWeight: Constants.FONTS.medium,
-        borderBottomWidth: 1,
-        paddingBottom: 0,
-        borderColor: Constants.COLORS.line_light_grey,
-    },
-
-    title: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 20,
-    },
-    titleText: {
-        fontFamily: Constants.FONTS.BASE_FONT_NAME,
-        fontSize: Constants.SIZES.large,
-        fontWeight: Constants.FONTS.medium,
-        fontColor: Constants.COLORS.text_grey,
-    },
-    titleInput: {
-        flex: 1,
-        fontFamily: Constants.FONTS.BASE_FONT_NAME,
-        fontSize: Constants.SIZES.large,
-        fontWeight: Constants.FONTS.medium,
-        fontColor: Constants.COLORS.line_light_grey,
-        marginLeft: 10,
-        borderBottomWidth: 1,
-        paddingBottom: 0,
-        paddingTop: 0,
-        borderColor: Constants.COLORS.line_light_grey,
-    },
     startButton: {
         marginTop: 30
     },

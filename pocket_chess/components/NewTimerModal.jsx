@@ -112,8 +112,8 @@ const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the
                         height={modalSize.height} 
                         onConfirm={hideTimePicker} 
                         onBack={hideTimePicker}
-                        timer={baseTime}
-                        setTimer={setBaseTime}
+                        time={baseTime}
+                        setTime={setBaseTime}
                     />
                 )}
                 {incrementPickerVisible && modalSize.width > 0 && modalSize.height > 0 && (
@@ -124,8 +124,8 @@ const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the
                         hideHours={true}
                         onConfirm={hideTimePicker} 
                         onBack={hideTimePicker}
-                        timer={incrementTime}
-                        setTimer={setIncrementTime}
+                        time={incrementTime}
+                        setTime={setIncrementTime}
                     />
                 )}
             </View>

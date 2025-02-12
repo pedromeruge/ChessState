@@ -5,9 +5,13 @@ import IconComponent from './common/IconComponent.jsx';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
-const Header = ({leftIcon, leftIconSize, text, rightIcon, rightIconSize, onPressRightIcon, lowBorder=false}) => {
+const Header = ({leftIcon, leftIconSize, text, rightIcon, rightIconSize, onPressRightIcon, lowBorder=false, curvyTop=false}) => {
     return (
-        <View style={styles.containerHeader}>
+        <View style={
+                [styles.containerHeader, 
+                lowBorder ? {borderBottomWidth: 1, borderColor: Constants.COLORS.line_light_grey} : null,
+                curvyTop ? {borderTopLeftRadius: 10, borderTopRightRadius: 10} : null
+            ]}>
             <View style={styles.containerHeaderLeft}>
                 <IconComponent source={leftIcon} width={leftIconSize} tintColor={Constants.COLORS.text_dark}/>
                 <Text style={styles.containerHeaderText}>{text}</Text>
@@ -41,7 +45,7 @@ const styles = StyleSheet.create({
         fontFamily: Constants.FONTS.BASE_FONT_NAME,
         fontSize: Constants.SIZES.large,
         fontWeight: Constants.FONTS.bold,
-        fontColor: Constants.COLORS.text_dark,
+        color: Constants.COLORS.text_dark,
         marginLeft: 8
     },     
     containerHeaderRight: {

@@ -145,6 +145,10 @@ export class Stage {
             Time.fromJSON(data.increment), 
             data.moves);
     }
+
+    toString() {
+        return `${Time.toStringCleanBoth(this.time, this.increment)} - ${this.moves ? this.moves : "∞"} moves`;
+    }
 }
 
 export class Timer {

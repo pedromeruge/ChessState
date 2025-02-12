@@ -5,7 +5,7 @@
 // };
 
 export default {
-  play: require("../assets/icons/pawn.png"),
+  pawn: require("../assets/icons/pawn.png"),
   scan: require("../assets/icons/qrcode.png"),
   storage: require("../assets/icons/box.png"),
   no_camera: require("../assets/icons/no_camera.png"),
@@ -28,8 +28,7 @@ export default {
   clock_full: require("../assets/icons/clock_full.png"),
   arrow_left: require("../assets/icons/arrow_left.png"),
   check: require("../assets/icons/check.png"),
-  player_white: require("../assets/icons/player_white.png"),
-  player_black: require("../assets/icons/player_black.png"),
+  pawn_full: require("../assets/icons/pawn_full.png"),
   light_pawn: require("../assets/icons/pieces/light_pawn.png"),
   light_bishop: require("../assets/icons/pieces/light_bishop.png"),
   light_knight: require("../assets/icons/pieces/light_knight.png"),

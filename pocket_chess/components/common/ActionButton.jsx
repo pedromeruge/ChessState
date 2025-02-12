@@ -45,21 +45,21 @@ const ActionButton = ({ source, text, onPress,  height=45, width=null, iconSize=
 
   });
 
-return (
-  <TouchableOpacity 
-      disabled={disabled} 
-      onPress={onPress} 
-      style={[
-          styles.button, 
-          {backgroundColor: backColor}, 
-          componentStyle, 
-          Constants.SHADOWS.medium,
-          disabled ? styles.disabled : null // if disabled make it less visible
-        ]}>
-    <IconComponent style={styles.icon} source={source} tintColor={textColor}/>
-    <Text style={[styles.text, textStyle]}>{text}</Text>
-  </TouchableOpacity>
-);
+  return (
+    <TouchableOpacity 
+        disabled={disabled} 
+        onPress={onPress} 
+        style={[
+            styles.button, 
+            {backgroundColor: backColor}, 
+            componentStyle, 
+            Constants.SHADOWS.medium,
+            disabled ? styles.disabled : null // if disabled make it less visible
+          ]}>
+      <IconComponent style={styles.icon} source={source} tintColor={textColor}/>
+      <Text style={[styles.text, textStyle]}>{text}</Text>
+    </TouchableOpacity>
+  );
 
 };
 export default ActionButton ;

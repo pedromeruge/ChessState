@@ -8,19 +8,17 @@ import { Audio } from "expo-av"; // for audio feedback (click sound as you scrol
 import * as Haptics from "expo-haptics"; // for haptic feedback
 
 import * as Constants from '../constants/index.js';
-import { transform } from 'typescript';
-import { hide } from 'expo-router/build/utils/splash.js';
 import { Time } from '../classes/Timer.js';
 
-//based on https://www.npmjs.com/package/react-native-timer-picker
-const TimerPickerRoulette = ({timer, setTimer, hideHours=false}) => {
+//based on https://www.npmjs.com/package/react-native-time-picker
+const TimerPickerRoulette = ({time, setTime, hideHours=false}) => {
 
     return (
         <View style={styles.container}>
             <TimerPicker
                 padWithNItems={2}
                 hideHours={hideHours}
-                initialValue={{hours: timer.hours, minutes: timer.minutes, seconds: timer.seconds}}
+                initialValue={{hours: time.hours, minutes: time.minutes, seconds: time.seconds}}
                 hourLabel="h"
                 minuteLabel="m"
                 secondLabel="s"
@@ -32,9 +30,9 @@ const TimerPickerRoulette = ({timer, setTimer, hideHours=false}) => {
                 padHoursWithZero
                 onDurationChange={({hours,minutes,seconds}) => {
                     try {
-                        setTimer(new Time(hours,minutes,seconds));
+                        setTime(new Time(hours,minutes,seconds));
                     } catch (error) {
-                        console.error("Error setting timer: ", error);
+                        console.error("Error setting time: ", error);
                     }
                 }}
                 styles={styles.roulette}
