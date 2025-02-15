@@ -8,18 +8,18 @@ import IconComponent from './common/IconComponent.jsx';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
-const TabNavigator = forwardRef(({tabs, icons, swipeEnabled=true}, ref) => {
+const TabNavigator = forwardRef(({tabs, icons, swipeEnabled=true, callbacks=[]}, ref) => {
     const Tab = createMaterialTopTabNavigator();
 
-    const tabRefs = useRef({});
+    // const tabRefs = useRef({});
 
-    useImperativeHandle(ref, () => ({
-        getRefs: () => tabRefs.current
-    }));
+    // useImperativeHandle(ref, () => ({
+    //     getRefs: () => tabRefs.current
+    // }));
 
-    useEffect(() => {
-        console.log("Updated tabRefs:", tabRefs.current);
-    }, [tabRefs.current]);
+    // useEffect(() => {
+    //     console.log("Updated tabRefs:", tabRefs.current);
+    // }, [tabRefs.current]);
 
     function MyTabs() {
         return (
@@ -53,17 +53,21 @@ const TabNavigator = forwardRef(({tabs, icons, swipeEnabled=true}, ref) => {
                                     ),
                                 }}
                             >
-                                {/* Dynamically pass ref to dynamic tab component */}
+                                {/* Dynamically pass ref to dynamic tab component
                                 {() => {
-                                        const tabRef = useRef(null);
+                                    const tabRef = useRef(null);
 
-                                        // Store ref dynamically
-                                        useEffect(() => {
-                                            tabRefs.current[tabName] = tabRef;
-                                        }, []);
+                                    // Store ref dynamically
+                                    useEffect(() => {
+                                        tabRefs.current[tabName] = tabRef;
+                                    }, []);
 
-                                        return <TabComponent ref={tabRef} />;
-                                    }}
+                                    return <TabComponent forwardRef={tabRef} />;
+                                }} */}
+                                {() => {
+                                        return <TabComponent/>
+                                    }
+                                }
                             </Tab.Screen>
                         )
                     })}

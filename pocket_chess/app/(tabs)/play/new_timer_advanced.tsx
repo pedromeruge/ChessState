@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle, useCallback, useReducer, useMemo } from 'react';
 import { SafeAreaView, ScrollView, View, StyleSheet, TextInput, Image, Text } from 'react-native'
 import { router} from 'expo-router';
 
@@ -14,30 +14,38 @@ import { all } from 'axios';
 
 const NewTimerAdvanced = ({}) => { // expose the ref to the parent component
 
-    const tabNavigatorRef = useRef<{ getRefs: () => { [key: string]: { current: { stages: any } } } } | null>(null)
-    const [titleText, setTitleText] = useState('asd');
-    const [playerTimers, setPlayerTimers] = useState({});
-    const [isStartButtonEnabled, setIsStartButtonEnabled] = useState(false);
-    
-    const allPlayersHaveStages = () => {
-        const allRefs = tabNavigatorRef.current?.getRefs();
-        if (!allRefs) return false;
-        
-        return Object.values(allRefs)
-            .every(playerRef => 
-                playerRef.current?.stages?.length > 0
+    const [title, setTitle] = useState(''); // title of the timer
+    const titleTextRef = useRef(''); // reference to the title input, used in textInput to prevent re-rendering, instead of using state directly
+
+    const [playersStages, setPlayersStages] = useState({
+        "Player White": [],
+        "Player Black": []
+    });
+
+    const updateStages = useCallback((player: string, stages: Stage[]) => {
+        setPlayersStages(prev => ({
+            ...prev,
+            [player]: stages
+          }));
+    }, []);
+
+    const allPlayersHaveStages = useCallback(() =>  {
+        return Object.values(playersStages)
+            .every(stages => 
+                stages?.length > 0
         );
-    }
+    }, [playersStages]);
 
     const onStartTimer = () => {
         console.log("All players have stages:", allPlayersHaveStages());
-        const allRefs = tabNavigatorRef.current?.getRefs();
-        console.log("All child refs:", allRefs);
+        console.log("All child refs:", Object.values(playersStages));
 
-        Object.entries(allRefs).forEach(([player, playerRef]) => {
-            console.log(`Stages for ${player}:`, playerRef.current?.stages);
+        Object.entries(playersStages).forEach(([player, playerStages]) => {
+            console.log(`Stages for ${player}:`, playerStages);
         });
        
+        const title = titleTextRef.current;
+        console.log("Title:", title);
         // const customTimers = storage.getCustomTimers();
         // customTimers.custom.timers.push(newTimer);
         // storage.setCustomTimers(customTimers);
@@ -51,6 +59,11 @@ const NewTimerAdvanced = ({}) => { // expose the ref to the parent component
         //reset input parameters
     }
 
+    const onChangeTitle = (text: string) => {
+        titleTextRef.current = text;
+        setTitle(text);
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <Header leftIcon={Constants.icons.clock_lines} leftIconSize={16} text={'New timer'} rightIcon={Constants.icons.arrow_left} rightIconSize={18} 
@@ -63,18 +76,20 @@ const NewTimerAdvanced = ({}) => { // expose the ref to the parent component
                         <Image source={Constants.images.banner1} style={styles.banner}/>
                     </View>
                     <View style={styles.tabNavigatorWrapper}>
-                        <TabNavigator 
-                            ref = {tabNavigatorRef}
-                            tabs = {{
-                                "Player White": StagesSelection,
-                                "Player Black": StagesSelection
-                            }}
-                            icons = {{
-                                "Player White": Constants.icons.pawn,
-                                "Player Black": Constants.icons.pawn_full
-                            }}
-                            swipeEnabled={false}
-                        />
+                        {useMemo(() => (
+                            <TabNavigator 
+                                tabs = {{
+                                    "Player White": (props) => <StagesSelection {...props} onUpdateStages={(stages: Stage[]) => updateStages("Player White", stages)}/>,
+                                    "Player Black": (props) => <StagesSelection {...props} onUpdateStages={(stages: Stage[]) => updateStages("Player Black", stages)}/>
+                                }}
+                                icons = {{
+                                    "Player White": Constants.icons.pawn,
+                                    "Player Black": Constants.icons.pawn_full
+                                }}
+                                swipeEnabled={false}
+                            />
+                        ), [updateStages])
+                        }
                     </View>
                     {/* <View style={styles.separationLine}></View> */}
                     <View style={Styles.newTimer.sectionContainer}>
@@ -87,15 +102,15 @@ const NewTimerAdvanced = ({}) => { // expose the ref to the parent component
                                 style={Styles.newTimer.titleInput} 
                                 placeholder="New timer" 
                                 placeholderTextColor={Constants.COLORS.line_light_grey}
-                                onChangeText={setTitleText}
-                                value={titleText}
+                                onChangeText={onChangeTitle}
+                                value={title}
                             />
                         </View>
                     </View>
                     <View style={styles.startButtonContainer}>
                         <ActionButton source={Constants.icons.hourglass} text="Start" height={45} iconSize={20} fontSize={Constants.SIZES.xxLarge} componentStyle={styles.startButton}
                             onPress={onStartTimer}
-                            disabled={!allPlayersHaveStages() || titleText === ''}
+                            disabled={!allPlayersHaveStages() || title === ''}
                             />
                     </View>
                 </ScrollView>

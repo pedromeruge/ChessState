@@ -1,4 +1,4 @@
-import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable, TextInput, Keyboard } from 'react-native'
 
 import * as Constants from '../constants/index.js';
@@ -10,13 +10,10 @@ import ModalTimerPicker from './ModalTimerPicker.jsx';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
-const StagesSelection = forwardRef(({}, ref) => { // expose the ref to the parent component
+const StagesSelection = forwardRef(({onUpdateStages}, ref) => { // expose the ref to the parent component
 
     // state
-    const [stages, setStages] = useState([ // track stages 
-        new Stage(new Time(0, 1, 0)),
-        new Stage(new Time(0, 5, 0), new Time(0, 0, 3))
-    ]); 
+    const [stages, setStages] = useState([]); 
     const [baseTime, setBaseTime] = useState(new Time()); // track base time
     const [increment, setIncrement] = useState(new Time()); // track increment
     const [moves, setMoves] = useState(null); // track moves
@@ -36,15 +33,29 @@ const StagesSelection = forwardRef(({}, ref) => { // expose the ref to the paren
     }
 
     const onAddStage = () => {
-        setStages([...stages, new Stage(baseTime, increment, moves)]); // add stage to list
+        const newStages = [ // add stage to list
+            ...stages, 
+            new Stage(baseTime, increment, moves)
+        ]; 
+        setStages(newStages);
+        onUpdateStages(newStages); // update parent component
+
         console.log("Added stage");
+
         setBaseTime(new Time()); // reset base time
         setIncrement(new Time()); // reset increment
         setMoves(null); // reset moves
+
     }
+
     const onRemoveStage = (index) => {
-        setStages(stages.filter((stage, i) => i !== index)); // remove stage from list
+        const newStages = stages.filter((stage, i) => i !== index); // remove stage from list
+        
+        setStages(newStages);
+        onUpdateStages(newStages); // update parent component
+
         console.log("Removed stage in position: ", index);
+
     }
 
     const showBaseTimePicker = () => {

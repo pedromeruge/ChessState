@@ -200,3 +200,28 @@ export class Timer {
         )
     }
 }
+export class Preset {
+    /**
+     * Details of a timer preset
+     * @param {*} timers - array of Timer objects
+     * @param {*} title - title of the preset
+     */
+    constructor(timers, title) {
+        this.timers = timers;
+        this.title = title;
+    }
+
+    toJSON() {
+        return {
+            timers: this.timers.map(timer => timer.toJSON()),
+            title: this.title
+        }
+    }
+
+    static fromJSON(data) {
+        return new Preset(
+            data.timers.map(timer => Timer.fromJSON(timer)), 
+            data.title
+        )
+    }
+}
