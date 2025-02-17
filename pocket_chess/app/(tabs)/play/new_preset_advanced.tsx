@@ -10,7 +10,6 @@ import ActionButton from '../../../components/common/ActionButton.jsx';
 import storage from '../../../classes/Storage.js';
 import TabNavigator from '../../../components/TabNavigator.jsx';
 import StagesSelection from '../../../components/StagesSelection.jsx';
-import { all } from 'axios';
 
 const NewPresetAdvanced = ({}) => { // expose the ref to the parent component
 
@@ -51,7 +50,6 @@ const NewPresetAdvanced = ({}) => { // expose the ref to the parent component
         const timers = Object.values(playersStages).map(stages => {
             return new Timer(stages);
         })
-        console.log("Title:", title);
         const newPreset = new Preset(timers, title, undefined, undefined, true, Object.keys(playersStages));
         const customPresets = storage.getCustomPresets();
         customPresets.custom.presets.push(newPreset);

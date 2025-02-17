@@ -4,6 +4,7 @@ import * as Constants from '../constants/index.js';
 import TimerPreset from './TimerPreset.jsx';
 import IconComponent from './common/IconComponent.jsx';
 import {LinearGradient} from 'expo-linear-gradient';
+import {router} from 'expo-router'
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
@@ -30,6 +31,11 @@ const TimerPresetSection = ({presetsList}) =>{
 
     const onPressPreset = (preset) => {
         console.log("Pressed preset", preset);
+        //note: its an anti-pattern to send a full object in params. Should just send id, and fetch it in the next screen
+        router.push(
+            { pathname: './play/play_preset', 
+            params: {preset_id: preset.id}
+        });
     }
 
     return (

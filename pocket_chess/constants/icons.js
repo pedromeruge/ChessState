@@ -40,5 +40,10 @@ export default {
   dark_knight: require("../assets/icons/pieces/dark_knight.png"),
   dark_rook: require("../assets/icons/pieces/dark_rook.png"),
   dark_queen: require("../assets/icons/pieces/dark_queen.png"),
-  dark_king: require("../assets/icons/pieces/dark_king.png")
+  dark_king: require("../assets/icons/pieces/dark_king.png"),
+  restart: require("../assets/icons/restart.png"),
+  pause: require("../assets/icons/pause.png"),
+  play: require("../assets/icons/play.png"),
+  volume_on: require("../assets/icons/volume_on.png"),
+  volume_off: require("../assets/icons/volume_off.png")
 };

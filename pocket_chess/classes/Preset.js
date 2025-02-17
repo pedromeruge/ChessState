@@ -14,6 +14,14 @@ export class Time {
         this.seconds = seconds;
     }
 
+    static fromMiliseconds(miliseconds) {
+        const inSeconds = Math.floor(miliseconds / 1000);
+        const hours = Math.floor(inSeconds / (60 * 60));
+        const minutes = Math.floor( (inSeconds % (60 * 60)) / 60);
+        const seconds = inSeconds % 60;
+        return new Time(hours, minutes, seconds);
+    }
+
     setHours(hours) {
         this.hours = hours;
     }
@@ -26,28 +34,11 @@ export class Time {
         this.seconds = seconds;
     }
 
-    //to auto-suggest on new timers
-    toStringClean() {
-        let timeParts = []
-
-        if (this.hours !== 0) {
-            timeParts.push(this.hours.toString())
-        }
-        if (this.minutes !== 0) {
-            timeParts.push(this.minutes.toString())
-        }
-        
-        if ((this.minutes === 0 && this.hours === 0) || this.seconds !== 0) {
-            timeParts.push(this.seconds.toString());
-        }
-        return timeParts.join(":");
-    }
-
     toStringFieldsPad(incHours, incMinutes, incSeconds, padMinutes, padSeconds) {
         let timeParts = []
 
         if (incHours) {
-            timeParts.push(this.hours.toString().padStart(2, "0"))
+            timeParts.push(this.hours.toString())
         }
         if (incMinutes) {
             const minutes = padMinutes ? this.minutes.toString().padStart(2, "0") : this.minutes.toString()
@@ -88,6 +79,28 @@ export class Time {
         return result
     }
 
+    toStringTimer() {
+        let result = ""
+
+        if (this.hours) {
+            result += this.hours.toString() + ":"
+        }
+        if (this.hours || this.minutes || this.seconds) {
+            if (this.hours) {
+                result += this.minutes.toString().padStart(2, "0")
+            }
+            else {
+                result += this.minutes.toString()
+            }
+
+            result += ":"
+        }
+        
+        result += this.seconds.toString().padStart(2, "0")
+
+        return result
+    }
+
     toStringComplete() {
         return `${this.hours.toString().padStart(2, "0")}:` +
                 `${this.minutes.toString().padStart(2, "0")}:`+
@@ -99,7 +112,7 @@ export class Time {
                 `${this.seconds.toString().padStart(2, "0")}`; 
     }
 
-    toMilliseconds() {
+    toMiliseconds() {
         return (this.hours * 60 * 60 + 
                 this.minutes * 60 + 
                 this.seconds) * 1000;

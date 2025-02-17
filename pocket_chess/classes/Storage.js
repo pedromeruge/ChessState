@@ -70,7 +70,7 @@ class Storage {
             [ 
               Preset.samePlayerTimers(
                 new Timer(
-                    [new Stage(new Time(0, 90, 0), new Time(0, 0, 0), 40), 
+                    [new Stage(new Time(1, 30, 0), new Time(0, 0, 0), 40), 
                       new Stage(new Time(0, 30, 0))]),
                 "90+30|30", 
                 Constants.COLORS.white, 
@@ -78,7 +78,7 @@ class Storage {
               ),
               Preset.samePlayerTimers(
                 new Timer(
-                  [new Stage(new Time(0, 90, 0), new Time(0, 0, 30))])
+                  [new Stage(new Time(1, 30, 0), new Time(0, 0, 30))])
                 ,"90|30"),
             ]
           }
@@ -139,6 +139,25 @@ class Storage {
     //update custom presets in storage
     setCustomPresets(newPresets) {
       this.storage.set(Constants.storageNames.PRESETS.CUSTOM, JSON.stringify(newPresets, this.#serializePresetGroupFunc));
+    }
+
+    getPreset(preset_id) {
+      const customPresets = this.getCustomPresets();
+      const defaultPresets = this.getDefaultPresets();
+
+      const preset = customPresets.custom.presets.find((preset) => preset.id === preset_id);
+      if (preset) {
+          return preset;
+      }
+
+      const preset2 = Object.values(defaultPresets)
+                        .flatMap((presetGroup) => presetGroup.presets)
+                        .find((preset) => preset.id === preset_id);
+      if (preset2) {
+          return preset2;
+      }
+
+      return null;
     }
 }
 

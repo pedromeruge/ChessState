@@ -30,8 +30,12 @@ const TimerPreset = ({preset, onPress}) =>{
 
 const styles = (preset) => StyleSheet.create({ 
     container: {
-        minWidth: 70,
-        minHeight: 70,
+        minWidth: 60,
+        minHeight: 60,
+        maxWidth: 120,
+        maxHeight: 120,
+        flexBasis: '20%',
+        aspectRatio: 1,
         borderRadius: 5,
         padding: 5,
         alignItems: 'center',
