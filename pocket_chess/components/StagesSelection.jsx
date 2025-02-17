@@ -5,7 +5,7 @@ import * as Constants from '../constants/index.js';
 import * as Styles from '../styles/index.js';
 
 import IconComponent from './common/IconComponent.jsx';
-import { Time, Stage, Timer } from '../classes/Timer.js';
+import { Time, Stage, Timer, Preset } from '../classes/Preset.js';
 import ModalTimerPicker from './ModalTimerPicker.jsx';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
@@ -72,33 +72,33 @@ const StagesSelection = forwardRef(({onUpdateStages}, ref) => { // expose the re
 
     return (
         <View style={styles.container}>
-            <View style={Styles.newTimer.sectionContainer}>
-                <View style={Styles.newTimer.sectionTitleContainer}>
-                    <Text style={Styles.newTimer.sectionTitleText}>Add stage</Text>
+            <View style={Styles.newPreset.sectionContainer}>
+                <View style={Styles.newPreset.sectionTitleContainer}>
+                    <Text style={Styles.newPreset.sectionTitleText}>Add stage</Text>
                 </View>
                 <View style={styles.addStageContainer}>
-                    <TouchableOpacity style={[Styles.newTimer.timeContainer, styles.stageInput]} onPress={showBaseTimePicker}>
-                        <View style={Styles.newTimer.timeTitle}>
+                    <TouchableOpacity style={[Styles.newPreset.timeContainer, styles.stageInput]} onPress={showBaseTimePicker}>
+                        <View style={Styles.newPreset.timeTitle}>
                             <IconComponent source={Constants.icons.clock_full} width={15} />
-                            <Text style={Styles.newTimer.timeTitleText}>Base time</Text>
+                            <Text style={Styles.newPreset.timeTitleText}>Base time</Text>
                         </View>
-                        <Text style={[Styles.newTimer.timeInput, {color: baseTime.isDefault() ? Constants.COLORS.line_light_grey : Constants.COLORS.text_dark_2}]}>{baseTime.toStringComplete()}</Text>
+                        <Text style={[Styles.newPreset.timeInput, {color: baseTime.isDefault() ? Constants.COLORS.line_light_grey : Constants.COLORS.text_dark_2}]}>{baseTime.toStringComplete()}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[Styles.newTimer.timeContainer, styles.stageInput]} onPress={showIncrementPicker}>
-                        <View style={Styles.newTimer.timeTitle}>
+                    <TouchableOpacity style={[Styles.newPreset.timeContainer, styles.stageInput]} onPress={showIncrementPicker}>
+                        <View style={Styles.newPreset.timeTitle}>
                             <IconComponent source={Constants.icons.plus_thick} width={12} tintColor={Constants.COLORS.contrast_blue_light}/>
-                            <Text style={Styles.newTimer.timeTitleText}>Increment</Text>
+                            <Text style={Styles.newPreset.timeTitleText}>Increment</Text>
                         </View>
-                        <Text style={[Styles.newTimer.timeInput, {color: increment.isDefault() ? Constants.COLORS.line_light_grey : Constants.COLORS.text_dark_2}]}>{increment.toStringMinSecs()}</Text>
+                        <Text style={[Styles.newPreset.timeInput, {color: increment.isDefault() ? Constants.COLORS.line_light_grey : Constants.COLORS.text_dark_2}]}>{increment.toStringMinSecs()}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[Styles.newTimer.timeContainer, styles.stageInput]} onPress={handlePressMoves}>
-                        <View style={Styles.newTimer.timeTitle}>
+                    <TouchableOpacity style={[Styles.newPreset.timeContainer, styles.stageInput]} onPress={handlePressMoves}>
+                        <View style={Styles.newPreset.timeTitle}>
                             <IconComponent source={Constants.icons.pawn_full} width={12} tintColor={Constants.COLORS.contrast_blue_light}/>
-                            <Text style={Styles.newTimer.timeTitleText}>Moves</Text>
+                            <Text style={Styles.newPreset.timeTitleText}>Moves</Text>
                         </View>
                         <TextInput 
                             ref={movesInputRef}
-                            style={Styles.newTimer.timeInput}
+                            style={Styles.newPreset.timeInput}
                             placeholder="∞"
                             placeholderTextColor={Constants.COLORS.line_light_grey}
                             keyboardType='numeric'
@@ -118,10 +118,10 @@ const StagesSelection = forwardRef(({onUpdateStages}, ref) => { // expose the re
                     <ModalTimerPicker ref={incrementPickerRef} time={increment} setTime={setIncrement} hideHours={true}/>
                 </View>
             </View>
-            <View style={Styles.newTimer.sectionContainer}>
-                <View style={Styles.newTimer.sectionTitleContainer}>
-                    <Text style={Styles.newTimer.sectionTitleText}>Stages</Text>
-                    <Text style={Styles.newTimer.sectionSubtitleText}>{stages.length} items</Text>
+            <View style={Styles.newPreset.sectionContainer}>
+                <View style={Styles.newPreset.sectionTitleContainer}>
+                    <Text style={Styles.newPreset.sectionTitleText}>Stages</Text>
+                    <Text style={Styles.newPreset.sectionSubtitleText}>{stages.length} items</Text>
                 </View>
                 <View style={styles.stagesContent}>
                     {stages.length == 0 ? (

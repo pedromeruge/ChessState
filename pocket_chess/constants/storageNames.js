@@ -1,7 +1,7 @@
 
 export default {
-  TIMERS: {
-    DEFAULT: 'timers-default',
-    CUSTOM: 'timers-custom'
+  PRESETS: {
+    DEFAULT: 'presets-default',
+    CUSTOM: 'presets-custom'
   }
 };

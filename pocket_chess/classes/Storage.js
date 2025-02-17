@@ -1,7 +1,7 @@
 import * as Constants from '../constants';
 
 import {MMKV} from 'react-native-mmkv';
-import { Timer, Stage, Time} from '../classes/Timer.js';
+import { Preset, Timer, Stage, Time} from './Preset.js';
 
 //initialize MMKV storage
 class Storage {
@@ -24,17 +24,17 @@ class Storage {
     }
 
     #initialSetupTimers() {
-      const defaultTimers = {
+      const defaultPresets = {
           "bullet": {
             "icon": Constants.icons.preset_bullet,
             "iconColor": Constants.COLORS.preset_blue,
             "title": "Bullet",
-            "timers":
+            "presets":
             [
-              new Timer([new Stage(new Time(0, 1, 0))],"1|0", Constants.COLORS.white, Constants.COLORS.preset_blue),
-              new Timer([new Stage(new Time(0, 1, 0), new Time(0, 0, 1))],"1|1"),
-              new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 1))],"2|1"),
-              new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 5))],"2|5")
+              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 1, 0))]),"1|0", Constants.COLORS.white, Constants.COLORS.preset_blue),
+              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 1, 0), new Time(0, 0, 1))]),"1|1"),
+              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 1))]),"2|1"),
+              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 5))]),"2|5")
             ]
           },
       
@@ -42,58 +42,62 @@ class Storage {
             "icon": Constants.icons.flash_on,
             "iconColor": Constants.COLORS.preset_yellow,
             "title": "Blitz",
-            "timers":
+            "presets":
             [
-              new Timer([new Stage(new Time(0, 3, 0))],"3|0", Constants.COLORS.white, Constants.COLORS.preset_yellow),
-              new Timer([new Stage(new Time(0, 3, 0), new Time(0, 0, 2))],"3|2"),
-              new Timer([new Stage(new Time(0, 5, 0))],"5|0"),
-              new Timer([new Stage(new Time(0, 5, 0), new Time(0, 0, 3))],"5|3"),
+              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 3, 0))]), "3|0", Constants.COLORS.white, Constants.COLORS.preset_yellow),
+              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 3, 0), new Time(0, 0, 2))]), "3|2"),
+              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 5, 0))]), "5|0"),
+              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 5, 0), new Time(0, 0, 3))]), "5|3"),
             ]
           },
           "rapid": {
             "icon": Constants.icons.preset_rapid,
             "iconColor": Constants.COLORS.preset_green,
             "title": "Rapid",
-            "timers":
+            "presets":
             [
-              new Timer([new Stage(new Time(0, 10, 0))],"10|0", Constants.COLORS.white, Constants.COLORS.preset_green),
-              new Timer([new Stage(new Time(0, 10, 0), new Time(0, 0, 5))],"10|5"),
-              new Timer([new Stage(new Time(0, 15, 0), new Time(0, 0, 10))],"15|10"),
-              new Timer([new Stage(new Time(0, 25, 0), new Time(0, 0, 10))],"25|10"),
+              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 10, 0))]), "10|0", Constants.COLORS.white, Constants.COLORS.preset_green),
+              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 10, 0), new Time(0, 0, 5))]), "10|5"),
+              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 15, 0), new Time(0, 0, 10))]), "15|10"),
+              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 25, 0), new Time(0, 0, 10))]), "25|10"),
             ]
           },
           "standard": {
             "icon": Constants.icons.preset_standard,
             "iconColor": Constants.COLORS.preset_red,
             "title": "Standard",
-            "timers":
+            "presets":
             [ 
-              new Timer(
+              Preset.samePlayerTimers(
+                new Timer(
                     [new Stage(new Time(0, 90, 0), new Time(0, 0, 0), 40), 
-                      new Stage(new Time(0, 30, 0))],
-                    "90+30|30", Constants.COLORS.white, Constants.COLORS.preset_red
-                  ),
-              new Timer(
-                [new Stage(new Time(0, 90, 0), new Time(0, 0, 30))]
+                      new Stage(new Time(0, 30, 0))]),
+                "90+30|30", 
+                Constants.COLORS.white, 
+                Constants.COLORS.preset_red
+              ),
+              Preset.samePlayerTimers(
+                new Timer(
+                  [new Stage(new Time(0, 90, 0), new Time(0, 0, 30))])
                 ,"90|30"),
             ]
           }
         }
       
-      //store default timers
-      this.storage.set(Constants.storageNames.TIMERS.DEFAULT, JSON.stringify(defaultTimers, this.#serializeTimerGroupFunc));
+      //store default presets
+      this.storage.set(Constants.storageNames.PRESETS.DEFAULT, JSON.stringify(defaultPresets, this.#serializePresetGroupFunc));
 
       this.customTimers = {
           "custom": {
               "icon": Constants.icons.preset_custom,
               "iconColor": Constants.COLORS.text_dark,
               "title": "Custom",
-              "timers": []
+              "presets": []
           }
       }
 
-      //store custom timers
-      this.storage.set(Constants.storageNames.TIMERS.CUSTOM, JSON.stringify(this.customTimers, this.#serializeTimerGroupFunc));
+      //store custom presets
+      this.storage.set(Constants.storageNames.PRESETS.CUSTOM, JSON.stringify(this.customTimers, this.#serializePresetGroupFunc));
     }
 
     #getObject(key) {
@@ -101,40 +105,40 @@ class Storage {
         return value ? JSON.parse(value) : null;
     }
 
-    //serialize a group of timers that belong to a section: standard, rapid, etc.
-    #serializeTimerGroupFunc(key, value) {
+    //serialize a group of presets that belong to a section: standard, rapid, etc.
+    #serializePresetGroupFunc(key, value) {
       if (Array.isArray(value)) {
-        return value.map((item) => item instanceof Timer ? item.toJSON() : item);
+        return value.map((item) => item instanceof Preset ? item.toJSON() : item);
       }
       return value;
     };
 
-    //get object with timers and layout data, for default or custom timers
-    #getTimers(key) {
+    //get object with presets and layout data, for default or custom presets
+    #getPresets(key) {
       const data = this.#getObject(key)
 
       if (data) {
         Object.keys(data).forEach((category) => {
-            data[category].timers = data[category].timers.map((timer) => Timer.fromJSON(timer))
+            data[category].presets = data[category].presets.map((preset) => Preset.fromJSON(preset))
         })
       }
 
       return data
     }
 
-    //get default timers
-    getDefaultTimers() {
-      return this.#getTimers(Constants.storageNames.TIMERS.DEFAULT)
+    //get default presets
+    getDefaultPresets() {
+      return this.#getPresets(Constants.storageNames.PRESETS.DEFAULT)
     }
 
-    //get custom timers
-    getCustomTimers() {
-      return this.#getTimers(Constants.storageNames.TIMERS.CUSTOM)
+    //get custom presets
+    getCustomPresets() {
+      return this.#getPresets(Constants.storageNames.PRESETS.CUSTOM)
     }
 
-    //update custom timers in storage
-    setCustomTimers(newTimers) {
-      this.storage.set(Constants.storageNames.TIMERS.CUSTOM, JSON.stringify(newTimers, this.#serializeTimerGroupFunc));
+    //update custom presets in storage
+    setCustomPresets(newPresets) {
+      this.storage.set(Constants.storageNames.PRESETS.CUSTOM, JSON.stringify(newPresets, this.#serializePresetGroupFunc));
     }
 }
 

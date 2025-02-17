@@ -4,17 +4,17 @@ import { router} from 'expo-router';
 
 import * as Constants from '../../../constants/index.js';
 import * as Styles from '../../../styles/index.js';
-import { Time, Stage, Timer } from '../../../classes/Timer.js';
+import { Time, Stage, Timer, Preset } from '../../../classes/Preset.js';
 import Header from '../../../components/Header.jsx';
 import ActionButton from '../../../components/common/ActionButton.jsx';
-import storage from '../../../classes/Storage';
+import storage from '../../../classes/Storage.js';
 import TabNavigator from '../../../components/TabNavigator.jsx';
 import StagesSelection from '../../../components/StagesSelection.jsx';
 import { all } from 'axios';
 
-const NewTimerAdvanced = ({}) => { // expose the ref to the parent component
+const NewPresetAdvanced = ({}) => { // expose the ref to the parent component
 
-    const [title, setTitle] = useState(''); // title of the timer
+    const [title, setTitle] = useState(''); // title of the preset
     const titleTextRef = useRef(''); // reference to the title input, used in textInput to prevent re-rendering, instead of using state directly
 
     const [playersStages, setPlayersStages] = useState({
@@ -36,27 +36,38 @@ const NewTimerAdvanced = ({}) => { // expose the ref to the parent component
         );
     }, [playersStages]);
 
-    const onStartTimer = () => {
-        console.log("All players have stages:", allPlayersHaveStages());
-        console.log("All child refs:", Object.values(playersStages));
-
-        Object.entries(playersStages).forEach(([player, playerStages]) => {
-            console.log(`Stages for ${player}:`, playerStages);
+    const resetParameters = () => {
+        setTitle('');
+        setPlayersStages({
+            "Player White": [],
+            "Player Black": []
         });
-       
-        const title = titleTextRef.current;
-        console.log("Title:", title);
-        // const customTimers = storage.getCustomTimers();
-        // customTimers.custom.timers.push(newTimer);
-        // storage.setCustomTimers(customTimers);
-
-        //reset input parameters
+        titleTextRef.current = '';
     }
 
-    const onBack = () => {
-        router.back() // go back to the play screen
+    const onStartPreset = () => {
+
+        const title = titleTextRef.current;
+        const timers = Object.values(playersStages).map(stages => {
+            return new Timer(stages);
+        })
+        console.log("Title:", title);
+        const newPreset = new Preset(timers, title, undefined, undefined, true, Object.keys(playersStages));
+        const customPresets = storage.getCustomPresets();
+        customPresets.custom.presets.push(newPreset);
+        storage.setCustomPresets(customPresets);
+
+        onBack(true);
+    }
+
+    const onBack = (refreshPrevPage=false) => {
 
         //reset input parameters
+        resetParameters();
+
+        //back to previous component
+        router.back() 
+        router.setParams({ refresh: refreshPrevPage ? 'true' : 'false' }); // indicate to other component if it should refresh
     }
 
     const onChangeTitle = (text: string) => {
@@ -66,7 +77,7 @@ const NewTimerAdvanced = ({}) => { // expose the ref to the parent component
 
     return (
         <SafeAreaView style={styles.container}>
-            <Header leftIcon={Constants.icons.clock_lines} leftIconSize={16} text={'New timer'} rightIcon={Constants.icons.arrow_left} rightIconSize={18} 
+            <Header leftIcon={Constants.icons.clock_lines} leftIconSize={16} text={'New preset'} rightIcon={Constants.icons.arrow_left} rightIconSize={18} 
                 onPressRightIcon={onBack}
             />
             <View style={styles.scrollContainer}>
@@ -92,15 +103,15 @@ const NewTimerAdvanced = ({}) => { // expose the ref to the parent component
                         }
                     </View>
                     {/* <View style={styles.separationLine}></View> */}
-                    <View style={Styles.newTimer.sectionContainer}>
-                        <View style={Styles.newTimer.sectionTitleContainer}>
-                            <Text style={Styles.newTimer.sectionTitleText}>Title</Text>
+                    <View style={Styles.newPreset.sectionContainer}>
+                        <View style={Styles.newPreset.sectionTitleContainer}>
+                            <Text style={Styles.newPreset.sectionTitleText}>Title</Text>
                         </View>
                         <View style={styles.titleSectionContent}>
                             <Text style={styles.titleSectionText}>Name:</Text>
                             <TextInput 
-                                style={Styles.newTimer.titleInput} 
-                                placeholder="New timer" 
+                                style={Styles.newPreset.titleInput} 
+                                placeholder="New preset" 
                                 placeholderTextColor={Constants.COLORS.line_light_grey}
                                 onChangeText={onChangeTitle}
                                 value={title}
@@ -109,7 +120,7 @@ const NewTimerAdvanced = ({}) => { // expose the ref to the parent component
                     </View>
                     <View style={styles.startButtonContainer}>
                         <ActionButton source={Constants.icons.hourglass} text="Start" height={45} iconSize={20} fontSize={Constants.SIZES.xxLarge} componentStyle={styles.startButton}
-                            onPress={onStartTimer}
+                            onPress={onStartPreset}
                             disabled={!allPlayersHaveStages() || title === ''}
                             />
                     </View>
@@ -186,4 +197,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default NewTimerAdvanced;
+export default NewPresetAdvanced;

@@ -157,46 +157,28 @@ export class Timer {
      * @param {*} stages - array of Stage objects
      * @param {*} title - title of the timer
      */
-    constructor(stages, title, textColor=Constants.COLORS.text_grey, backColor=Constants.COLORS.white, isCustom=false, currentStage=0, id=null) {
+    constructor(stages, currentStage=0, currentStageTime=null, currentStageMoves=null) {
         this.stages = stages;
-        this.title = title;
-        this.textColor = textColor
-        this.backColor = backColor
-        this.isCustom = isCustom
         this.currentStage = currentStage;
-        this.currentStageTime = this.stages[currentStage].time
-        this.currentStageMoves = this.stages[currentStage].moves
-        this.id = id ? id : Math.random().toString(36).slice(2, 9); // random id
-    }
-
-    /**
-     * Split the title into an array of strings, for correct display
-     */
-    titleStrings() {
-        return this.title.split('|').map(item => item.trim())
+        this.currentStageTime = currentStageTime ? currentStageTime : this.stages[currentStage].time
+        this.currentStageMoves = currentStageMoves ? currentStageMoves : this.stages[currentStage].moves
     }
 
     toJSON() {
         return {
             stages: this.stages.map(stage => stage.toJSON()),
-            title: this.title,
-            textColor: this.textColor,
-            backColor: this.backColor,
-            isCustom: this.isCustom,
             currentStage: this.currentStage,
-            id: this.id
+            currentStageTime: this.currentStageTime ? this.currentStageTime.toJSON() : null,
+            currentStageMoves: this.currentStageMoves
         }
     }
 
     static fromJSON(data) {
         return new Timer(
             data.stages.map(stage => Stage.fromJSON(stage)), 
-            data.title, 
-            data.textColor, 
-            data.backColor, 
-            data.isCustom,
             data.currentStage,
-            data.id
+            Time.fromJSON(data.currentStageTime),
+            data.currentStageMoves
         )
     }
 }
@@ -206,22 +188,72 @@ export class Preset {
      * @param {*} timers - array of Timer objects
      * @param {*} title - title of the preset
      */
-    constructor(timers, title) {
+    constructor(
+            timers, 
+            title, 
+            textColor=Constants.COLORS.text_grey, 
+            backColor=Constants.COLORS.white, 
+            isCustom=false, 
+            playerNames=null, 
+            id=null) {
         this.timers = timers;
         this.title = title;
+        this.textColor = textColor
+        this.backColor = backColor
+        this.isCustom = isCustom
+        this.playerNames = playerNames ? playerNames : Array.from({ length: timers.length }, (_, i) => `Player ${i+1}`) // creates array with size, filled with custom function
+        this.id = id ? id : Math.random().toString(36).slice(2, 9); // random id
+    }
+
+    // simplified constructor for a single timer identical in all players
+    static samePlayerTimers(
+        timer,
+        title,
+        textColor=Constants.COLORS.text_grey, 
+        backColor=Constants.COLORS.white, 
+        playerCount=2,
+        isCustom=false,
+        playerNames=null,
+        id=null) {
+        return new Preset(
+            Array(playerCount).fill(timer),
+            title,
+            textColor,
+            backColor,
+            isCustom,
+            playerNames,
+            id
+        )
+    }
+
+        /**
+     * Split the title into an array of strings, for correct display
+     */
+    titleStrings() {
+        return this.title.split('|').map(item => item.trim())
     }
 
     toJSON() {
         return {
             timers: this.timers.map(timer => timer.toJSON()),
-            title: this.title
+            title: this.title,
+            textColor: this.textColor,
+            backColor: this.backColor,
+            isCustom: this.isCustom,
+            playerNames: this.playerNames, // array of strings
+            id: this.id
         }
     }
 
     static fromJSON(data) {
         return new Preset(
             data.timers.map(timer => Timer.fromJSON(timer)), 
-            data.title
+            data.title,
+            data.textColor, 
+            data.backColor, 
+            data.isCustom,
+            data.playerNames,
+            data.id
         )
     }
 }

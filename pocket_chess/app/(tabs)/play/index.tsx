@@ -1,4 +1,4 @@
-import React, { useState, useRef} from 'react';
+import React, { useState, useRef, useCallback} from 'react';
 import { View, Text, ScrollView, StyleSheet, TextStyle, TouchableOpacity} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -7,13 +7,17 @@ import IconComponent from '../../../components/common/IconComponent.jsx';
 import TimerPresetSection from '../../../components/TimerPresetSection';
 import NewTimerModal from '../../../components/NewTimerModal';
 import storage from '../../../classes/Storage';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
+
 
 const Play = () => {
-
-  //permanent storage of timers
-  const customTimers = storage.getCustomTimers();
-  const [defaultTimers, _] = useState(storage.getDefaultTimers());
-  const [timers, setTimers] = useState({...customTimers, ...defaultTimers});
+  
+  //permanent storage of presets
+  const customPresets = storage.getCustomPresets();
+  const [defaultPresets, _] = useState(storage.getDefaultPresets());
+  const [presets, setPresets] = useState({...customPresets, ...defaultPresets});
+  
+  const routerParams = useLocalSearchParams(); // router params to indicate necessary refresh
 
   function openHelpBox() {
     console.log('help box'); 
@@ -23,17 +27,24 @@ const Play = () => {
     console.log('settings');
   }
 
-  function onPressNewTimer() {
+  function onPressNewPreset() {
     modalRef.current?.showModal();
   }
 
-  function onSubmitNewTimer(newCustomTimers) {
-    setTimers({... newCustomTimers, ...defaultTimers})
+  function onSubmitNewPreset(newCustomPresets) {
+    setPresets({... newCustomPresets, ...defaultPresets})
     modalRef.current?.hideModal();
-
   }
 
   const modalRef = useRef(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (routerParams?.refresh) {
+        setPresets({...storage.getCustomPresets(), ...defaultPresets});
+      }
+    }, [routerParams?.refresh]) // when router refresh parameter passed, update custom presets
+  )
 
   return (
     <SafeAreaView style={styles.container}>
@@ -53,22 +64,23 @@ const Play = () => {
         <View style={styles.presetsContainer}>
           <View style={styles.presetsContainerHeader}>
             <Text style={styles.textPresetsContainerHeader}>Presets</Text>
-            <TouchableOpacity onPress={onPressNewTimer} style={styles.newTimerButton}>
+            <TouchableOpacity onPress={onPressNewPreset} style={styles.newPresetButton}>
               <IconComponent source={Constants.icons.plus} width={12} tintColor={Constants.COLORS.text_dark_2} />
-              <Text style={styles.newTimerButtonText}>New timer</Text>
+              <Text style={styles.newPresetButtonText}>New preset</Text>
             </TouchableOpacity>
           </View>
           <ScrollView style={styles.presetsSection}>
-            {Object.entries(timers).map(([titleSection, timersList]: [string, { icon: string, title: string, timers: any[] }]) => {
-                if (!timersList || !timersList.icon || !timersList.title || timersList.timers.length === 0) {
-                  console.warn(`Missing fields in timersList: ${titleSection}`);
-                  return null;
-                }
-                return <TimerPresetSection key={titleSection} timersList={timersList}/>
+            {Object.entries(presets).map((
+                [titleSection, presetsList]: [string, { icon: string, title: string, presets: any[] }]) => {
+                  if (!presetsList || !presetsList.icon || !presetsList.title || presetsList.presets.length === 0) {
+                    console.warn(`Missing fields in presetsList: ${titleSection}`);
+                    return null;
+                  }
+                  return <TimerPresetSection key={titleSection} presetsList={presetsList}/>
             })}
           </ScrollView>
         </View>
-        <NewTimerModal ref={modalRef} onSubmit={onSubmitNewTimer}/>
+        <NewTimerModal ref={modalRef} onSubmit={onSubmitNewPreset}/>
     </SafeAreaView>
   )
 }
@@ -133,7 +145,7 @@ const styles = StyleSheet.create({
     fontWeight: Constants.FONTS.bold as TextStyle['fontWeight'],
   },
 
-  newTimerButton: {
+  newPresetButton: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 5,
@@ -143,12 +155,12 @@ const styles = StyleSheet.create({
     borderColor: Constants.COLORS.line_light_grey,
   },
 
-  newTimerButtonText: {
+  newPresetButtonText: {
     color: Constants.COLORS.text_dark_2,
     fontFamily: Constants.FONTS.BASE_FONT_NAME,
     fontSize: Constants.SIZES.medium,
     fontWeight: Constants.FONTS.medium as TextStyle['fontWeight'],
-    marginLeft: 5
+    marginHorizontal: 5
   },
 
   presetsSection: {

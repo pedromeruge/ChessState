@@ -22,12 +22,12 @@ const NewTimerScreenPicker = forwardRef(({width=null, height=null, hideHours=fal
 
     return (
         <SafeAreaView style={[styles.container, Constants.SHADOWS.medium, width && height ? {width: width, height: height} : null]}>
-            <Header leftIcon={Constants.icons.clock_lines} leftIconSize={16} text={'New timer'} rightIcon={Constants.icons.arrow_left} rightIconSize={18} onPressRightIcon={onBack} lowBorder={true} curvyTop={true}/>
+            <Header leftIcon={Constants.icons.clock_lines} leftIconSize={16} text={'New preset'} rightIcon={Constants.icons.arrow_left} rightIconSize={18} onPressRightIcon={onBack} lowBorder={true} curvyTop={true}/>
             <View style={styles.body}>
                 <View style={styles.roulette}>
                     <TimerPickerRoulette time={time} setTime={setTime} hideHours={hideHours}/>
                 </View>
-                <TouchableOpacity style={[styles.confirm, Constants.SHADOWS.timer]} onPressOut={onConfirm}>
+                <TouchableOpacity style={[styles.confirm, Constants.SHADOWS.preset]} onPressOut={onConfirm}>
                     <IconComponent source={Constants.icons.check} width={25} tintColor={Constants.COLORS.white}/>
                 </TouchableOpacity>
             </View>

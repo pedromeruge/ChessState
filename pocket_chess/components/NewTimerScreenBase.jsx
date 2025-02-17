@@ -76,24 +76,24 @@ const NewTimerScreenBase = forwardRef(({
                 )}
                 <View style={styles.counter}>
                     <View style={styles.numberInputs}>
-                        <TouchableOpacity style={Styles.newTimer.timeContainer} onPress={onShowBaseTimePicker}>
-                            <View style={Styles.newTimer.timeTitle}>
+                        <TouchableOpacity style={Styles.newPreset.timeContainer} onPress={onShowBaseTimePicker}>
+                            <View style={Styles.newPreset.timeTitle}>
                                 <IconComponent source={Constants.icons.clock_full} width={15} />
-                                <Text style={Styles.newTimer.timeTitleText}>Base time</Text>
+                                <Text style={Styles.newPreset.timeTitleText}>Base time</Text>
                             </View>
-                            <Text style={[Styles.newTimer.timeInput, {color: baseTime.isDefault() ? Constants.COLORS.line_light_grey : Constants.COLORS.text_dark_2}]}>{baseTime.toStringComplete()}</Text>
+                            <Text style={[Styles.newPreset.timeInput, {color: baseTime.isDefault() ? Constants.COLORS.line_light_grey : Constants.COLORS.text_dark_2}]}>{baseTime.toStringComplete()}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={Styles.newTimer.timeContainer} onPress={onShowIncrementPicker}>
-                            <View style={Styles.newTimer.timeTitle}>
+                        <TouchableOpacity style={Styles.newPreset.timeContainer} onPress={onShowIncrementPicker}>
+                            <View style={Styles.newPreset.timeTitle}>
                                 <IconComponent source={Constants.icons.plus_thick} width={12} tintColor={Constants.COLORS.contrast_blue_light}/>
-                                <Text style={Styles.newTimer.timeTitleText}>Increment</Text>
+                                <Text style={Styles.newPreset.timeTitleText}>Increment</Text>
                             </View>
-                            <Text style={[Styles.newTimer.timeInput, {color: increment.isDefault() ? Constants.COLORS.line_light_grey : Constants.COLORS.text_dark_2}]}>{increment.toStringMinSecs()}</Text>
+                            <Text style={[Styles.newPreset.timeInput, {color: increment.isDefault() ? Constants.COLORS.line_light_grey : Constants.COLORS.text_dark_2}]}>{increment.toStringMinSecs()}</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={Styles.newTimer.title}>
-                        <Text style={Styles.newTimer.titleText}>Title:</Text>
-                        <TextInput style={[Styles.newTimer.titleInput, {color: titleText ? Constants.COLORS.text_dark_2 : Constants.COLORS.line_light_grey}]} placeholder="New timer" placeholderTextColor={Constants.COLORS.line_light_grey}
+                    <View style={Styles.newPreset.title}>
+                        <Text style={Styles.newPreset.titleText}>Title:</Text>
+                        <TextInput style={[Styles.newPreset.titleInput, {color: titleText ? Constants.COLORS.text_dark_2 : Constants.COLORS.line_light_grey}]} placeholder="New timer" placeholderTextColor={Constants.COLORS.line_light_grey}
                             onFocus={() => setIsKeyboardVisible(true)}
                             onBlur={() => handleKeyboardInputEnd()}
                             onChangeText={setTitleText}
@@ -104,7 +104,7 @@ const NewTimerScreenBase = forwardRef(({
                         onPress={onStartTimer}
                         disabled={(baseTime.isDefault())|| titleText === ''}
                     />
-                    <Link href="./play/new_timer_advanced" asChild>
+                    <Link href="./play/new_preset_advanced" asChild>
                         <TouchableOpacity style={styles.moreOptionsButton} onPress={onAdvancedOptions}>
                             <Text style={styles.moreOptionsButtonText}>Advanced options</Text>
                         </TouchableOpacity>

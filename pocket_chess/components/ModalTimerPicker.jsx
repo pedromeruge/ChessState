@@ -2,9 +2,7 @@ import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 're
 import { SafeAreaView, View, StyleSheet, Modal, Pressable} from 'react-native'
 
 import * as Constants from '../constants/index.js';
-import NewTimerScreenBase from './NewTimerScreenBase.jsx';
 import NewTimerScreenPicker from './NewTimerScreenPicker.jsx';
-import { Time, Stage, Timer } from '../classes/Timer.js';
 
 const ModalTimerPicker = forwardRef(({time, setTime, hideHours=false}, ref) => { // expose the ref to the parent component
 

@@ -8,7 +8,7 @@ import { Audio } from "expo-av"; // for audio feedback (click sound as you scrol
 import * as Haptics from "expo-haptics"; // for haptic feedback
 
 import * as Constants from '../constants/index.js';
-import { Time } from '../classes/Timer.js';
+import { Time } from '../classes/Preset.js';
 
 //based on https://www.npmjs.com/package/react-native-time-picker
 const TimerPickerRoulette = ({time, setTime, hideHours=false}) => {

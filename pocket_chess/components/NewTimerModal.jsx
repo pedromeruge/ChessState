@@ -4,7 +4,7 @@ import { SafeAreaView, View, StyleSheet, Modal, Pressable} from 'react-native'
 import * as Constants from '../constants/index.js';
 import NewTimerScreenBase from './NewTimerScreenBase.jsx';
 import NewTimerScreenPicker from './NewTimerScreenPicker.jsx';
-import { Time, Stage, Timer } from '../classes/Timer.js';
+import { Time, Stage, Timer, Preset } from '../classes/Preset.js';
 
 const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the parent component
 
@@ -59,14 +59,14 @@ const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the
         setIncrementPickerVisible(false);
     }
 
-    const startTimer = () => {
-        const newTimer = new Timer([new Stage(baseTime, incrementTime)], titleText);
-        const customTimers = storage.getCustomTimers();
+    const onStartPreset = () => {
+        const newPreset = Preset.samePlayerTimers( new Timer([new Stage(baseTime, incrementTime)]), titleText, undefined, undefined, undefined, true);
+        const customPresets = storage.getCustomPresets();
 
-        customTimers.custom.timers.push(newTimer);
-        storage.setCustomTimers(customTimers);
+        customPresets.custom.presets.push(newPreset);
+        storage.setCustomPresets(customPresets);
 
-        onSubmit(customTimers);
+        onSubmit(customPresets);
 
         //reset input parameters
         setBaseTime(new Time());
@@ -94,7 +94,7 @@ const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the
                 {(!baseTimePickerVisible && !incrementPickerVisible) && (
                     <NewTimerScreenBase
                         ref={startScreenRef} 
-                        onStart={startTimer}
+                        onStart={onStartPreset}
                         onClose={hideModal} 
                         onShowBaseTimePicker={showBaseTimePicker} 
                         onShowIncrementPicker={showIncrementPicker} 

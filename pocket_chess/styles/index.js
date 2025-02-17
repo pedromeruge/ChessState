@@ -1,4 +1,4 @@
-import newTimer from './newTimer';
+import newPreset from './newPreset';
 import stages from './Stages';
 
-export {newTimer, stages}
+export {newPreset, stages}

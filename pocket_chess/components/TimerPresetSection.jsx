@@ -7,7 +7,7 @@ import {LinearGradient} from 'expo-linear-gradient';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
-const TimerPresetSection = ({timersList}) =>{
+const TimerPresetSection = ({presetsList}) =>{
     
     //gradien to appear on right of flatlist to indicate there are more elements to the right, that the user can scroll to
     const [showGradient, setShowGradient] = useState(false);
@@ -28,15 +28,15 @@ const TimerPresetSection = ({timersList}) =>{
         setShowGradient(!endReached);
     };
 
-    const onPressTimer = (timer) => {
-        console.log("Pressed timer", timer);
+    const onPressPreset = (preset) => {
+        console.log("Pressed preset", preset);
     }
 
     return (
         <>
         <View style={styles.presetsSectionHeader}>
-            <IconComponent source={timersList.icon} width={12} tintColor={timersList.iconColor}/>
-            <Text style={styles.textPresetsSectionHeader}>{timersList.title}</Text>
+            <IconComponent source={presetsList.icon} width={12} tintColor={presetsList.iconColor}/>
+            <Text style={styles.textPresetsSectionHeader}>{presetsList.title}</Text>
         </View>
         <View style={styles.listWrapper}>
             <FlatList
@@ -44,13 +44,13 @@ const TimerPresetSection = ({timersList}) =>{
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(item) => item.id}
                 ref={flatListRef}
-                data={timersList.timers}
-                renderItem={({item}) => (<TimerPreset timer={item} onPress={() => onPressTimer(item)}/>)}
+                data={presetsList.presets}
+                renderItem={({item}) => (<TimerPreset preset={item} onPress={() => onPressPreset(item)}/>)}
                 onScroll={handleScroll}
                 onContentSizeChange={handleContentSizeChange}
                 scrollEventThrottle={16} // delay scroll events
                 contentContainerStyle={styles.presetsSectionContent}
-                style={styles.flatList} // allow shadows of timers to overflow
+                style={styles.flatList} // allow shadows of presets to overflow
             />
             {showGradient && 
                 <LinearGradient
