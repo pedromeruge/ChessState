@@ -1,9 +1,3 @@
-// export default {
-//   play: require("../assets/icons/pawn.svg"),
-//   scan: require("../assets/icons/qrcode.svg"),
-//   storage: require("../assets/icons/box.svg"),
-// };
-
 export default {
   pawn: require("../assets/icons/pawn.png"),
   scan: require("../assets/icons/qrcode.png"),
@@ -45,5 +39,6 @@ export default {
   pause: require("../assets/icons/pause.png"),
   play: require("../assets/icons/play.png"),
   volume_on: require("../assets/icons/volume_on.png"),
-  volume_off: require("../assets/icons/volume_off.png")
+  volume_off: require("../assets/icons/volume_off.png"),
+  edit_pencil: require("../assets/icons/edit_pencil.png"),
 };

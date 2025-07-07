@@ -5,6 +5,7 @@ import * as Constants from '../constants/index.js';
 import NewTimerScreenBase from './NewTimerScreenBase.jsx';
 import NewTimerScreenPicker from './NewTimerScreenPicker.jsx';
 import { Time, Stage, Timer, Preset } from '../classes/Preset.js';
+import {router} from 'expo-router'
 
 const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the parent component
 
@@ -72,6 +73,12 @@ const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the
         setBaseTime(new Time());
         setIncrementTime(new Time());
         setTitleText('');
+
+        //immediately navigate to the created preset screen
+        router.push(
+            { pathname: './play/play_preset', 
+            params: {preset_id: newPreset.id}
+        });
     }
 
     // auto-suggest title based on input time
@@ -86,7 +93,7 @@ const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the
         <Modal
             visible={visible}
             onRequestClose={hideModal}
-            animationType="slide"
+            animationType="fade"
             transparent
         >
             <View style={styles.container}>
@@ -138,10 +145,9 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 10,
         width: '100%',
-        height: '100%'
-
+        height: '100%',
+        zIndex: 100,
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,
