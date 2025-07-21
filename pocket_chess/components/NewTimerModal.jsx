@@ -60,8 +60,14 @@ const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the
         setIncrementPickerVisible(false);
     }
 
+    const resetParameters = () => {
+        setBaseTime(new Time());
+        setIncrementTime(new Time());
+        setTitleText('');
+    }
+
     const onStartPreset = () => {
-        const newPreset = Preset.samePlayerTimers( new Timer([new Stage(baseTime, incrementTime)]), titleText, undefined, undefined, undefined, true);
+        const newPreset = Preset.samePlayerTimers(new Timer([new Stage(baseTime, incrementTime)]), titleText, undefined, undefined, undefined, true);
         const customPresets = storage.getCustomPresets();
 
         customPresets.custom.presets.push(newPreset);
@@ -70,9 +76,7 @@ const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the
         onSubmit(customPresets);
 
         //reset input parameters
-        setBaseTime(new Time());
-        setIncrementTime(new Time());
-        setTitleText('');
+        resetParameters();
 
         //immediately navigate to the created preset screen
         router.push(

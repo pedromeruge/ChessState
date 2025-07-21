@@ -31,7 +31,7 @@ class Storage {
             "title": "Bullet",
             "presets":
             [
-              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 1, 0))]),"1|0", Constants.COLORS.white, Constants.COLORS.preset_blue),
+              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 1, 0))]),"1|0", false, Constants.COLORS.white, Constants.COLORS.preset_blue),
               Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 1, 0), new Time(0, 0, 1))]),"1|1"),
               Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 1))]),"2|1"),
               Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 5))]),"2|5")
@@ -44,7 +44,7 @@ class Storage {
             "title": "Blitz",
             "presets":
             [
-              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 3, 0))]), "3|0", Constants.COLORS.white, Constants.COLORS.preset_yellow),
+              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 3, 0))]), "3|0", false, Constants.COLORS.white, Constants.COLORS.preset_yellow),
               Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 3, 0), new Time(0, 0, 2))]), "3|2"),
               Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 5, 0))]), "5|0"),
               Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 5, 0), new Time(0, 0, 3))]), "5|3"),
@@ -56,7 +56,7 @@ class Storage {
             "title": "Rapid",
             "presets":
             [
-              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 10, 0))]), "10|0", Constants.COLORS.white, Constants.COLORS.preset_green),
+              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 10, 0))]), "10|0", false, Constants.COLORS.white, Constants.COLORS.preset_green),
               Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 10, 0), new Time(0, 0, 5))]), "10|5"),
               Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 15, 0), new Time(0, 0, 10))]), "15|10"),
               Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 25, 0), new Time(0, 0, 10))]), "25|10"),
@@ -73,6 +73,7 @@ class Storage {
                     [new Stage(new Time(1, 30, 0), new Time(0, 0, 0), 40), 
                       new Stage(new Time(0, 30, 0))]),
                 "90+30|30", 
+                false,
                 Constants.COLORS.white, 
                 Constants.COLORS.preset_red
               ),
@@ -153,6 +154,10 @@ class Storage {
       const preset2 = Object.values(defaultPresets)
                         .flatMap((presetGroup) => presetGroup.presets)
                         .find((preset) => preset.id === preset_id);
+
+      console.log("All default preset ids: ", Object.values(defaultPresets).flatMap((presetGroup) => presetGroup.presets.map(p => p.id)));
+      console.log("All custom preset ids: ", customPresets.custom.presets.map(p => p.id));
+
       if (preset2) {
           return preset2;
       }

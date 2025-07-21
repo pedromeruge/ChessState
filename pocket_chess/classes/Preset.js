@@ -135,6 +135,10 @@ export class Time {
     static fromJSON(data) {
         return new Time(data.hours, data.minutes, data.seconds);
     }
+
+    clone() {
+        return new Time(this.hours, this.minutes, this.seconds);
+    }
 }
 
 export class Stage {
@@ -162,24 +166,44 @@ export class Stage {
     toString() {
         return `${Time.toStringCleanBoth(this.time, this.increment)} - ${this.moves ? this.moves : "∞"} moves`;
     }
+
+    clone() {
+        return new Stage(
+            this.time.clone(),
+            this.increment.clone(),
+            this.moves
+        );
+    }
 }
 
 export class Timer {
     /**
      * Details of a timer preset
      * @param {*} stages - array of Stage objects
-     * @param {*} title - title of the timer
-     */
-    constructor(stages, currentStage=0, currentStageTime=null, currentStageMoves=null) {
+     * @param {*} currentStage- current stage index
+     * @param {*} playerName - name of the player assigned to this timer
+     * @param {*} currentStageTime - current stage time, if null is max stage time
+     * @param {*} currentStageMoves - current stage moves, if null is max stage moves
+    */
+    constructor(stages, playerName=null, currentStage = 0, currentStageTime=null, currentStageMoves=null) {
         this.stages = stages;
+        this.playerName = playerName ? playerName : Constants.PLAYER_NAME_DEFAULT;
         this.currentStage = currentStage;
         this.currentStageTime = currentStageTime ? currentStageTime : this.stages[currentStage].time
         this.currentStageMoves = currentStageMoves ? currentStageMoves : this.stages[currentStage].moves
     }
 
+    // deep copy constructor 
+    static TimerWithDifferentPlayerName(timer, playerName) {
+        let newTimer = timer.clone();
+        newTimer.playerName = playerName ? playerName : Constants.PLAYER_NAME_DEFAULT;
+        return newTimer;
+    }
+
     toJSON() {
         return {
             stages: this.stages.map(stage => stage.toJSON()),
+            playerName: this.playerName,
             currentStage: this.currentStage,
             currentStageTime: this.currentStageTime ? this.currentStageTime.toJSON() : null,
             currentStageMoves: this.currentStageMoves
@@ -189,10 +213,21 @@ export class Timer {
     static fromJSON(data) {
         return new Timer(
             data.stages.map(stage => Stage.fromJSON(stage)), 
+            data.playerName,
             data.currentStage,
             Time.fromJSON(data.currentStageTime),
             data.currentStageMoves
         )
+    }
+
+    clone() {
+        return new Timer(
+            this.stages.map(stage => stage.clone()),
+            this.playerName,
+            this.currentStage,
+            this.currentStageTime ? this.currentStageTime.clone() : null,
+            this.currentStageMoves
+        );
     }
 }
 export class Preset {
@@ -204,42 +239,42 @@ export class Preset {
     constructor(
             timers, 
             title, 
+            isCustom=false, 
             textColor=Constants.COLORS.text_grey, 
             backColor=Constants.COLORS.white, 
-            isCustom=false, 
-            playerNames=null, 
             id=null) {
         this.timers = timers;
         this.title = title;
+        this.isCustom = isCustom
         this.textColor = textColor
         this.backColor = backColor
-        this.isCustom = isCustom
-        this.playerNames = playerNames ? playerNames : Array.from({ length: timers.length }, (_, i) => `Player ${i+1}`) // creates array with size, filled with custom function
         this.id = id ? id : Math.random().toString(36).slice(2, 9); // random id
     }
 
     // simplified constructor for a single timer identical in all players
     static samePlayerTimers(
-        timer,
-        title,
-        textColor=Constants.COLORS.text_grey, 
-        backColor=Constants.COLORS.white, 
-        playerCount=2,
-        isCustom=false,
-        playerNames=null,
-        id=null) {
-        return new Preset(
-            Array(playerCount).fill(timer),
+            timer,
             title,
+            isCustom=false,
+            textColor=Constants.COLORS.text_grey, 
+            backColor=Constants.COLORS.white, 
+            playerCount=2,
+            id=null) {
+
+        const player1Timer = Timer.TimerWithDifferentPlayerName(timer, Constants.PLAYER_NAMES[0]);
+        const player2Timer = Timer.TimerWithDifferentPlayerName(timer, Constants.PLAYER_NAMES[1]);
+
+        return new Preset(
+            [player1Timer, player2Timer],
+            title,
+            isCustom,
             textColor,
             backColor,
-            isCustom,
-            playerNames,
             id
         )
     }
 
-        /**
+    /**
      * Split the title into an array of strings, for correct display
      */
     titleStrings() {
@@ -250,10 +285,9 @@ export class Preset {
         return {
             timers: this.timers.map(timer => timer.toJSON()),
             title: this.title,
+            isCustom: this.isCustom,
             textColor: this.textColor,
             backColor: this.backColor,
-            isCustom: this.isCustom,
-            playerNames: this.playerNames, // array of strings
             id: this.id
         }
     }
@@ -262,10 +296,9 @@ export class Preset {
         return new Preset(
             data.timers.map(timer => Timer.fromJSON(timer)), 
             data.title,
+            data.isCustom,
             data.textColor, 
             data.backColor, 
-            data.isCustom,
-            data.playerNames,
             data.id
         )
     }

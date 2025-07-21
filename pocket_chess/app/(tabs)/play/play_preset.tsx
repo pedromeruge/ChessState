@@ -4,10 +4,7 @@ import { View, Text, StyleSheet, TextStyle, TouchableOpacity} from 'react-native
 import * as Constants from '../../../constants';
 import storage from '../../../classes/Storage';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { Time, Stage, Timer, Preset } from '../../../classes/Preset.js';
-import PlayPreset1Player from '../../../components/PlayPreset1Player';
-import PlayPreset2Players from '../../../components/PlayPreset2Players';
-import PlayPreset4Players from '../../../components/PlayPreset4Players';
+import PlayPreset2Players from '../../../components/play_tab/Preset2Players';
 
 const Play_preset = () => {
   
@@ -31,9 +28,7 @@ const Play_preset = () => {
 
   return (
     <View style={styles.container}>
-      {playerCount === 1 && (<PlayPreset1Player preset={preset}/>)}
-      {playerCount === 2 && (<PlayPreset2Players preset={preset}/>)}
-      {playerCount === 4 && (<PlayPreset4Players preset={preset}/>)}
+      <PlayPreset2Players preset={preset}/>
     </View>
   )
 }

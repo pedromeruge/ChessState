@@ -5,6 +5,7 @@ import * as Constants from '../../constants';
 import TimerPresetSection from './TimerPresetSection';
 import storage from '../../classes/Storage';
 
+// presets tab, displayed in the start of the play section
 
 const PresetTimersPage = () => {
   

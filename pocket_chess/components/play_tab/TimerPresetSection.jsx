@@ -44,6 +44,9 @@ const TimerPresetSection = ({presetsList, singleLine=false, style = {}}) =>{
                 <IconComponent source={presetsList.icon} width={12} tintColor={presetsList.iconColor}/>
                 <Text style={styles.textPresetsSectionHeader}>{presetsList.title}</Text>
             </View>
+            {presetsList.presets.length === 0 && (
+                <Text style={styles.textNoPresets}>No presets defined</Text>
+            )}
             {singleLine ? (
                 <View style={styles.listWrapper}>
                     <FlatList
@@ -73,7 +76,7 @@ const TimerPresetSection = ({presetsList, singleLine=false, style = {}}) =>{
                         />
                     }
                 </View>
-             ) : (
+            ) : (
                 <View style={[styles.flatListGrid, styles.presetsSectionContent]}>
                     {presetsList.presets.map((item) => (
                         <TimerPreset key={item.id} preset={item} onPress={() => onPressPreset(item)} />
@@ -97,6 +100,13 @@ const styles = StyleSheet.create({
         fontSize: Constants.SIZES.medium,
         fontWeight: Constants.FONTS.medium,
         marginLeft: 5
+    },
+
+    textNoPresets: {
+        fontFamily: Constants.FONTS.BASE_FONT_NAME,
+        fontSize: Constants.SIZES.medium,
+        fontWeight: Constants.FONTS.light,
+        color: Constants.COLORS.line_light_grey,
     },
 
     presetsSectionContent: {

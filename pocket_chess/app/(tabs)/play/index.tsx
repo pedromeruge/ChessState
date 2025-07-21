@@ -4,9 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import * as Constants from '../../../constants';
 import IconComponent from '../../../components/common/IconComponent.jsx';
-import TimerPresetSection from '../../../components/play_tab/TimerPresetSection';
-import NewTimerModal from '../../../components/NewTimerModal';
-import storage from '../../../classes/Storage';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import TabNavigator from '../../../components/TabNavigator';
 import PresetTimersPage from '../../../components/play_tab/PresetTimersPage';

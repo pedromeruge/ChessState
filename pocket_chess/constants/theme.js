@@ -40,7 +40,7 @@ const SIZES = {
   xLarge: 20,
   xxLarge: 25,
   xxxLarge: 35,
-  veryLarge: 90
+  veryLarge: 85
 };
 
 const SHADOWS = StyleSheet.create({

@@ -16,10 +16,9 @@ const NewPresetAdvanced = ({}) => { // expose the ref to the parent component
     const [title, setTitle] = useState(''); // title of the preset
     const titleTextRef = useRef(''); // reference to the title input, used in textInput to prevent re-rendering, instead of using state directly
 
-    const [playersStages, setPlayersStages] = useState({
-        "Player White": [],
-        "Player Black": []
-    });
+    const [playersStages, setPlayersStages] = useState(
+        Object.fromEntries(Constants.PLAYER_NAMES.map(playerName => [playerName, []])) // dictionary where key is player and value is empty array
+    );
 
     const updateStages = useCallback((player: string, stages: Stage[]) => {
         setPlayersStages(prev => ({
@@ -37,25 +36,28 @@ const NewPresetAdvanced = ({}) => { // expose the ref to the parent component
 
     const resetParameters = () => {
         setTitle('');
-        setPlayersStages({
-            "Player White": [],
-            "Player Black": []
-        });
+        setPlayersStages(Object.fromEntries(Constants.PLAYER_NAMES.map(playerName => [playerName, []]))); // dictionary where key is player and value is empty array
         titleTextRef.current = '';
     }
 
     const onStartPreset = () => {
 
         const title = titleTextRef.current;
-        const timers = Object.values(playersStages).map(stages => {
-            return new Timer(stages);
+        const timers = Object.entries(playersStages).map(([playerName, stages]) => {
+            return new Timer(stages, playerName);
         })
-        const newPreset = new Preset(timers, title, undefined, undefined, true, Object.keys(playersStages));
+        const newPreset = new Preset(timers, title, true);
         const customPresets = storage.getCustomPresets();
         customPresets.custom.presets.push(newPreset);
         storage.setCustomPresets(customPresets);
 
-        onBack(true);
+        // reset input parameters
+        resetParameters(); 
+        
+        router.replace( // dont use push, use replace so the back button (in the incoming timer page) returns to the play screen, not this advanced timer
+            { pathname: './play_preset', 
+            params: {preset_id: newPreset.id}
+        });
     }
 
     const onBack = (refreshPrevPage=false) => {
@@ -87,14 +89,19 @@ const NewPresetAdvanced = ({}) => { // expose the ref to the parent component
                     <View style={styles.tabNavigatorWrapper}>
                         {useMemo(() => (
                             <TabNavigator 
-                                tabs = {{
-                                    "Player White": (props) => <StagesSelection {...props} onUpdateStages={(stages: Stage[]) => updateStages("Player White", stages)}/>,
-                                    "Player Black": (props) => <StagesSelection {...props} onUpdateStages={(stages: Stage[]) => updateStages("Player Black", stages)}/>
-                                }}
-                                icons = {{
-                                    "Player White": Constants.icons.pawn,
-                                    "Player Black": Constants.icons.pawn_full
-                                }}
+                                tabs = {
+                                    Object.fromEntries(
+                                        Object.entries(playersStages).map(([playerName, stages]) => 
+                                            [playerName, (props) => <StagesSelection {...props} stages={stages} onUpdateStages={(stages: Stage[]) => updateStages(playerName, stages)}/>]
+                                        ))
+                                }
+                                icons = {
+                                    Object.fromEntries(
+                                        Object.keys(playersStages).map((playerName, idx) =>
+                                            [playerName, idx === 0 ? Constants.icons.pawn : Constants.icons.pawn_full] // assign pawn_full icon to all players except the first one
+                                        )
+                                    )
+                                }
                                 swipeEnabled={false}
                             />
                         ), [updateStages])

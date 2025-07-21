@@ -63,7 +63,7 @@ const CustomTimersPage = () => {
         <ScrollView style={styles.presetsSection}>
           {Object.entries(customPresets).map((
             [titleSection, presetsList]: [string, { icon: string, title: string, presets: any[] }]) => {
-              if (!presetsList || !presetsList.icon || !presetsList.title || presetsList.presets.length === 0) {
+              if (!presetsList || !presetsList.icon || !presetsList.title) {
                 console.warn(`Missing fields in presetsList: ${titleSection}`);
                 return null;
               }
