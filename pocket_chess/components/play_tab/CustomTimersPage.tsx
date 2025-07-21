@@ -33,16 +33,6 @@ const CustomTimersPage = () => {
     modalRef.current?.hideModal();
   }
 
-
-  // What did i use this for ???
-  // when router refresh parameter passed, update custom presets
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     if (routerParams?.refresh) {
-  //     }
-  //   }, [routerParams?.refresh]) 
-  // )
-
   return (
     <>
       <View style={styles.presetsContainer}>

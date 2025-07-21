@@ -80,7 +80,7 @@ const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the
 
         //immediately navigate to the created preset screen
         router.push(
-            { pathname: './play/play_preset', 
+            { pathname: '/play_more/timer_interact/interact', 
             params: {preset_id: newPreset.id}
         });
     }

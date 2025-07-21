@@ -1,6 +1,7 @@
 import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, Pressable, TextInput, Keyboard } from 'react-native'
 import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 import * as Constants from '../constants/index.js';
 import * as Styles from '../styles/index.js';
@@ -21,7 +22,10 @@ const NewTimerScreenBase = forwardRef(({
         setTitleText, 
         onLayout}
         , ref) => { // expose the ref to the parent component
+    
+    const router = useRouter();
 
+    //state
     const [isKeyboardVisible, setIsKeyboardVisible] = useState(false); // state to alter container layout when keyboard is visible
     const [userHasInputTitle, setUserHasInputTitle] = useState(false); // track if user has input a title, to manage auto-suggestions
 
@@ -62,7 +66,8 @@ const NewTimerScreenBase = forwardRef(({
     }
 
     const onAdvancedOptions = () => {
-        console.log("More options");
+        onClose();
+        router.push('play/create_timer_advanced/stages');
     }
 
     return (
@@ -104,11 +109,9 @@ const NewTimerScreenBase = forwardRef(({
                         onPress={onStartTimer}
                         disabled={(baseTime.isDefault())|| titleText === ''}
                     />
-                    <Link href="./play/new_preset_advanced" asChild>
-                        <TouchableOpacity style={styles.moreOptionsButton} onPress={onAdvancedOptions}>
-                            <Text style={styles.moreOptionsButtonText}>Advanced options</Text>
-                        </TouchableOpacity>
-                    </Link>
+                    <TouchableOpacity style={styles.moreOptionsButton} onPress={onAdvancedOptions}>
+                        <Text style={styles.moreOptionsButtonText}>Advanced options</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         </SafeAreaView>

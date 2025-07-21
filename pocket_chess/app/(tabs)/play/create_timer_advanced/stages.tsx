@@ -2,16 +2,16 @@ import { useState, useEffect, useRef, forwardRef, useImperativeHandle, useCallba
 import { SafeAreaView, ScrollView, View, StyleSheet, TextInput, Image, Text } from 'react-native'
 import { router} from 'expo-router';
 
-import * as Constants from '../../../constants/index.js';
-import * as Styles from '../../../styles/index.js';
-import { Time, Stage, Timer, Preset } from '../../../classes/Preset.js';
-import Header from '../../../components/Header.jsx';
-import ActionButton from '../../../components/common/ActionButton.jsx';
-import storage from '../../../classes/Storage.js';
-import TabNavigator from '../../../components/TabNavigator.jsx';
-import StagesSelection from '../../../components/StagesSelection.jsx';
+import * as Constants from '../../../../constants/index.js';
+import * as Styles from '../../../../styles/index.js';
+import { Time, Stage, Timer, Preset } from '../../../../classes/Preset.js';
+import Header from '../../../../components/Header.jsx';
+import ActionButton from '../../../../components/common/ActionButton.jsx';
+import storage from '../../../../classes/Storage.js';
+import TabNavigator from '../../../../components/TabNavigator.jsx';
+import StagesSelection from '../../../../components/StagesSelection.jsx';
 
-const NewPresetAdvanced = ({}) => { // expose the ref to the parent component
+const Stages = ({}) => { // expose the ref to the parent component
 
     const [title, setTitle] = useState(''); // title of the preset
     const titleTextRef = useRef(''); // reference to the title input, used in textInput to prevent re-rendering, instead of using state directly
@@ -55,7 +55,7 @@ const NewPresetAdvanced = ({}) => { // expose the ref to the parent component
         resetParameters(); 
         
         router.replace( // dont use push, use replace so the back button (in the incoming timer page) returns to the play screen, not this advanced timer
-            { pathname: './play_preset', 
+            { pathname: 'play_more/timer_interact/interact', 
             params: {preset_id: newPreset.id}
         });
     }
@@ -202,4 +202,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default NewPresetAdvanced;
+export default Stages;

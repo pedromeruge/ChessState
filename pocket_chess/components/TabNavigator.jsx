@@ -1,25 +1,16 @@
 import {useState, useEffect, forwardRef, useImperativeHandle, useRef} from 'react';
-import { StyleSheet, View, Text } from 'react-native'
+import { tabStylesheet, View, Text } from 'react-native'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationContainer, NavigationIndependentTree} from '@react-navigation/native';
 
 import * as Constants from '../constants/index.js';
 import IconComponent from './common/IconComponent.jsx';
+import {tabStyles} from './common/styles.jsx';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
 const TabNavigator = forwardRef(({tabs, icons, swipeEnabled=true, callbacks=[]}, ref) => {
     const Tab = createMaterialTopTabNavigator();
-
-    // const tabRefs = useRef({});
-
-    // useImperativeHandle(ref, () => ({
-    //     getRefs: () => tabRefs.current
-    // }));
-
-    // useEffect(() => {
-    //     console.log("Updated tabRefs:", tabRefs.current);
-    // }, [tabRefs.current]);
 
     function MyTabs() {
         return (
@@ -28,9 +19,9 @@ const TabNavigator = forwardRef(({tabs, icons, swipeEnabled=true, callbacks=[]},
                 <Tab.Navigator
                     screenOptions={{
                         swipeEnabled: swipeEnabled,
-                        tabBarStyle: styles.tabBarStyle,
-                        tabBarItemStyle: styles.tabBarItem,
-                        tabBarIndicatorStyle: styles.tabBarIndicatorStyle,
+                        tabBarStyle: tabStyles.tabBarStyle,
+                        tabBarItemStyle: tabStyles.tabBarItem,
+                        tabBarIndicatorStyle: tabStyles.tabBarIndicatorStyle,
                         tabBarActiveTintColor: Constants.COLORS.contrast_red_light,
                         tabBarInactiveTintColor: Constants.COLORS.text_grey,
                         tabBarPressColor: Constants.COLORS.transparent,
@@ -53,21 +44,10 @@ const TabNavigator = forwardRef(({tabs, icons, swipeEnabled=true, callbacks=[]},
                                     ),
                                 }}
                             >
-                                {/* Dynamically pass ref to dynamic tab component
-                                {() => {
-                                    const tabRef = useRef(null);
-
-                                    // Store ref dynamically
-                                    useEffect(() => {
-                                        tabRefs.current[tabName] = tabRef;
-                                    }, []);
-
-                                    return <TabComponent forwardRef={tabRef} />;
-                                }} */}
-                                {() => {
-                                        return <TabComponent/>
-                                    }
+                            {() => { // this needs to be a function or the component wont render right
+                                    return <TabComponent/>
                                 }
+                            }
                             </Tab.Screen>
                         )
                     })}
@@ -84,14 +64,14 @@ const TabNavigator = forwardRef(({tabs, icons, swipeEnabled=true, callbacks=[]},
 
 const CustomTabLabel = ({ focused, label, icon }) => {
     return (
-      <View style={styles.labelContainer}>
+      <View style={tabStyles.labelContainer}>
         <IconComponent
           source={icon}
           width={15} // {focused ? 15 : 14}
           tintColor={focused ? Constants.COLORS.contrast_red_light : Constants.COLORS.text_grey}
         />
         <Text
-          style={[styles.labelText,
+          style={[tabStyles.labelText,
             { fontWeight: focused ? Constants.FONTS.semi_bold : Constants.FONTS.regular,
               color: focused ? Constants.COLORS.contrast_red_light : Constants.COLORS.text_grey, // Change label color based on focus state
             },
@@ -102,38 +82,5 @@ const CustomTabLabel = ({ focused, label, icon }) => {
       </View>
     );
 };
-
-const styles = StyleSheet.create({
-    tabBarStyle: {
-        backgroundColor: Constants.COLORS.white,
-        elevation: 0,  // Remove shadow on android
-        shadowOpacity: 0,  // Remove shadow on ios
-        borderBottomWidth: 1,
-        borderBottomColor: Constants.COLORS.line_light_grey,
-    },
-
-    tabBarItem: {
-        alignItems: 'center',
-    },
-
-    tabBarIndicatorStyle: {
-        height: 4,
-        backgroundColor: Constants.COLORS.contrast_red_light,
-    },
-
-    labelContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'row',
-    },
-    labelIcon: {
-    },
-
-    labelText: {
-        marginLeft: 5,
-        fontSize: Constants.SIZES.medium,
-        fontFamily: Constants.FONTS.BASE_FONT_NAME,
-    }
-});
 
 export default TabNavigator;
