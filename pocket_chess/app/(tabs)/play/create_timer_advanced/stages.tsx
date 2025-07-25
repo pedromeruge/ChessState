@@ -54,10 +54,13 @@ const Stages = ({}) => { // expose the ref to the parent component
         // reset input parameters
         resetParameters(); 
         
-        router.replace( // dont use push, use replace so the back button (in the incoming timer page) returns to the play screen, not this advanced timer
-            { pathname: 'play_more/timer_interact/interact', 
-            params: {preset_id: newPreset.id}
-        });
+        // navigate back to timers_custom first, then push to timer screen
+        // This ensures proper navigation stack: timers_custom -> timer_interact
+        router.dismissTo('/play/timers_custom');
+        router.push({ // should be placed inside some timeout to ensure it runs after dismissing??
+                pathname: '/play_more/timer_interact/interact', 
+                params: {preset_id: newPreset.id}
+            });
     }
 
     const onBack = (refreshPrevPage=false) => {

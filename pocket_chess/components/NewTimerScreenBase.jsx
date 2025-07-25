@@ -1,6 +1,5 @@
 import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, Pressable, TextInput, Keyboard } from 'react-native'
-import { Link } from 'expo-router';
 import { useRouter } from 'expo-router';
 
 import * as Constants from '../constants/index.js';
@@ -67,7 +66,7 @@ const NewTimerScreenBase = forwardRef(({
 
     const onAdvancedOptions = () => {
         onClose();
-        router.push('play/create_timer_advanced/stages');
+        router.replace('/play/create_timer_advanced/stages');
     }
 
     return (

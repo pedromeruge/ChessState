@@ -67,7 +67,7 @@ const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the
     }
 
     const onStartPreset = () => {
-        const newPreset = Preset.samePlayerTimers(new Timer([new Stage(baseTime, incrementTime)]), titleText, undefined, undefined, undefined, true);
+        const newPreset = Preset.samePlayerTimers(new Timer([new Stage(baseTime, incrementTime)]), titleText, true);
         const customPresets = storage.getCustomPresets();
 
         customPresets.custom.presets.push(newPreset);

@@ -41,4 +41,5 @@ export default {
   volume_on: require("../assets/icons/volume_on.png"),
   volume_off: require("../assets/icons/volume_off.png"),
   edit_pencil: require("../assets/icons/edit_pencil.png"),
+  box_full: require("../assets/icons/box_full.png"),
 };

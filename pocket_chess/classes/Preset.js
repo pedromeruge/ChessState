@@ -14,11 +14,12 @@ export class Time {
         this.seconds = seconds;
     }
 
+    // create a Time object from miliseconds
     static fromMiliseconds(miliseconds) {
         const inSeconds = Math.floor(miliseconds / 1000);
         const hours = Math.floor(inSeconds / (60 * 60));
         const minutes = Math.floor( (inSeconds % (60 * 60)) / 60);
-        const seconds = inSeconds % 60;
+        const seconds = Math.ceil(miliseconds / 1000) % 60; // for example, when we have 0,67 seconds left -> instead of showing 00:00 to the player, show 00:01, hence the rounding up
         return new Time(hours, minutes, seconds);
     }
 
@@ -32,6 +33,14 @@ export class Time {
 
     setSeconds(seconds) {
         this.seconds = seconds;
+    }
+
+    //update time from miliseconds
+    setFromMiliseconds(miliseconds) {
+        const inSeconds = Math.floor(miliseconds / 1000);
+        this.hours = Math.floor(inSeconds / (60 * 60));
+        this.minutes = Math.floor( (inSeconds % (60 * 60)) / 60);
+        this.seconds = Math.ceil(miliseconds / 1000) % 60;
     }
 
     toStringFieldsPad(incHours, incMinutes, incSeconds, padMinutes, padSeconds) {
@@ -79,6 +88,7 @@ export class Time {
         return result
     }
 
+    // IN WORK: separte attempt at simplyfying the string representation of time, by removing padding in minutes when hours are 0
     toStringTimer() {
         let result = ""
 
@@ -101,6 +111,19 @@ export class Time {
         return result
     }
 
+    // two 0 padding on each field, but ignore hours if they are 0
+    toStringTimerSimple() {
+        let result = ""
+
+        if (this.hours) {
+            result += this.hours.toString().padStart(2, "0") + ":";
+        }
+        result += this.minutes.toString().padStart(2, "0") + ":"
+        result += this.seconds.toString().padStart(2, "0");
+        return result;
+    }
+
+    // include all fields, with two 0 padding
     toStringComplete() {
         return `${this.hours.toString().padStart(2, "0")}:` +
                 `${this.minutes.toString().padStart(2, "0")}:`+
@@ -182,15 +205,15 @@ export class Timer {
      * @param {*} stages - array of Stage objects
      * @param {*} currentStage- current stage index
      * @param {*} playerName - name of the player assigned to this timer
-     * @param {*} currentStageTime - current stage time, if null is max stage time
+     * @param {*} currentStageTime - current stage time in miliseconds, if passed null becomes max stage time
      * @param {*} currentStageMoves - current stage moves, if null is max stage moves
     */
     constructor(stages, playerName=null, currentStage = 0, currentStageTime=null, currentStageMoves=null) {
         this.stages = stages;
         this.playerName = playerName ? playerName : Constants.PLAYER_NAME_DEFAULT;
         this.currentStage = currentStage;
-        this.currentStageTime = currentStageTime ? currentStageTime : this.stages[currentStage].time
-        this.currentStageMoves = currentStageMoves ? currentStageMoves : this.stages[currentStage].moves
+        this.currentStageTime = currentStageTime ? currentStageTime : this.stages[currentStage].time.toMiliseconds(); // in miliseconds // decreases until reaching 0
+        this.currentStageMoves = currentStageMoves ? currentStageMoves : 0; // it increases until reaching max stage moves (if it exists)
     }
 
     // deep copy constructor 
@@ -205,7 +228,7 @@ export class Timer {
             stages: this.stages.map(stage => stage.toJSON()),
             playerName: this.playerName,
             currentStage: this.currentStage,
-            currentStageTime: this.currentStageTime ? this.currentStageTime.toJSON() : null,
+            currentStageTime: this.currentStageTime,
             currentStageMoves: this.currentStageMoves
         }
     }
@@ -215,7 +238,7 @@ export class Timer {
             data.stages.map(stage => Stage.fromJSON(stage)), 
             data.playerName,
             data.currentStage,
-            Time.fromJSON(data.currentStageTime),
+            data.currentStageTime,
             data.currentStageMoves
         )
     }
@@ -225,11 +248,68 @@ export class Timer {
             this.stages.map(stage => stage.clone()),
             this.playerName,
             this.currentStage,
-            this.currentStageTime ? this.currentStageTime.clone() : null,
+            this.currentStageTime,
             this.currentStageMoves
         );
     }
+
+    #moveToNextStage() {
+        if (this.currentStage < this.stages.length - 1) {
+            this.currentStage++;
+            this.currentStageTime = this.stages[this.currentStage].time.toMiliseconds(); // set current stage time to the next stage time
+            this.currentStageMoves = 0; // reset moves for the new stage
+            return true; // moved to next stage
+        }
+        return false; // no more stages to move to
+    }
+
+    //increment current stage moves
+    // call OnEndMoves when timer reaches 0 moves in all stages
+    addMove(onEndMoves) {
+        console.log('adding move to timer');
+        if (this.currentStageMoves !== null) {
+            this.currentStageMoves++;
+            
+            // add increment time to current stage time
+            const increment = this.stages[this.currentStage].increment;
+            if (increment && !increment.isDefault()) {
+                this.currentStageTime += increment.toMiliseconds();
+                console.log(`Added increment: ${increment.toMiliseconds()}ms, new time: ${this.currentStageTime}ms`);
+            }
+            
+            const currentStageMaxMoves = this.stages[this.currentStage].moves;
+            const remainingMoves = currentStageMaxMoves - this.currentStageMoves;
+            if (currentStageMaxMoves && remainingMoves <= 0) { // if no more moves in current stage, move to next stage
+                let moveToNextStage = this.#moveToNextStage();
+                if (!moveToNextStage) { // if no more stages, call onEndMoves
+                    onEndMoves();
+                }
+            }
+        }
+    }
+
+    //update current stage time
+    updateStageTime(timeLeftMiliseconds, onEndMoves) {
+        console.log('updating stage time');
+        if (this.currentStageTime !== null) {
+            this.currentStageTime = Math.max(0,timeLeftMiliseconds); // always set to 0 or more
+            if (timeLeftMiliseconds == 0) {
+                let moveToNextStage = this.#moveToNextStage();
+                if (!moveToNextStage) { // if no more stages, reset current stage time to 0
+                    onEndMoves();
+                }
+            
+            }
+        }
+    }
+
+    reset() {
+        this.currentStage = 0;
+        this.currentStageTime = this.stages[0].time.toMiliseconds();
+        this.currentStageMoves = 0;
+    }
 }
+
 export class Preset {
     /**
      * Details of a timer preset

@@ -32,8 +32,8 @@ const TimerPresetSection = ({presetsList, singleLine=false, style = {}}) =>{
     const onPressPreset = (preset) => {
         console.log("Pressed preset", preset);
         //note: its an anti-pattern to send a full object in params. Should just send id, and fetch it in the next screen
-        router.push(
-            { pathname: '/play_more/timer_interact/interact', 
+        router.push({ 
+            pathname: '/play_more/timer_interact/interact', 
             params: {preset_id: preset.id}
         });
     }
