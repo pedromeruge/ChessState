@@ -1,14 +1,13 @@
 import * as Constants from '../constants';
 
 import {MMKV} from 'react-native-mmkv';
-import { Preset, Timer, Stage, Time} from './Preset.js';
-
+import { Preset, Time} from './Preset.js';
+import { FischerIncrementStage, FischerIncrementTimer } from './Preset.js';
 //initialize MMKV storage
 class Storage {
     
     constructor() {
         this.storage = new MMKV();
-
         this.#setup()
     }
 
@@ -31,10 +30,10 @@ class Storage {
             "title": "Bullet",
             "presets":
             [
-              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 1, 0))]),"1|0", false, Constants.COLORS.white, Constants.COLORS.preset_blue),
-              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 1, 0), new Time(0, 0, 1))]),"1|1"),
-              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 1))]),"2|1"),
-              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 2, 0), new Time(0, 0, 5))]),"2|5")
+              Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(new Time(0, 1, 0))]),"1|0", false, Constants.COLORS.white, Constants.COLORS.preset_blue),
+              Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(new Time(0, 1, 0), new Time(0, 0, 1))]),"1|1"),
+              Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(new Time(0, 2, 0), new Time(0, 0, 1))]),"2|1"),
+              Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(new Time(0, 2, 0), new Time(0, 0, 5))]),"2|5")
             ]
           },
       
@@ -44,10 +43,10 @@ class Storage {
             "title": "Blitz",
             "presets":
             [
-              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 3, 0))]), "3|0", false, Constants.COLORS.white, Constants.COLORS.preset_yellow),
-              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 3, 0), new Time(0, 0, 2))]), "3|2"),
-              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 5, 0))]), "5|0"),
-              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 5, 0), new Time(0, 0, 3))]), "5|3"),
+              Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(new Time(0, 3, 0))]), "3|0", false, Constants.COLORS.white, Constants.COLORS.preset_yellow),
+              Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(new Time(0, 3, 0), new Time(0, 0, 2))]), "3|2"),
+              Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(new Time(0, 5, 0))]), "5|0"),
+              Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(new Time(0, 5, 0), new Time(0, 0, 3))]), "5|3"),
             ]
           },
           "rapid": {
@@ -56,10 +55,10 @@ class Storage {
             "title": "Rapid",
             "presets":
             [
-              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 10, 0))]), "10|0", false, Constants.COLORS.white, Constants.COLORS.preset_green),
-              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 10, 0), new Time(0, 0, 5))]), "10|5"),
-              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 15, 0), new Time(0, 0, 10))]), "15|10"),
-              Preset.samePlayerTimers(new Timer([new Stage(new Time(0, 25, 0), new Time(0, 0, 10))]), "25|10"),
+              Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(new Time(0, 10, 0))]), "10|0", false, Constants.COLORS.white, Constants.COLORS.preset_green),
+              Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(new Time(0, 10, 0), new Time(0, 0, 5))]), "10|5"),
+              Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(new Time(0, 15, 0), new Time(0, 0, 10))]), "15|10"),
+              Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(new Time(0, 25, 0), new Time(0, 0, 10))]), "25|10"),
             ]
           },
           "standard": {
@@ -69,17 +68,17 @@ class Storage {
             "presets":
             [ 
               Preset.samePlayerTimers(
-                new Timer(
-                    [new Stage(new Time(1, 30, 0), new Time(0, 0, 0), 40), 
-                      new Stage(new Time(0, 30, 0))]),
+                new FischerIncrementTimer(
+                    [new FischerIncrementStage(new Time(1, 30, 0), new Time(0, 0, 0), 40), 
+                      new FischerIncrementStage(new Time(0, 30, 0))]),
                 "90+30|30", 
                 false,
                 Constants.COLORS.white, 
                 Constants.COLORS.preset_red
               ),
               Preset.samePlayerTimers(
-                new Timer(
-                  [new Stage(new Time(1, 30, 0), new Time(0, 0, 30))])
+                new FischerIncrementTimer(
+                  [new FischerIncrementStage(new Time(1, 30, 0), new Time(0, 0, 30))])
                 ,"90|30"),
             ]
           }

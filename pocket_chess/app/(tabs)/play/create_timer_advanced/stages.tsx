@@ -5,6 +5,7 @@ import { router} from 'expo-router';
 import * as Constants from '../../../../constants/index.js';
 import * as Styles from '../../../../styles/index.js';
 import { Time, Stage, Timer, Preset } from '../../../../classes/Preset.js';
+import { FischerIncrementStage, FischerIncrementTimer } from '../../../../classes/Preset.js';
 import Header from '../../../../components/Header.jsx';
 import ActionButton from '../../../../components/common/ActionButton.jsx';
 import storage from '../../../../classes/Storage.js';
@@ -44,7 +45,7 @@ const Stages = ({}) => { // expose the ref to the parent component
 
         const title = titleTextRef.current;
         const timers = Object.entries(playersStages).map(([playerName, stages]) => {
-            return new Timer(stages, playerName);
+            return new FischerIncrementTimer(stages as [FischerIncrementStage], playerName);
         })
         const newPreset = new Preset(timers, title, true);
         const customPresets = storage.getCustomPresets();

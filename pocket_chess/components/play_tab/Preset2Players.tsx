@@ -59,7 +59,7 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
         const elapsed = Date.now() - startTime;
         const timeLeft = Math.max(0, initialTime - elapsed);
         
-        timer.updateStageTime(timeLeft, () => {
+        timer._updateStageTime(timeLeft, () => {
           clearInterval(intervalRef.current);
           handleTimeout();
         });

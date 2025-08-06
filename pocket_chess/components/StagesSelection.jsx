@@ -5,7 +5,7 @@ import * as Constants from '../constants/index.js';
 import * as Styles from '../styles/index.js';
 
 import IconComponent from './common/IconComponent.jsx';
-import { Time, Stage, Timer, Preset } from '../classes/Preset.js';
+import { Time, Stage, Timer, Preset, FischerIncrementStage } from '../classes/Preset.js';
 import ModalTimerPicker from './ModalTimerPicker.jsx';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
@@ -35,7 +35,7 @@ const StagesSelection = forwardRef(({onUpdateStages}, ref) => { // expose the re
     const onAddStage = () => {
         const newStages = [ // add stage to list
             ...stages, 
-            new Stage(baseTime, increment, moves)
+            new FischerIncrementStage(baseTime, increment, moves)
         ]; 
         setStages(newStages);
         onUpdateStages(newStages); // update parent component

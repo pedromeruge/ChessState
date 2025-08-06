@@ -4,7 +4,8 @@ import { SafeAreaView, View, StyleSheet, Modal, Pressable} from 'react-native'
 import * as Constants from '../constants/index.js';
 import NewTimerScreenBase from './NewTimerScreenBase.jsx';
 import NewTimerScreenPicker from './NewTimerScreenPicker.jsx';
-import { Time, Stage, Timer, Preset } from '../classes/Preset.js';
+import { Time, Preset } from '../classes/Preset.js';
+import { FischerIncrementStage, FischerIncrementTimer } from '../classes/Preset.js';
 import {router} from 'expo-router'
 
 const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the parent component
@@ -67,7 +68,7 @@ const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the
     }
 
     const onStartPreset = () => {
-        const newPreset = Preset.samePlayerTimers(new Timer([new Stage(baseTime, incrementTime)]), titleText, true);
+        const newPreset = Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(baseTime, incrementTime)]), titleText, true);
         const customPresets = storage.getCustomPresets();
 
         customPresets.custom.presets.push(newPreset);
