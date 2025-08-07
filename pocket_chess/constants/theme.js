@@ -6,6 +6,7 @@ const COLORS = {
   text_dark_2: "#434343",
   text_grey: "#787878",
   line_light_grey: "#C1C1C1",
+  super_light_grey: "#F5F5F5",
   white: "#FFFFFF",
   contrast_red_light: "#BB8588",
   contrast_red_dark: "#B7555B",

@@ -6,8 +6,6 @@ import IconComponent from '../common/IconComponent.jsx';
 import {LinearGradient} from 'expo-linear-gradient';
 import {router} from 'expo-router'
 
-// based on https://www.youtube.com/watch?v=GrLCS5ww030
-
 const TimerPresetSection = ({presetsList, singleLine=false, style = {}}) =>{
     
     //gradien to appear on right of flatlist to indicate there are more elements to the right, that the user can scroll to

@@ -65,21 +65,55 @@ const PresetTypes = {
     ),
     HOURGLASS: new PresetType(6, 
         "Hourglass",
-        "Time used by one player is added to the other player’s clock",
+        "Time used is transferred to other player",
         "TO BE DEFINED6"
-    )
+    ),
+    HOURGLASS_2: new PresetType(7, 
+        "Hourglass_2",
+        "Time used is transferred to other player",
+        "TO BE DEFINED6"
+    ),
+    HOURGLASS_3: new PresetType(8, 
+        "Hourglass_3",
+        "Time used is transferred to other player",
+        "TO BE DEFINED6"
+    ),
+    HOURGLASS_4: new PresetType(9, 
+        "Hourglass_4",
+        "Time used is transferred to other player",
+        "TO BE DEFINED6"
+    ),
+    HOURGLASS_5: new PresetType(10, 
+        "Hourglass_5",
+        "Time used is transferred to other player",
+        "TO BE DEFINED6"
+    ),
+    HOURGLASS_6: new PresetType(11, 
+        "Hourglass_6",
+        "Time used is transferred to other player",
+        "TO BE DEFINED6"
+    ),
 }
 
-const popularPresetTypes = [
-    PresetTypes.FISCHER_INCREMENT,
-    PresetTypes.SIMPLE_DELAY,
-    PresetTypes.BRONSTEIN_DELAY,
-]
+const PresetTypeSections = {
+    "popular": [
+        PresetTypes.FISCHER_INCREMENT,
+        PresetTypes.SIMPLE_DELAY,
+        PresetTypes.BRONSTEIN_DELAY,
+    ],
+    "uncommon": [
+        PresetTypes.CUMULATIVE_INCREMENT,
+        PresetTypes.MOVE_TIMER,
+    ],
+    "experimental": [
+        PresetTypes.HOURGLASS,
+        PresetTypes.HOURGLASS_2,
+        PresetTypes.HOURGLASS_3,
+        PresetTypes.HOURGLASS_4,
+        PresetTypes.HOURGLASS_5,
+        PresetTypes.HOURGLASS_6
+    ]
+}
 
-const uncommonPresetTypes = [
-    PresetTypes.CUMULATIVE_INCREMENT,
-    PresetTypes.MOVE_TIMER,
-    PresetTypes.HOURGLASS,
-]
 
-export { PresetType, PresetTypes, popularPresetTypes, uncommonPresetTypes };
+export { PresetType, PresetTypes, PresetTypeSections };

@@ -5,8 +5,6 @@ import IconComponent from './common/IconComponent.jsx';
 import TimerPickerRoulette from './TimerPickerRoulette.jsx';
 import Header from './Header.jsx';
 
-// based on https://www.youtube.com/watch?v=GrLCS5ww030
-
 const NewTimerScreenPicker = forwardRef(({width=null, height=null, hideHours=false, onConfirm, onBack, time, setTime}, ref) => { // expose the ref to the parent component
     
     const showScreen = () => {

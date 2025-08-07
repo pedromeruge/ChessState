@@ -7,16 +7,17 @@ import * as Styles from '../styles/index.js';
 import IconComponent from './common/IconComponent.jsx';
 import { Time, Stage, Timer, Preset, FischerIncrementStage } from '../classes/Preset.js';
 import ModalTimerPicker from './ModalTimerPicker.jsx';
+import { PresetTypes } from '../classes/PresetTypes.js';
+import {router} from 'expo-router'
 
-// based on https://www.youtube.com/watch?v=GrLCS5ww030
-
-const StagesSelection = forwardRef(({onUpdateStages}, ref) => { // expose the ref to the parent component
+const TimerSelection = forwardRef(({onUpdateTimer}, ref) => { // expose the ref to the parent component
 
     // state
     const [stages, setStages] = useState([]); 
     const [baseTime, setBaseTime] = useState(new Time()); // track base time
     const [increment, setIncrement] = useState(new Time()); // track increment
     const [moves, setMoves] = useState(null); // track moves
+    const [currentClockType, setCurrentClockType] = useState(PresetTypes.FISCHER_INCREMENT); // track current clock type
 
     // refs for the time picker roulettes for base time and increment
     const baseTimePickerRef = useRef(null);
@@ -38,7 +39,7 @@ const StagesSelection = forwardRef(({onUpdateStages}, ref) => { // expose the re
             new FischerIncrementStage(baseTime, increment, moves)
         ]; 
         setStages(newStages);
-        onUpdateStages(newStages); // update parent component
+        onUpdateTimer(newStages); // update parent component
 
         console.log("Added stage");
 
@@ -52,7 +53,7 @@ const StagesSelection = forwardRef(({onUpdateStages}, ref) => { // expose the re
         const newStages = stages.filter((stage, i) => i !== index); // remove stage from list
         
         setStages(newStages);
-        onUpdateStages(newStages); // update parent component
+        onUpdateTimer(newStages); // update parent component
 
         console.log("Removed stage in position: ", index);
 
@@ -66,12 +67,31 @@ const StagesSelection = forwardRef(({onUpdateStages}, ref) => { // expose the re
         incrementPickerRef.current?.showModal();
     }
 
+    const showClockTypesScreen = () => {
+        router.push({
+            pathname: '/play_more/clock_types/clock_types_list',
+            params: {current_type: currentClockType}
+        });
+    }
+
     const onChangeTitle = (text) => {
         setMoves(text.replace(/[^0-9]/g, ''))
     };
-
+    
     return (
         <View style={styles.container}>
+            <View style={[Styles.newPreset.sectionContainer, {paddingBottom: 0}]}>
+                <TouchableOpacity style={[styles.clockTypeContainer]} onPress={showClockTypesScreen}>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <IconComponent source={Constants.icons.clock_type} width={15} tintColor={Constants.COLORS.white} />
+                        <Text style={[Styles.newPreset.sectionTitleText, {color: Constants.COLORS.white, marginLeft: 7}]}>Clock type</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <Text style={styles.clockTypeText}>{currentClockType.name}</Text>
+                        <IconComponent source={Constants.icons.arrow_right} width={15} tintColor={Constants.COLORS.white} />
+                    </View>
+                </TouchableOpacity>
+            </View>
             <View style={Styles.newPreset.sectionContainer}>
                 <View style={Styles.newPreset.sectionTitleContainer}>
                     <Text style={Styles.newPreset.sectionTitleText}>Add stage</Text>
@@ -156,6 +176,26 @@ const styles = StyleSheet.create({
         flex: 1
     },
 
+    clockTypeContainer: {
+        width: '100%',
+        flexDirection: 'row',
+        minHeight: 40,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: Constants.COLORS.preset_blue,
+        borderRadius: 10,
+        paddingVertical: 5,
+        paddingHorizontal: 15,
+    },
+
+    clockTypeText: {
+        fontFamily: Constants.FONTS.BASE_FONT_NAME,
+        fontSize: Constants.SIZES.medium,
+        fontWeight: Constants.FONTS.regular,
+        color: Constants.COLORS.white,
+        marginRight: 15
+    },
+
     addStageContainer: {
         width: '100%',
         flexDirection: 'row',
@@ -219,4 +259,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default StagesSelection;
+export default TimerSelection;

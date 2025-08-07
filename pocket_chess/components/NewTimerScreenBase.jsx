@@ -8,8 +8,6 @@ import IconComponent from './common/IconComponent.jsx';
 import ActionButton from './common/ActionButton.jsx';
 import Header from './Header.jsx';
 
-// based on https://www.youtube.com/watch?v=GrLCS5ww030
-
 const NewTimerScreenBase = forwardRef(({
         onStart,
         onClose, 

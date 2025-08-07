@@ -2,10 +2,9 @@ import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, Pressable, TextInput, Keyboard } from 'react-native'
 import * as Constants from '../constants/index.js';
 import IconComponent from './common/IconComponent.jsx';
+import { router } from 'expo-router';
 
-// based on https://www.youtube.com/watch?v=GrLCS5ww030
-
-const Header = ({leftIcon, leftIconSize, text, rightIcon, rightIconSize, onPressRightIcon, lowBorder=false, curvyTop=false}) => {
+const Header = ({leftIcon, leftIconSize, text, rightIcon, rightIconSize, onPressRightIcon=()=>{router.back()}, lowBorder=false, curvyTop=false}) => {
     return (
         <View style={
                 [styles.containerHeader, 

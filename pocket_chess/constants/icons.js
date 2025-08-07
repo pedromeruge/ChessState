@@ -21,6 +21,7 @@ export default {
   clock_lines: require("../assets/icons/clock_lines.png"),
   clock_full: require("../assets/icons/clock_full.png"),
   arrow_left: require("../assets/icons/arrow_left.png"),
+  arrow_right: require("../assets/icons/arrow_right.png"),
   check: require("../assets/icons/check.png"),
   pawn_full: require("../assets/icons/pawn_full.png"),
   light_pawn: require("../assets/icons/pieces/light_pawn.png"),
@@ -42,4 +43,8 @@ export default {
   volume_off: require("../assets/icons/volume_off.png"),
   edit_pencil: require("../assets/icons/edit_pencil.png"),
   box_full: require("../assets/icons/box_full.png"),
+  clock_type: require("../assets/icons/clock_type.png"),
+  target: require("../assets/icons/target.png"),
+  diamond: require("../assets/icons/diamond.png"),
+  experimental: require("../assets/icons/experimental.png"),
 };

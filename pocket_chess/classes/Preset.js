@@ -309,6 +309,22 @@ export class Timer {
         return newTimer;
     }
 
+    hasStages() {
+        return this.stages && this.stages.length > 0;
+    }
+
+    removeStage(index) {
+        if (index < 0 || index >= this.stages.length) {
+            throw new Error("Index out of bounds");
+        }
+        this.stages.splice(index, 1);
+        
+        // reset current stage if it was removed
+        if (this.currentStage >= this.stages.length) {
+            this.currentStage = this.stages.length - 1;
+            this.currentStageTime = this.stages[this.currentStage].time.toMiliseconds();
+        }
+    }
     toJSON() {
         return {
             stages: this.stages.map(stage => stage.toJSON()),

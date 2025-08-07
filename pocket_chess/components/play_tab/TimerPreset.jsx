@@ -1,8 +1,6 @@
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import * as Constants from '../../constants/index.js';
 
-// based on https://www.youtube.com/watch?v=GrLCS5ww030
-
 const TimerPreset = ({preset, onPress}) =>{
     const titleStrings = preset.titleStrings()
     
