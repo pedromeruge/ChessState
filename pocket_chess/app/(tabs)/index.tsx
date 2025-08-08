@@ -45,10 +45,10 @@ const Scan = () => {
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.iconRowTop}>
             <TouchableOpacity onPress={openHelpBox}>
-              <IconComponent source={Constants.icons.help} width={30}/>
+              <IconComponent source={Constants.icons.help} width={30} tintColor={Constants.COLORS.white}/>
             </TouchableOpacity>
             <TouchableOpacity onPress={openSettings}>
-              <IconComponent source={Constants.icons.settings} width={30}/>
+              <IconComponent source={Constants.icons.settings} width={30} tintColor={Constants.COLORS.white}/>
             </TouchableOpacity>
           </View>
 

@@ -7,17 +7,33 @@ import * as Styles from '../styles/index.js';
 import IconComponent from './common/IconComponent.jsx';
 import { Time, Stage, Timer, Preset, FischerIncrementStage } from '../classes/Preset.js';
 import ModalTimerPicker from './ModalTimerPicker.jsx';
-import { PresetTypes } from '../classes/PresetTypes.js';
-import {router} from 'expo-router'
+import { PresetTypes, PresetIdToTypes } from '../classes/PresetTypes.js';
+import {router, useLocalSearchParams} from 'expo-router'
 
 const TimerSelection = forwardRef(({onUpdateTimer}, ref) => { // expose the ref to the parent component
 
+    const {clock_type_id} = useLocalSearchParams();
+    
     // state
     const [stages, setStages] = useState([]); 
     const [baseTime, setBaseTime] = useState(new Time()); // track base time
     const [increment, setIncrement] = useState(new Time()); // track increment
     const [moves, setMoves] = useState(null); // track moves
-    const [currentClockType, setCurrentClockType] = useState(PresetTypes.FISCHER_INCREMENT); // track current clock type
+
+    const [currentClockType, setCurrentClockType] = useState(() => {
+        // ensure valid id
+        if (clock_type_id && PresetIdToTypes[clock_type_id]) {
+            return PresetIdToTypes[clock_type_id];
+        }
+        return PresetTypes.FISCHER_INCREMENT; // by default go to fischer increment
+    });
+
+    //update clock type when returning to page with different clock_type_id
+    useEffect(() => {
+        if (clock_type_id && PresetIdToTypes[clock_type_id]) {
+            setCurrentClockType(PresetIdToTypes[clock_type_id]);
+        }
+    }, [clock_type_id]);
 
     // refs for the time picker roulettes for base time and increment
     const baseTimePickerRef = useRef(null);
@@ -70,7 +86,7 @@ const TimerSelection = forwardRef(({onUpdateTimer}, ref) => { // expose the ref 
     const showClockTypesScreen = () => {
         router.push({
             pathname: '/play_more/clock_types/clock_types_list',
-            params: {current_type: currentClockType}
+            params: {clock_type_id: currentClockType.id}
         });
     }
 
