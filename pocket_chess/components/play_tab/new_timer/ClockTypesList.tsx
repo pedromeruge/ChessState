@@ -1,10 +1,10 @@
 import React, { useState} from 'react';
 import { View, Text, StyleSheet, TextStyle, TouchableOpacity, SafeAreaView, ViewStyle} from 'react-native'
 
-import * as Constants from '../../constants';
-import IconComponent from '../common/IconComponent.jsx';
-import Header from '../Header';
-import {PresetType, PresetTypes, PresetTypeSections} from '../../classes/PresetTypes.js';
+import * as Constants from '../../../constants';
+import IconComponent from '../../common/IconComponent.jsx';
+import Header from '../../common/Header.jsx';
+import {PresetType, PresetTypes, PresetTypeSections} from '../../../classes/PresetTypes.js';
 import { ScrollView } from 'react-native';
 import { router } from 'expo-router';
 

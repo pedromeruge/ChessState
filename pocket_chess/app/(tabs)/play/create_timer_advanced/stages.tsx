@@ -6,11 +6,11 @@ import * as Constants from '../../../../constants/index.js';
 import * as Styles from '../../../../styles/index.js';
 import { Time, Stage, Timer, Preset } from '../../../../classes/Preset.js';
 import { FischerIncrementStage, FischerIncrementTimer } from '../../../../classes/Preset.js';
-import Header from '../../../../components/Header.jsx';
+import Header from '../../../../components/common/Header.jsx';
 import ActionButton from '../../../../components/common/ActionButton.jsx';
 import storage from '../../../../classes/Storage.js';
 import TabNavigator from '../../../../components/TabNavigator.jsx';
-import TimerSelection from '../../../../components/TimerSelection.jsx';
+import TimerSelection from '../../../../components/play_tab/new_timer/TimerSelection.jsx';
 
 const Stages = ({}) => { // expose the ref to the parent component
 
@@ -18,25 +18,25 @@ const Stages = ({}) => { // expose the ref to the parent component
     const titleTextRef = useRef(''); // reference to the title input, used in textInput to prevent re-rendering, instead of using state directly
 
     const [playersTimers, setplayersTimers] = useState(
-        Object.fromEntries(Constants.PLAYER_NAMES.map(playerName => [playerName, null])) // dictionary where key is player and value is timers array
+        Object.fromEntries(Constants.PLAYER_NAMES.map(playerName => [playerName, []])) // dictionary where key is player and value is timers array
     );
 
-    const updateTimer = useCallback((player: string, timer: Timer) => {
+    const updateStages = useCallback((player: string, stages: Stage[]) => {
         setplayersTimers(prev => ({
             ...prev,
-            [player]: timer
+            [player]: stages
           }));
     }, []);
 
     const allPlayersHaveStages = useCallback(() =>  {
         return Object.values(playersTimers)
-            .every(timer => timer?.hasStages()
+            .every(playerStages => playerStages?.length > 0
         );
     }, [playersTimers]);
 
     const resetParameters = () => {
         setTitle('');
-        setplayersTimers(Object.fromEntries(Constants.PLAYER_NAMES.map(playerName => [playerName, null]))); // dictionary where key is player and value is empty array
+        setplayersTimers(Object.fromEntries(Constants.PLAYER_NAMES.map(playerName => [playerName, []]))); // dictionary where key is player and value is empty array
         titleTextRef.current = '';
     }
 
@@ -45,9 +45,7 @@ const Stages = ({}) => { // expose the ref to the parent component
         const title = titleTextRef.current;
 
         const newPreset = new Preset(playersTimers, title, true);
-        const customPresets = storage.getCustomPresets();
-        customPresets.custom.presets.push(newPreset);
-        storage.setCustomPresets(customPresets);
+        storage.addCustomPreset(newPreset);
 
         // reset input parameters
         resetParameters(); 
@@ -61,14 +59,13 @@ const Stages = ({}) => { // expose the ref to the parent component
         });
     }
 
-    const onBack = (refreshPrevPage=false) => {
+    const onBack = () => {
 
         //reset input parameters
         resetParameters();
 
         //back to previous component
         router.back() 
-        router.setParams({ refresh: refreshPrevPage ? 'true' : 'false' }); // indicate to other component if it should refresh
     }
 
     const onChangeTitle = (text: string) => {
@@ -92,8 +89,8 @@ const Stages = ({}) => { // expose the ref to the parent component
                             <TabNavigator 
                                 tabs = {
                                     Object.fromEntries(
-                                        Object.entries(playersTimers).map(([playerName, timer]) => 
-                                            [playerName, (props) => <TimerSelection {...props} timer={timer} onUpdateTimer={(timer: Timer) => updateTimer(playerName, timer)}/>]
+                                        Object.keys(playersTimers).map((playerName) => 
+                                            [playerName, (props) => <TimerSelection {...props} playerName={playerName} onUpdateStages={(stages: Stage[]) => updateStages(playerName, stages)}/>]
                                         ))
                                 }
                                 icons = {
@@ -105,7 +102,7 @@ const Stages = ({}) => { // expose the ref to the parent component
                                 }
                                 swipeEnabled={false}
                             />
-                        ), [updateTimer])
+                        ), [updateStages])
                         }
                     </View>
                     {/* <View style={styles.separationLine}></View> */}

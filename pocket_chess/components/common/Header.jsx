@@ -1,15 +1,17 @@
 import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, Pressable, TextInput, Keyboard } from 'react-native'
-import * as Constants from '../constants/index.js';
-import IconComponent from './common/IconComponent.jsx';
+import * as Constants from '../../constants/index.js';
+import IconComponent from './IconComponent.jsx';
 import { router } from 'expo-router';
 
-const Header = ({leftIcon, leftIconSize, text, rightIcon, rightIconSize, onPressRightIcon=()=>{router.back()}, lowBorder=false, curvyTop=false}) => {
+const Header = ({leftIcon, leftIconSize, text, rightIcon, rightIconSize, onPressRightIcon=()=>{router.back()}, lowBorder=false, curvyTop=false, fullWidth=true}) => {
     return (
         <View style={
-                [styles.containerHeader, 
-                lowBorder ? {borderBottomWidth: 1, borderColor: Constants.COLORS.line_light_grey} : null,
-                curvyTop ? {borderTopLeftRadius: 10, borderTopRightRadius: 10} : null
+                [styles.ModalContainerHeader,
+                fullWidth && styles.fullWidthContainerHeader, 
+                lowBorder && {borderBottomWidth: 1, borderColor: Constants.COLORS.line_light_grey},
+                curvyTop && {borderTopLeftRadius: 10, borderTopRightRadius: 10},
+                fullWidth && {width: '100%'}
             ]}>
             <View style={styles.containerHeaderLeft}>
                 <IconComponent source={leftIcon} width={leftIconSize} tintColor={Constants.COLORS.text_dark}/>
@@ -24,17 +26,21 @@ const Header = ({leftIcon, leftIconSize, text, rightIcon, rightIconSize, onPress
 
 const styles = StyleSheet.create({
 
-    containerHeader: {
+    fullWidthContainerHeader: {
         width: '100%',
+    },
+    
+    ModalContainerHeader: {
         flexDirection: 'row',
+        display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 10,
         minHeight: 40,
-        backgroundColor: Constants.COLORS.white
-    },
-    
+        backgroundColor: Constants.COLORS.white,
+        alignSelf: 'stretch' // stretch to fit full width of parent container
+    }, 
     containerHeaderLeft: {
         flexDirection: 'row',
         justifyContent: 'flex-start',

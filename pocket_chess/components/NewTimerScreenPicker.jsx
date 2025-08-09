@@ -3,10 +3,10 @@ import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Screen, Image, 
 import * as Constants from '../constants/index.js';
 import IconComponent from './common/IconComponent.jsx';
 import TimerPickerRoulette from './TimerPickerRoulette.jsx';
-import Header from './Header.jsx';
+import Header from './common/Header.jsx';
 
-const NewTimerScreenPicker = forwardRef(({width=null, height=null, hideHours=false, onConfirm, onBack, time, setTime}, ref) => { // expose the ref to the parent component
-    
+const NewTimerScreenPicker = forwardRef(({width=null, height=null, hideHours=false, onConfirm, onBack, time, setTime, fullScreen=true, headerText="New preset", headerLeftIcon=Constants.icons.clock_lines, headerRightIcon=Constants.icons.arrow_left}, ref) => { // expose the ref to the parent component
+
     const showScreen = () => {
     }
 
@@ -20,8 +20,8 @@ const NewTimerScreenPicker = forwardRef(({width=null, height=null, hideHours=fal
 
     return (
         <SafeAreaView style={[styles.container, Constants.SHADOWS.medium, width && height ? {width: width, height: height} : null]}>
-            <Header leftIcon={Constants.icons.clock_lines} leftIconSize={16} text={'New preset'} rightIcon={Constants.icons.arrow_left} rightIconSize={18} onPressRightIcon={onBack} lowBorder={true} curvyTop={true}/>
-            <View style={styles.body}>
+            <Header leftIcon={headerLeftIcon} leftIconSize={18} text={headerText} rightIcon={headerRightIcon} rightIconSize={fullScreen ? 18 : 14} onPressRightIcon={onBack} lowBorder={true} curvyTop={true} fullWidth={fullScreen}/>
+            <View style={[styles.body, fullScreen && styles.fullScreen]}>
                 <View style={styles.roulette}>
                     <TimerPickerRoulette time={time} setTime={setTime} hideHours={hideHours}/>
                 </View>
@@ -40,41 +40,20 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems: 'center',
         flexDirection: 'column',
+        minWidth: '65%'
     },
-
-    containerHeader: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        minHeight: 40,
-        borderBottomWidth: 1,
-        borderColor: Constants.COLORS.line_light_grey,
-    },
-    containerHeaderLeft: {
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-    },
-    containerHeaderText: {
-        fontFamily: Constants.FONTS.BASE_FONT_NAME,
-        fontSize: Constants.SIZES.large,
-        fontWeight: Constants.FONTS.bold,
-        color: Constants.COLORS.text_dark,
-        marginLeft: 8
-    },     
 
     body: {
         flexDirection: 'column',
-        flex: 1,
-        width: '100%',
-        justifyContent: 'flex-start',
+        justifyContent: 'space-between',
         alignItems: 'center',
         position: 'relative',
         paddingHorizontal: 20,
         paddingVertical: 30,
+    },
+
+    fullScreen: {
+        flex:1
     },
 
     roulette: {
@@ -84,13 +63,12 @@ const styles = StyleSheet.create({
     },
 
     confirm: {
-        position: 'absolute',
-        bottom: 30,
         alignItems: 'center',
         justifyContent: 'center',
         height: 40,
         width: 40,
         borderRadius: 20,
+        marginTop: 40,
         backgroundColor: Constants.COLORS.contrast_blue_light,
     }
 });

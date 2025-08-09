@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: Constants.COLORS.white,
-        position: 'relative'
+        position: 'relative',
     },
 
     roulette: {

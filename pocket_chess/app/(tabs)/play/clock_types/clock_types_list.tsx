@@ -1,11 +1,8 @@
 import React, { useState, useRef, useCallback} from 'react';
 import { View, Text, StyleSheet, TextStyle, TouchableOpacity} from 'react-native'
 
-import * as Constants from '../../../constants';
-import storage from '../../../classes/Storage';
-import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import {PresetTypes} from '../../../classes/PresetTypes.js';
-import ClockTypesList from '../../../components/play_tab/ClockTypesList';
+import { useLocalSearchParams } from 'expo-router';
+import ClockTypesList from '../../../../components/play_tab/new_timer/ClockTypesList';
 
 const Clock_types_list = () => {
   

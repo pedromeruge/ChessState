@@ -6,7 +6,7 @@ import * as Constants from '../constants/index.js';
 import * as Styles from '../styles/index.js';
 import IconComponent from './common/IconComponent.jsx';
 import ActionButton from './common/ActionButton.jsx';
-import Header from './Header.jsx';
+import Header from './common/Header.jsx';
 
 const NewTimerScreenBase = forwardRef(({
         onStart,
@@ -64,7 +64,7 @@ const NewTimerScreenBase = forwardRef(({
 
     const onAdvancedOptions = () => {
         onClose();
-        router.replace('/play/create_timer_advanced/stages');
+        router.push('/play/create_timer_advanced/stages');
     }
 
     return (

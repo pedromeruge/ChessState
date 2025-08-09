@@ -4,7 +4,7 @@ import { SafeAreaView, View, StyleSheet, Modal, Pressable} from 'react-native'
 import * as Constants from '../constants/index.js';
 import NewTimerScreenPicker from './NewTimerScreenPicker.jsx';
 
-const ModalTimerPicker = forwardRef(({time, setTime, hideHours=false}, ref) => { // expose the ref to the parent component
+const ModalTimerPicker = forwardRef(({time, setTime, hideHours=false, fullScreen=true, headerText="", headerLeftIcon=null, headerRightIcon=null}, ref) => { // expose the ref to the parent component
 
     //state of modal
     const [visible, setVisible] = useState(false); // state to show/hide the modal
@@ -34,7 +34,7 @@ const ModalTimerPicker = forwardRef(({time, setTime, hideHours=false}, ref) => {
         <Modal
             visible={visible}
             onRequestClose={hideModal}
-            animationType="slide"
+            animationType="fade"
             transparent
         >
             <View style={styles.container}>
@@ -46,6 +46,10 @@ const ModalTimerPicker = forwardRef(({time, setTime, hideHours=false}, ref) => {
                         onBack={hideModal}
                         time={time}
                         setTime={setTime}
+                        fullScreen={fullScreen}
+                        headerText={headerText}
+                        headerLeftIcon={headerLeftIcon}
+                        headerRightIcon={headerRightIcon}
                     />
             </View>
         </Modal>

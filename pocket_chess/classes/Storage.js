@@ -163,6 +163,11 @@ class Storage {
 
       return null;
     }
+
+    addCustomPreset(preset) {
+        this.customTimers.custom.presets.push(preset);
+        this.setCustomPresets(this.customTimers);
+    }
 }
 
  export default storage = new Storage();

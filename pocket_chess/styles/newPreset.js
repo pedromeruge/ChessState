@@ -48,7 +48,8 @@ const style = StyleSheet.create({
         paddingBottom: 10,
         minWidth: 45,
         minHeight: 70,
-        rowGap: 7
+        rowGap: 7,
+        flex: 2
     },
 
     timeTitle: {
