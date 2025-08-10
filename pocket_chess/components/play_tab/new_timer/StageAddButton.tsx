@@ -1,10 +1,21 @@
-import { Text, TouchableOpacity, StyleSheet} from 'react-native'
+import { Text, TouchableOpacity, StyleSheet, TextStyle} from 'react-native'
 
 import * as Constants from '../../../constants/index.js';
 
 import IconComponent from '../../common/IconComponent.jsx';
 
-export default StageAddButton = ({onPress, disabled=true, icon=Constants.icons.plus_thick, text="Add", vertical=true, iconSize=16}) => {
+interface StageAddButtonProps {
+    onPress: () => void;
+    disabled?: boolean;
+    icon?: any;
+    text?: string;
+    vertical?: boolean;
+    iconSize?: number;
+}
+
+interface StageAddButtonRef {}
+
+const StageAddButton = ({onPress, disabled=true, icon=Constants.icons.plus_thick, text="Add", vertical=true, iconSize=16} : StageAddButtonProps) => {
 
     return (
         <TouchableOpacity 
@@ -25,7 +36,7 @@ const styles = StyleSheet.create({
     stageTitleAdd: {
         fontFamily: Constants.FONTS.BASE_FONT_NAME,
         fontSize: Constants.SIZES.small,
-        fontWeight: Constants.FONTS.regular,
+        fontWeight: Constants.FONTS.regular as TextStyle['fontWeight'],
         color: Constants.COLORS.white
     },
 
@@ -42,3 +53,6 @@ const styles = StyleSheet.create({
         flex: 1
     }
 })
+
+export default StageAddButton;
+export type {StageAddButtonRef};

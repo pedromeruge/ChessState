@@ -5,10 +5,24 @@ import * as Constants from '../../../constants/index.js';
 import * as Styles from '../../../styles/index.js';
 
 import IconComponent from '../../common/IconComponent.jsx';
-import { Time} from '../../../classes/Preset.js';
-import ModalTimerPicker from '../../ModalTimerPicker.jsx';
+import { Time} from '../../../classes/timers_base/Preset.js';
+import ModalTimerPicker from '../../ModalTimerPicker';
 
-export default StageTimerField = forwardRef(({icon,  title, onChange=null, hideHours=false, iconSize=15}, ref) => {
+interface StageTimeFieldRef {
+  getTime: () => Time;
+  reset: () => void;
+}
+
+interface StageTimeFieldProps {
+  icon: any;
+  title: string;
+  onChange?: (time: any) => void;
+  hideHours?: boolean;
+  iconSize?: number;
+}
+
+const StageTimeField = forwardRef<StageTimeFieldRef,StageTimeFieldProps>(
+    ({icon,  title, onChange=null, hideHours=false, iconSize=15}, ref) => {
 
     //functions for parent
     useImperativeHandle(ref, () => ({
@@ -47,3 +61,6 @@ export default StageTimerField = forwardRef(({icon,  title, onChange=null, hideH
         </TouchableOpacity>
     )
 });
+
+export default StageTimeField;
+export type { StageTimeFieldRef };

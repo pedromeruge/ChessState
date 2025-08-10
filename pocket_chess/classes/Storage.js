@@ -1,8 +1,8 @@
 import * as Constants from '../constants';
 
 import {MMKV} from 'react-native-mmkv';
-import { Preset, Time} from './Preset.js';
-import { FischerIncrementStage, FischerIncrementTimer } from './Preset.js';
+import { Preset, Time} from './timers_base/Preset.js';
+import { FischerIncrementStage, FischerIncrementTimer } from './timers_base/Preset.js';
 //initialize MMKV storage
 class Storage {
     

@@ -1,11 +1,32 @@
 import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
-import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Screen, Image, Pressable, TextInput, Keyboard } from 'react-native'
+import { SafeAreaView, View, StyleSheet, TouchableOpacity} from 'react-native'
 import * as Constants from '../constants/index.js';
 import IconComponent from './common/IconComponent.jsx';
 import TimerPickerRoulette from './TimerPickerRoulette.jsx';
 import Header from './common/Header.jsx';
+import { Time } from '../classes/timers_base/Preset.js';
 
-const NewTimerScreenPicker = forwardRef(({width=null, height=null, hideHours=false, onConfirm, onBack, time, setTime, fullScreen=true, headerText="New preset", headerLeftIcon=Constants.icons.clock_lines, headerRightIcon=Constants.icons.arrow_left}, ref) => { // expose the ref to the parent component
+interface NewTimerScreenPickerRef {
+    showScreen: () => void;
+    hideScreen: () => void;
+}
+
+interface NewTimerScreenPickerProps {
+    width?: number | null;
+    height?: number | null;
+    hideHours?: boolean;
+    onConfirm?: () => void;
+    onBack?: () => void;
+    time: Time;
+    setTime: (time: Time) => void;
+    fullScreen?: boolean;
+    headerText?: string;
+    headerLeftIcon?: any;
+    headerRightIcon?: any;
+}
+
+const NewTimerScreenPicker = forwardRef<NewTimerScreenPickerRef, NewTimerScreenPickerProps>(
+    ({width=null, height=null, hideHours=false, onConfirm, onBack, time, setTime, fullScreen=true, headerText="New preset", headerLeftIcon=Constants.icons.clock_lines, headerRightIcon=Constants.icons.arrow_left}, ref) => { // expose the ref to the parent component
 
     const showScreen = () => {
     }
@@ -74,3 +95,4 @@ const styles = StyleSheet.create({
 });
 
 export default NewTimerScreenPicker;
+export type { NewTimerScreenPickerRef };

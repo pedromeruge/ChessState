@@ -1,5 +1,5 @@
 import {useState, useEffect, forwardRef, useImperativeHandle, useRef} from 'react';
-import { tabStylesheet, View, Text } from 'react-native'
+import { View, Text, TextStyle } from 'react-native'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationContainer, NavigationIndependentTree} from '@react-navigation/native';
 
@@ -9,7 +9,18 @@ import {tabStyles} from './common/styles.jsx';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
-const TabNavigator = forwardRef(({tabs, icons, swipeEnabled=true, callbacks=[]}, ref) => {
+interface TabNavigatorRef {
+}
+
+interface TabNavigatorProps {
+    tabs: Record<string, React.ComponentType>;
+    icons: Record<string, any>;
+    swipeEnabled?: boolean;
+    callbacks?: Array<() => void>;
+}
+
+const TabNavigator = forwardRef<TabNavigatorRef,TabNavigatorProps>(
+    ({tabs, icons, swipeEnabled=true, callbacks=[]}, ref) => {
     const Tab = createMaterialTopTabNavigator();
 
     function MyTabs() {
@@ -17,6 +28,7 @@ const TabNavigator = forwardRef(({tabs, icons, swipeEnabled=true, callbacks=[]},
             <NavigationIndependentTree>
                 <NavigationContainer>
                 <Tab.Navigator
+                    id={undefined}
                     screenOptions={{
                         swipeEnabled: swipeEnabled,
                         tabBarStyle: tabStyles.tabBarStyle,
@@ -63,6 +75,12 @@ const TabNavigator = forwardRef(({tabs, icons, swipeEnabled=true, callbacks=[]},
 });
 
 const CustomTabLabel = ({ focused, label, icon }) => {
+
+    const textStyle: TextStyle = {
+        fontWeight: focused ? (Constants.FONTS.semi_bold as TextStyle['fontWeight']) : (Constants.FONTS.regular as TextStyle['fontWeight']),
+        color: focused ? Constants.COLORS.contrast_red_light : Constants.COLORS.text_grey, // Change label color based on focus state
+    };
+
     return (
       <View style={tabStyles.labelContainer}>
         <IconComponent
@@ -71,11 +89,7 @@ const CustomTabLabel = ({ focused, label, icon }) => {
           tintColor={focused ? Constants.COLORS.contrast_red_light : Constants.COLORS.text_grey}
         />
         <Text
-          style={[tabStyles.labelText,
-            { fontWeight: focused ? Constants.FONTS.semi_bold : Constants.FONTS.regular,
-              color: focused ? Constants.COLORS.contrast_red_light : Constants.COLORS.text_grey, // Change label color based on focus state
-            },
-          ]}
+          style={[tabStyles.labelText, textStyle]}
         >
         {label}
         </Text>

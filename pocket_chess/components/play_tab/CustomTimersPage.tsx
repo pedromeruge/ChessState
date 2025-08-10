@@ -5,30 +5,29 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Constants from '../../constants';
 import IconComponent from '../common/IconComponent.jsx';
 import TimerPresetSection from './TimerPresetSection';
-import NewTimerModal from '../NewTimerModal';
+import NewTimerModal, {NewTimerModalRef} from '../NewTimerModal';
 import storage from '../../classes/Storage';
-import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import SmallActionButton from '../common/SmallActionButton';
+import { Preset } from '../../classes/timers_base/Preset';
 
 
 const CustomTimersPage = () => {
   
   //permanent storage of presets
-  const [customPresets, setCustomPresets] = useState(storage.getCustomPresets());
+  const [customPresets, setCustomPresets] = useState<any>(storage.getCustomPresets());
 
-  const routerParams = useLocalSearchParams(); // router params to indicate necessary refresh
-  const modalRef = useRef(null);
+  const modalRef = useRef<NewTimerModalRef>(null);
 
-  function onPressNewPreset() {
+  function onPressNewPreset() : void {
     console.log("showing new preset modal");
     modalRef.current?.showModal();
   }
 
-  function onPressEditPresets() {
+  function onPressEditPresets() : void {
     console.log("TODO edit presets");
   }
 
-  function onSubmitNewPreset(newCustomPresets) {
+  function onSubmitNewPreset(newCustomPresets: [Preset]) : void {
     setCustomPresets({...newCustomPresets});
     modalRef.current?.hideModal();
   }

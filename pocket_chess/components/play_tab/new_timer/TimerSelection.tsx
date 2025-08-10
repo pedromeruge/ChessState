@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle, useMemo } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextStyle } from 'react-native'
 import {router, useLocalSearchParams} from 'expo-router'
 
 import * as Constants from '../../../constants/index.js';
@@ -7,34 +7,49 @@ import * as Styles from '../../../styles/index.js';
 
 import IconComponent from '../../common/IconComponent.jsx';
 import { PresetTypes, PresetIdToTypes } from '../../../classes/PresetTypes.js';
-import { ClockTypeIdToBuilderComponent } from '../../../classes/ComponentRegistry.js';
+import { ClockTypeIdToBuilderComponent } from '../../../classes/ComponentRegistry';
+import { Timer } from '../../../classes/timers_base/Preset.js';
+import { TimerBuilderRef } from '../../../classes/types/TimerBuilderTypes.js';
 
-const TimerSelection = forwardRef(({onUpdateStages, playerName}, ref) => { // expose the ref to the parent component
+interface TimerSelectionRef{
+    buildTimer: (playerName: string) => Timer;
+}
+
+interface TimerSelectionProps {
+    onUpdateStages: (stages: any) => void;
+    playerName: string;
+}
+
+const TimerSelection = forwardRef<TimerSelectionRef, TimerSelectionProps>(
+    ({onUpdateStages, playerName}, ref) => { // expose the ref to the parent component
 
     //route params
     const {clock_type_id} = useLocalSearchParams();
-    
+    let clockTypeIdNumber = typeof clock_type_id === 'string' ? parseInt(clock_type_id) : clock_type_id; // convert clock id to int
+
     //functions for parent
     useImperativeHandle(ref, () => ({
         buildTimer
     }));
 
-    //
-    const timerBuilderRef = useRef(null);
+    //refs
+    const timerBuilderRef = useRef<TimerBuilderRef>(null);
 
     const [currentClockType, setCurrentClockType] = useState(() => {
         // ensure valid id passed in route
-        if (clock_type_id && PresetIdToTypes[clock_type_id]) {
-            return PresetIdToTypes[clock_type_id];
+        if (clockTypeIdNumber && PresetIdToTypes[clockTypeIdNumber]) {
+            return PresetIdToTypes[clockTypeIdNumber];
         }
-        return PresetTypes.FISCHER_INCREMENT; // by default use fischer increment timer type
+        return PresetTypes.FISCHER_INCREMENT;
     });
 
     //effects
     //update clock type when returning to page with different clock_type_id
     useEffect(() => {
-        if (clock_type_id && PresetIdToTypes[clock_type_id]) {
-            setCurrentClockType(PresetIdToTypes[clock_type_id]);
+        clockTypeIdNumber = typeof clock_type_id === 'string' ? parseInt(clock_type_id) : clock_type_id; // convert clock id to int
+
+        if (clockTypeIdNumber && PresetIdToTypes[clockTypeIdNumber]) {
+            setCurrentClockType(PresetIdToTypes[clockTypeIdNumber]);
         }
     }, [clock_type_id]);
 
@@ -51,8 +66,19 @@ const TimerSelection = forwardRef(({onUpdateStages, playerName}, ref) => { // ex
         });
     }
 
-    // render different builder components based on clock type
-    const TimerBuilderComponent = ClockTypeIdToBuilderComponent[currentClockType.id];
+    const TimerBuilderComponent = useMemo(() => {
+        return ClockTypeIdToBuilderComponent[currentClockType.id];
+    }, [currentClockType.id]);
+
+    // safety check before rendering
+    if (!TimerBuilderComponent) {
+        console.error(`No builder component found for clock type ID: ${currentClockType.id}`);
+        return (
+            <View style={styles.container}>
+                <Text>Builder component not available for {currentClockType.name}</Text>
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
@@ -75,7 +101,6 @@ const TimerSelection = forwardRef(({onUpdateStages, playerName}, ref) => { // ex
 });
 
 const styles = StyleSheet.create({
-
     container: {
         backgroundColor: Constants.COLORS.white,
         justifyContent: 'flex-start',
@@ -100,7 +125,7 @@ const styles = StyleSheet.create({
     clockTypeText: {
         fontFamily: Constants.FONTS.BASE_FONT_NAME,
         fontSize: Constants.SIZES.medium,
-        fontWeight: Constants.FONTS.regular,
+        fontWeight: Constants.FONTS.regular as TextStyle['fontWeight'],
         color: Constants.COLORS.white,
         marginRight: 15
     },

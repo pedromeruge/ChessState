@@ -1,14 +1,36 @@
 import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
-import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, Pressable, TextInput, Keyboard } from 'react-native'
+import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Keyboard, TextStyle } from 'react-native'
 import { useRouter } from 'expo-router';
 
 import * as Constants from '../constants/index.js';
 import * as Styles from '../styles/index.js';
+
 import IconComponent from './common/IconComponent.jsx';
 import ActionButton from './common/ActionButton.jsx';
 import Header from './common/Header.jsx';
+import { Time } from '../classes/timers_base/Preset.js';
 
-const NewTimerScreenBase = forwardRef(({
+interface NewTimerScreenBaseRef {
+    showScreen: () => void;
+    hideScreen: () => void;
+    titleText: string;
+    userHasInputTitle: boolean;
+}
+
+interface NewTimerScreenBaseProps {
+    onStart: () => void;
+    onClose: () => void;
+    onShowBaseTimePicker: () => void;
+    onShowIncrementPicker: () => void;
+    baseTime: Time;
+    increment: Time;
+    titleText: string;
+    setTitleText: (text: string) => void;
+    onLayout: (layout: { width: number; height: number }) => void;
+}
+
+const NewTimerScreenBase = forwardRef<NewTimerScreenBaseRef, NewTimerScreenBaseProps>(
+    ({
         onStart,
         onClose, 
         onShowBaseTimePicker, 
@@ -18,24 +40,24 @@ const NewTimerScreenBase = forwardRef(({
         titleText, 
         setTitleText, 
         onLayout}
-        , ref) => { // expose the ref to the parent component
+    , ref) => {
     
     const router = useRouter();
 
     //state
-    const [isKeyboardVisible, setIsKeyboardVisible] = useState(false); // state to alter container layout when keyboard is visible
-    const [userHasInputTitle, setUserHasInputTitle] = useState(false); // track if user has input a title, to manage auto-suggestions
+    const [isKeyboardVisible, setIsKeyboardVisible] = useState<boolean>(false); // state to alter container layout when keyboard is visible
+    const [userHasInputTitle, setUserHasInputTitle] = useState<boolean>(false); // track if user has input a title, to manage auto-suggestions
 
-    const showScreen = () => {
+    const showScreen = () : void => {
         setIsKeyboardVisible(false);
     }
 
-    const hideScreen = () => {
+    const hideScreen = () : void => {
         Keyboard.dismiss();
         setIsKeyboardVisible(false);
     }
-    
-    const handleKeyboardInputEnd = () => {
+
+    const handleKeyboardInputEnd = () : void => {
         setIsKeyboardVisible(false);
         if (titleText !== '') { // if the user has stopped typing, and there is text, then the user has input a title
             setUserHasInputTitle(true);
@@ -168,9 +190,10 @@ const styles = StyleSheet.create({
     moreOptionsButtonText: {
         fontFamily: Constants.FONTS.BASE_FONT_NAME,
         fontSize: Constants.SIZES.medium,
-        fontWeight: Constants.FONTS.regular,
+        fontWeight: Constants.FONTS.regular as TextStyle['fontWeight'],
         color: Constants.COLORS.contrast_blue_light,
     }
 });
 
 export default NewTimerScreenBase;
+export {NewTimerScreenBaseRef}

@@ -1,16 +1,15 @@
 import { useState, useEffect, useRef, forwardRef, useImperativeHandle, useCallback, useReducer, useMemo } from 'react';
-import { SafeAreaView, ScrollView, View, StyleSheet, TextInput, Image, Text } from 'react-native'
+import { SafeAreaView, ScrollView, View, StyleSheet, TextInput, Image, Text, TextStyle } from 'react-native'
 import { router} from 'expo-router';
 
 import * as Constants from '../../../../constants/index.js';
 import * as Styles from '../../../../styles/index.js';
-import { Time, Stage, Timer, Preset } from '../../../../classes/Preset.js';
-import { FischerIncrementStage, FischerIncrementTimer } from '../../../../classes/Preset.js';
+import { Time, Stage, Timer, Preset } from '../../../../classes/timers_base/Preset.js';
 import Header from '../../../../components/common/Header.jsx';
 import ActionButton from '../../../../components/common/ActionButton.jsx';
 import storage from '../../../../classes/Storage.js';
-import TabNavigator from '../../../../components/TabNavigator.jsx';
-import TimerSelection from '../../../../components/play_tab/new_timer/TimerSelection.jsx';
+import TabNavigator from '../../../../components/TabNavigator';
+import TimerSelection from '../../../../components/play_tab/new_timer/TimerSelection';
 
 const Stages = ({}) => { // expose the ref to the parent component
 
@@ -174,7 +173,7 @@ const styles = StyleSheet.create({
     titleSectionText: {
         fontFamily: Constants.FONTS.BASE_FONT_NAME,
         fontSize: Constants.SIZES.large,
-        fontWeight: Constants.FONTS.medium,
+        fontWeight: Constants.FONTS.medium as TextStyle['fontWeight'],
         color: Constants.COLORS.text_grey,
     },
 

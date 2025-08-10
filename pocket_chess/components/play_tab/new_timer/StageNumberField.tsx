@@ -6,7 +6,21 @@ import * as Styles from '../../../styles/index.js';
 
 import IconComponent from '../../common/IconComponent.jsx';
 
-export default StageNumberField = forwardRef(({icon, title, onChange=null, maxLength=4, iconSize=12}, ref) => {
+interface StageNumberFieldRef {
+  getNumber: () => number;
+  reset: () => void;
+}
+
+interface StageNumberFieldProps {
+  icon: any;
+  title: string;
+  onChange?: (time: any) => void;
+  maxLength?: number; // max size of number input
+  iconSize?: number;
+}
+
+const StageNumberField = forwardRef<StageNumberFieldRef, StageNumberFieldProps>(
+    ({icon, title, onChange=null, maxLength=4, iconSize=12}, ref) => {
 
     //functions for parent
     useImperativeHandle(ref, () => ({
@@ -54,3 +68,7 @@ export default StageNumberField = forwardRef(({icon, title, onChange=null, maxLe
         </TouchableOpacity>
     )
 });
+
+export default StageNumberField;
+
+export type { StageNumberFieldRef };

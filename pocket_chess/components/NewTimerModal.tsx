@@ -2,37 +2,48 @@ import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 're
 import { SafeAreaView, View, StyleSheet, Modal, Pressable} from 'react-native'
 
 import * as Constants from '../constants/index.js';
-import NewTimerScreenBase from './NewTimerScreenBase.jsx';
-import NewTimerScreenPicker from './NewTimerScreenPicker.jsx';
-import { Time, Preset } from '../classes/Preset.js';
-import { FischerIncrementStage, FischerIncrementTimer } from '../classes/Preset.js';
+import NewTimerScreenBase, {NewTimerScreenBaseRef} from './NewTimerScreenBase';
+import NewTimerScreenPicker, {NewTimerScreenPickerRef} from './NewTimerScreenPicker';
+import { Time, Preset } from '../classes/timers_base/Preset.js';
+import { FischerIncrementStage, FischerIncrementTimer } from '../classes/timers_base/Preset.js';
 import {router} from 'expo-router'
+import storage from '../classes/Storage';
 
-const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the parent component
+interface NewTimerModalRef {
+    showModal: () => void;
+    hideModal: () => void;
+}
+
+interface NewTimerModalProps {
+    onSubmit: (presets: any) => void;
+}
+
+const NewTimerModal = forwardRef<NewTimerModalRef, NewTimerModalProps>(
+    ({onSubmit}, ref) => { // expose the ref to the parent component
 
     //state of modal
-    const [visible, setVisible] = useState(false); // state to show/hide the modal
-    const [baseTimePickerVisible, setBaseTimePickerVisible] = useState(false);
-    const [incrementPickerVisible, setIncrementPickerVisible] = useState(false);
+    const [visible, setVisible] = useState<boolean>(false); // state to show/hide the modal
+    const [baseTimePickerVisible, setBaseTimePickerVisible] = useState<boolean>(false);
+    const [incrementPickerVisible, setIncrementPickerVisible] = useState<boolean>(false);
 
-    const [modalSize, setModalSize] = useState({ width: 0, height: 0 }); // width and height of the modal, to keep consistent across modal sections
-    const [baseTime, setBaseTime] = useState(new Time()); // track base time
-    const [incrementTime, setIncrementTime] = useState(new Time()); // track increment time
-    const [titleText, setTitleText] = useState('');
+    const [modalSize, setModalSize] = useState<{ width: number, height: number }>({ width: 0, height: 0 }); // width and height of the modal, to keep consistent across modal sections
+    const [baseTime, setBaseTime] = useState<Time>(new Time()); // track base time
+    const [incrementTime, setIncrementTime] = useState<Time>(new Time()); // track increment time
+    const [titleText, setTitleText] = useState<string>('');
 
     // refs for the time picker roulettes for base time and increment
-    const startScreenRef = useRef(null);
-    const baseTimePickerRef = useRef(null);
-    const incrementPickerRef = useRef(null);
-    
-    const showModal = () => {
+    const startScreenRef = useRef<NewTimerScreenBaseRef>(null);
+    const baseTimePickerRef = useRef<NewTimerScreenPickerRef>(null);
+    const incrementPickerRef = useRef<NewTimerScreenPickerRef>(null);
+
+    const showModal = () : void => {
         setVisible(true);
         startScreenRef.current?.showScreen();
         baseTimePickerRef.current?.hideScreen();
         incrementPickerRef.current?.hideScreen();
     }
 
-    const hideModal = () => {
+    const hideModal = () : void => {
         setVisible(false);
         startScreenRef.current?.hideScreen();
         baseTimePickerRef.current?.hideScreen();
@@ -46,28 +57,28 @@ const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the
         hideModal
     }));
 
-    const showBaseTimePicker = () => {
+    const showBaseTimePicker = () : void => {
         startScreenRef.current?.hideScreen();
         setBaseTimePickerVisible(true);
     }
 
-    const showIncrementPicker = () => {
+    const showIncrementPicker = () : void => {
         setIncrementPickerVisible(true);
     }
     
     // hide base time picker or increment picker
-    const hideTimePicker = () => {
+    const hideTimePicker = () : void => {
         setBaseTimePickerVisible(false);
         setIncrementPickerVisible(false);
     }
 
-    const resetParameters = () => {
+    const resetParameters = () : void => {
         setBaseTime(new Time());
         setIncrementTime(new Time());
         setTitleText('');
     }
 
-    const onStartPreset = () => {
+    const onStartPreset = () : void => {
         const newPreset = Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(baseTime, incrementTime)]), titleText, true);
         const customPresets = storage.getCustomPresets();
 
@@ -85,6 +96,11 @@ const NewTimerModal = forwardRef(({onSubmit}, ref) => { // expose the ref to the
             params: {preset_id: newPreset.id}
         });
     }
+
+    // ✅ Add debugging for visibility changes
+    useEffect(() => {
+        console.log('NewTimerModal visible state changed to:', visible);
+    }, [visible]);
 
     // auto-suggest title based on input time
     useEffect(() => {
@@ -161,3 +177,4 @@ const styles = StyleSheet.create({
 });
 
 export default NewTimerModal;
+export type { NewTimerModalRef };

@@ -1,10 +1,27 @@
 import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { SafeAreaView, View, StyleSheet, Modal, Pressable} from 'react-native'
-
+import {Time} from '../classes/timers_base/Preset.js';
 import * as Constants from '../constants/index.js';
-import NewTimerScreenPicker from './NewTimerScreenPicker.jsx';
+import NewTimerScreenPicker from './NewTimerScreenPicker';
 
-const ModalTimerPicker = forwardRef(({time, setTime, hideHours=false, fullScreen=true, headerText="", headerLeftIcon=null, headerRightIcon=null}, ref) => { // expose the ref to the parent component
+interface ModalTimerPickerRef {
+    showModal: () => void;
+    hideModal: () => void;
+    getTime: () => Time;
+}
+
+interface ModalTimerPickerProps {
+    time: Time;
+    setTime: (time: Time) => void;
+    hideHours?: boolean;
+    fullScreen?: boolean;
+    headerText?: string;
+    headerLeftIcon?: any;
+    headerRightIcon?: any;
+}
+
+const ModalTimerPicker = forwardRef<ModalTimerPickerRef, ModalTimerPickerProps>(
+    ({time, setTime, hideHours=false, fullScreen=true, headerText="", headerLeftIcon=null, headerRightIcon=null}, ref) => { // expose the ref to the parent component
 
     //state of modal
     const [visible, setVisible] = useState(false); // state to show/hide the modal
@@ -73,3 +90,4 @@ const styles = StyleSheet.create({
 });
 
 export default ModalTimerPicker;
+export type { ModalTimerPickerRef };

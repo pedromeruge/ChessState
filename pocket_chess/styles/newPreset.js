@@ -98,6 +98,13 @@ const style = StyleSheet.create({
         paddingBottom: 0,
         paddingTop: 0,
         borderColor: Constants.COLORS.line_light_grey,
+    },
+
+    addStageContainer: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        columnGap: '2%'
     }
 });
 

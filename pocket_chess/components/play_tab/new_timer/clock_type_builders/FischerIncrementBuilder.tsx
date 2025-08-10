@@ -1,23 +1,31 @@
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable, TextInput, Keyboard } from 'react-native'
 
-import * as Constants from '../../../constants/index.js';
-import * as Styles from '../../../styles/index.js';
+import * as Constants from '../../../../constants/index.js';
+import * as Styles from '../../../../styles/index.js';
 
-import IconComponent from '../../common/IconComponent.jsx';
-import { Time, Stage, Timer, Preset, FischerIncrementStage, FischerIncrementTimer } from '../../../classes/Preset.js';
-import StageNumberField from './StageNumberField.jsx';
-import StageTimerField from './StageTimerField.jsx';
-import StageAddButton from './StageAddButton.jsx';
-import DisplayStages from './DisplayStages.jsx';
+import IconComponent from '../../../common/IconComponent.jsx';
+import { Time } from '../../../../classes/timers_base/Preset.js';
+import { FischerIncrementStage, FischerIncrementTimer} from '../../../../classes/timers_clock_types/FischerIncrement.js';
+import StageNumberField, {StageNumberFieldRef} from '../StageNumberField';
+import StageTimeField, {StageTimeFieldRef} from '../StageTimeField';
+import StageAddButton from '../StageAddButton';
+import DisplayStages, {DisplayStagesRef} from '../DisplayStages';
+import { TimerBuilderProps, TimerBuilderRef } from '../../../../classes/types/TimerBuilderTypes.js';
 
-const FischerIncrementBuilder = forwardRef(({onUpdateStages}, ref) => {
+// Specific interface for Fischer Increment Builder
+interface FischerIncrementBuilderRef extends TimerBuilderRef {
+  buildTimer: (playerName: string) => FischerIncrementTimer;
+}
+
+const FischerIncrementBuilder = forwardRef<FischerIncrementBuilderRef, TimerBuilderProps>(
+    ({onUpdateStages}, ref) => {
     
     // refs
-    const displayStagesRef = useRef(null); // ref for displaying the stages of this builder
-    const baseTimeFieldRef = useRef(null);
-    const incrementFieldRef = useRef(null);
-    const movesFieldRef = useRef(null);
+    const displayStagesRef = useRef<DisplayStagesRef>(null); // ref for displaying the stages of this builder
+    const baseTimeFieldRef = useRef<StageTimeFieldRef>(null);
+    const incrementFieldRef = useRef<StageTimeFieldRef>(null);
+    const movesFieldRef = useRef<StageNumberFieldRef>(null);
 
     // funcs for parent
     useImperativeHandle(ref, () => ({ // expose functions to the parent component
@@ -25,14 +33,14 @@ const FischerIncrementBuilder = forwardRef(({onUpdateStages}, ref) => {
     }));
 
     // state
-    const [isBaseTimeDefault, setIsBaseTimeDefault] = useState(true);
+    const [isBaseTimeDefault, setIsBaseTimeDefault] = useState<boolean>(true);
 
-    const checkBaseTimeDefault = (time) => {
+    const checkBaseTimeDefault = (time: Time): void => {
         setIsBaseTimeDefault(time.isDefault());
     }
 
     //other funcs
-    const addStage = () => {
+    const addStage = (): void => {
         const newStage = new FischerIncrementStage(
             baseTimeFieldRef.current?.getTime(),
             incrementFieldRef.current?.getTime(),
@@ -48,9 +56,13 @@ const FischerIncrementBuilder = forwardRef(({onUpdateStages}, ref) => {
 
         setIsBaseTimeDefault(true); // reset base time default state
     }
-    
-    const buildTimer = (playerName) => {
-        return new FischerIncrementTimer(displayStagesRef.current?.getStages(), playerName);
+
+    const buildTimer = (playerName: string): FischerIncrementTimer => {
+        const stages = (displayStagesRef.current?.getStages() as FischerIncrementStage[]) || [];
+        if (stages.length === 0) {
+            throw new Error("No stages available to build FischerIncrementTimer");
+        }
+        return new FischerIncrementTimer(stages, playerName);
     }
 
     return (
@@ -59,14 +71,14 @@ const FischerIncrementBuilder = forwardRef(({onUpdateStages}, ref) => {
                 <View style={Styles.newPreset.sectionTitleContainer}>
                     <Text style={Styles.newPreset.sectionTitleText}>Add stage</Text>
                 </View>
-                <View style={styles.addStageContainer}>
-                    <StageTimerField
+                <View style={Styles.newPreset.addStageContainer}>
+                    <StageTimeField
                         ref={baseTimeFieldRef}
                         icon={Constants.icons.clock_full}
                         title="Base Time"
                         onChange={checkBaseTimeDefault}
                     />
-                    <StageTimerField
+                    <StageTimeField
                         ref={incrementFieldRef}
                         icon={Constants.icons.plus_thick}
                         title="Increment"
@@ -85,14 +97,5 @@ const FischerIncrementBuilder = forwardRef(({onUpdateStages}, ref) => {
     )
 });
 
-const styles = StyleSheet.create({
-
-    addStageContainer: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        columnGap: '2%'
-    },
-});
-
-export {FischerIncrementBuilder}
+export default FischerIncrementBuilder;
+export type { FischerIncrementBuilderRef };
