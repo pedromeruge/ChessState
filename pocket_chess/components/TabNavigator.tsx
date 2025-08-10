@@ -3,7 +3,7 @@ import { View, Text, TextStyle } from 'react-native'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationContainer, NavigationIndependentTree} from '@react-navigation/native';
 
-import * as Constants from '../constants/index.js';
+import * as Constants from '../constants/index';
 import IconComponent from './common/IconComponent.jsx';
 import {tabStyles} from './common/styles.jsx';
 

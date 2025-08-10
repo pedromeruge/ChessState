@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable, TextInput, Keyboard } from 'react-native'
 
-import * as Constants from '../../../../constants/index.js';
+import * as Constants from '../../../../constants/index';
 import * as Styles from '../../../../styles/index.js';
 
 import IconComponent from '../../../common/IconComponent.jsx';
-import { Time } from '../../../../classes/timers_base/Preset.js';
-import { FischerIncrementStage, FischerIncrementTimer} from '../../../../classes/timers_clock_types/FischerIncrement.js';
+import { Time } from '../../../../classes/timers_base/Preset';
+import { FischerIncrementStage, FischerIncrementTimer} from '../../../../classes/timers_clock_types/FischerIncrement';
 import StageNumberField, {StageNumberFieldRef} from '../StageNumberField';
 import StageTimeField, {StageTimeFieldRef} from '../StageTimeField';
 import StageAddButton from '../StageAddButton';

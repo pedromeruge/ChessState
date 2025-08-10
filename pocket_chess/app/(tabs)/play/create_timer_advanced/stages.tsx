@@ -2,40 +2,52 @@ import { useState, useEffect, useRef, forwardRef, useImperativeHandle, useCallba
 import { SafeAreaView, ScrollView, View, StyleSheet, TextInput, Image, Text, TextStyle } from 'react-native'
 import { router} from 'expo-router';
 
-import * as Constants from '../../../../constants/index.js';
+import * as Constants from '../../../../constants/index';
 import * as Styles from '../../../../styles/index.js';
-import { Time, Stage, Timer, Preset } from '../../../../classes/timers_base/Preset.js';
+import Preset, { Stage, Timer } from '../../../../classes/timers_base/Preset';
 import Header from '../../../../components/common/Header.jsx';
 import ActionButton from '../../../../components/common/ActionButton.jsx';
-import storage from '../../../../classes/Storage.js';
+import storage from '../../../../classes/Storage';
 import TabNavigator from '../../../../components/TabNavigator';
-import TimerSelection from '../../../../components/play_tab/new_timer/TimerSelection';
+import TimerSelection, { TimerSelectionRef } from '../../../../components/play_tab/new_timer/TimerSelection';
 
 const Stages = ({}) => { // expose the ref to the parent component
 
+    //state
     const [title, setTitle] = useState(''); // title of the preset
-    const titleTextRef = useRef(''); // reference to the title input, used in textInput to prevent re-rendering, instead of using state directly
-
-    const [playersTimers, setplayersTimers] = useState(
+    
+    const [playersStages, setPlayersStages] = useState<{[key: string]: Stage[]}>(
         Object.fromEntries(Constants.PLAYER_NAMES.map(playerName => [playerName, []])) // dictionary where key is player and value is timers array
     );
 
+    //refs
+    // create refs for each player tab
+    const playerRefsArray = Constants.PLAYER_NAMES.map(() => useRef<TimerSelectionRef>(null));
+    const playerRefs = useMemo(() => 
+        Object.fromEntries(
+            Constants.PLAYER_NAMES.map((playerName, index) => [playerName, playerRefsArray[index]])
+        ), []
+    );
+
+    const titleTextRef = useRef(''); // reference to the title input, used in textInput to prevent re-rendering, instead of using state directly
+    
+    //callbacks
     const updateStages = useCallback((player: string, stages: Stage[]) => {
-        setplayersTimers(prev => ({
+        setPlayersStages(prev => ({
             ...prev,
             [player]: stages
-          }));
+        }));
     }, []);
 
     const allPlayersHaveStages = useCallback(() =>  {
-        return Object.values(playersTimers)
+        return Object.values(playersStages)
             .every(playerStages => playerStages?.length > 0
         );
-    }, [playersTimers]);
+    }, [playersStages]);
 
     const resetParameters = () => {
         setTitle('');
-        setplayersTimers(Object.fromEntries(Constants.PLAYER_NAMES.map(playerName => [playerName, []]))); // dictionary where key is player and value is empty array
+        setPlayersStages(Object.fromEntries(Constants.PLAYER_NAMES.map(playerName => [playerName, []]))); // dictionary where key is player and value is empty array
         titleTextRef.current = '';
     }
 
@@ -43,7 +55,12 @@ const Stages = ({}) => { // expose the ref to the parent component
 
         const title = titleTextRef.current;
 
-        const newPreset = new Preset(playersTimers, title, true);
+        const playerTimers: Timer[] = Object.entries(playerRefs).map(([playerName, ref]: [string, React.RefObject<TimerSelectionRef>]) => {
+            const timer = (ref.current?.buildTimer(playerName)); // build timer for each player using the TimerSelection component
+            return timer;
+        });
+
+        const newPreset = new Preset(playerTimers, title, true);
         storage.addCustomPreset(newPreset);
 
         // reset input parameters
@@ -88,13 +105,13 @@ const Stages = ({}) => { // expose the ref to the parent component
                             <TabNavigator 
                                 tabs = {
                                     Object.fromEntries(
-                                        Object.keys(playersTimers).map((playerName) => 
-                                            [playerName, (props) => <TimerSelection {...props} playerName={playerName} onUpdateStages={(stages: Stage[]) => updateStages(playerName, stages)}/>]
+                                        Object.keys(playersStages).map((playerName) => 
+                                            [playerName, (props) => <TimerSelection {...props} ref={playerRefs[playerName]} playerName={playerName} onUpdateStages={(stages: Stage[]) => updateStages(playerName, stages)}/>]
                                         ))
                                 }
                                 icons = {
                                     Object.fromEntries(
-                                        Object.keys(playersTimers).map((playerName, idx) =>
+                                        Object.keys(playersStages).map((playerName, idx) =>
                                             [playerName, idx === 0 ? Constants.icons.pawn : Constants.icons.pawn_full] // assign pawn_full icon to all players except the first one
                                         )
                                     )

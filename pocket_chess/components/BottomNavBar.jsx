@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet,View, } from 'react-native';
 
-import * as Constants from '../constants/index.js';
+import * as Constants from '../constants/index';
 import IconComponent from './common/IconComponent.jsx';
 import { BottomNavBarItem } from './BottomNavBarItem.jsx';
 import Animated, { useAnimatedStyle, withSpring, withDecay, withTiming, useSharedValue } from 'react-native-reanimated';

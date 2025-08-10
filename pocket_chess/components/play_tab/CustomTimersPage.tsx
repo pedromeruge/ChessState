@@ -8,7 +8,7 @@ import TimerPresetSection from './TimerPresetSection';
 import NewTimerModal, {NewTimerModalRef} from '../NewTimerModal';
 import storage from '../../classes/Storage';
 import SmallActionButton from '../common/SmallActionButton';
-import { Preset } from '../../classes/timers_base/Preset';
+import Preset from '../../classes/timers_base/Preset';
 
 
 const CustomTimersPage = () => {
@@ -27,8 +27,8 @@ const CustomTimersPage = () => {
     console.log("TODO edit presets");
   }
 
-  function onSubmitNewPreset(newCustomPresets: [Preset]) : void {
-    setCustomPresets({...newCustomPresets});
+  function onSubmitNewPreset() : void {
+    setCustomPresets(storage.getCustomPresets());
     modalRef.current?.hideModal();
   }
 

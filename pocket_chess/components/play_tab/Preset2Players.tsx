@@ -5,7 +5,7 @@ import * as Constants from '../../constants';
 import IconComponent from '../common/IconComponent.jsx';
 import ActionIcon from '../common/ActionIcon';
 import { router } from 'expo-router';
-import { Time, Stage, Timer, Preset } from '../../classes/timers_base/Preset.js';
+import { Time, Stage, Timer, Preset } from '../../classes/timers_base/Preset';
 import { Animated } from 'react-native';
 
 // screen where a timer is played, with two regions where players can press to trigger their timers

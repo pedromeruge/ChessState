@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Pressable, TextInput, Keyboard, TextStyle } from 'react-native'
 
-import * as Constants from '../../../constants/index.js';
+import * as Constants from '../../../constants/index';
 import * as Styles from '../../../styles/index.js';
 
 import IconComponent from '../../common/IconComponent.jsx';
-// import { Stage } from '../../../classes/Preset.js';
+// import { Stage } from '../../../classes/Preset';
 
 // Define interfaces for TypeScript
 interface DisplayStagesRef {

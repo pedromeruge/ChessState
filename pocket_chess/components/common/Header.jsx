@@ -1,6 +1,6 @@
 import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, Pressable, TextInput, Keyboard } from 'react-native'
-import * as Constants from '../../constants/index.js';
+import * as Constants from '../../constants/index';
 import IconComponent from './IconComponent.jsx';
 import { router } from 'expo-router';
 

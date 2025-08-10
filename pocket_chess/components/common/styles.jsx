@@ -1,4 +1,4 @@
-import * as Constants from '../../constants/index.js';
+import * as Constants from '../../constants/index';
 import {StyleSheet} from 'react-native'
 
 const tabStyles = StyleSheet.create({

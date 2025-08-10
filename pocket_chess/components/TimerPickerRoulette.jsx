@@ -7,8 +7,8 @@ import { LinearGradient } from "expo-linear-gradient"; // or `import LinearGradi
 import { Audio } from "expo-av"; // for audio feedback (click sound as you scroll)
 import * as Haptics from "expo-haptics"; // for haptic feedback
 
-import * as Constants from '../constants/index.js';
-import { Time } from '../classes/timers_base/Preset.js';
+import * as Constants from '../constants/index';
+import { Time } from '../classes/timers_base/Preset';
 
 //based on https://www.npmjs.com/package/react-native-time-picker
 const TimerPickerRoulette = ({time, setTime, hideHours=false}) => {

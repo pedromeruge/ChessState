@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, Dimensions } from 'react-native'
-import * as Constants from '../../constants/index.js';
+import * as Constants from '../../constants/index';
 import TimerPreset from './TimerPreset.jsx';
 import IconComponent from '../common/IconComponent.jsx';
 import {LinearGradient} from 'expo-linear-gradient';

@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, TextStyle, TouchableOpacity, SafeAreaView, View
 import * as Constants from '../../../constants';
 import IconComponent from '../../common/IconComponent.jsx';
 import Header from '../../common/Header.jsx';
-import {PresetType, PresetTypes, PresetTypeSections} from '../../../classes/PresetTypes.js';
+import PresetType, { PresetTypes, PresetTypeSections} from '../../../classes/PresetType';
 import { ScrollView } from 'react-native';
 import { router } from 'expo-router';
 

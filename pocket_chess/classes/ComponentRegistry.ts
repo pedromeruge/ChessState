@@ -1,4 +1,4 @@
-import { PresetTypes } from './PresetTypes.js';
+import { PresetTypes } from './PresetType';
 import FischerIncrementBuilder from '../components/play_tab/new_timer/clock_type_builders/FischerIncrementBuilder';
 
 // import { SimpleDelayBuilder, BronsteinDelayBuilder, CumulativeIncrementBuilder, FixedMovesBuilder, HourglassBuilder } from '../components/play_tab/new_timer/ClockTypesStageBuilder.jsx';

@@ -2,13 +2,13 @@ import { useState, useRef, useEffect, forwardRef, useImperativeHandle, useMemo }
 import { View, Text, StyleSheet, TouchableOpacity, TextStyle } from 'react-native'
 import {router, useLocalSearchParams} from 'expo-router'
 
-import * as Constants from '../../../constants/index.js';
+import * as Constants from '../../../constants/index';
 import * as Styles from '../../../styles/index.js';
 
 import IconComponent from '../../common/IconComponent.jsx';
-import { PresetTypes, PresetIdToTypes } from '../../../classes/PresetTypes.js';
+import { PresetTypes, PresetIdToTypes } from '../../../classes/PresetType';
 import { ClockTypeIdToBuilderComponent } from '../../../classes/ComponentRegistry';
-import { Timer } from '../../../classes/timers_base/Preset.js';
+import { Timer } from '../../../classes/timers_base/Preset';
 import { TimerBuilderRef } from '../../../classes/types/TimerBuilderTypes.js';
 
 interface TimerSelectionRef{
@@ -25,7 +25,7 @@ const TimerSelection = forwardRef<TimerSelectionRef, TimerSelectionProps>(
 
     //route params
     const {clock_type_id} = useLocalSearchParams();
-    let clockTypeIdNumber = typeof clock_type_id === 'string' ? parseInt(clock_type_id) : clock_type_id; // convert clock id to int
+    let clockTypeIdNumber: number | null = typeof clock_type_id === 'string' ? parseInt(clock_type_id) : null; // convert clock id to int
 
     //functions for parent
     useImperativeHandle(ref, () => ({
@@ -46,7 +46,7 @@ const TimerSelection = forwardRef<TimerSelectionRef, TimerSelectionProps>(
     //effects
     //update clock type when returning to page with different clock_type_id
     useEffect(() => {
-        clockTypeIdNumber = typeof clock_type_id === 'string' ? parseInt(clock_type_id) : clock_type_id; // convert clock id to int
+        clockTypeIdNumber = typeof clock_type_id === 'string' ? parseInt(clock_type_id) : null; // convert clock id to int
 
         if (clockTypeIdNumber && PresetIdToTypes[clockTypeIdNumber]) {
             setCurrentClockType(PresetIdToTypes[clockTypeIdNumber]);
@@ -132,3 +132,4 @@ const styles = StyleSheet.create({
 });
 
 export default TimerSelection;
+export type { TimerSelectionRef };

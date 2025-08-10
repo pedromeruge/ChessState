@@ -1,4 +1,4 @@
-import { Timer } from '../timers_base/Preset.js';
+import { Timer } from '../timers_base/Preset';
 
 // props that all builders must receive
 export interface TimerBuilderProps {

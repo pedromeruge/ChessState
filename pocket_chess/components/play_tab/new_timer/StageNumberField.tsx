@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, TextInput} from 'react-native'
 import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 
-import * as Constants from '../../../constants/index.js';
+import * as Constants from '../../../constants/index';
 import * as Styles from '../../../styles/index.js';
 
 import IconComponent from '../../common/IconComponent.jsx';
@@ -12,7 +12,7 @@ interface StageNumberFieldRef {
 }
 
 interface StageNumberFieldProps {
-  icon: any;
+  icon: Constants.IconType;
   title: string;
   onChange?: (time: any) => void;
   maxLength?: number; // max size of number input

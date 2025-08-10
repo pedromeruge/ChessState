@@ -1,11 +1,11 @@
 import { View, Text, TouchableOpacity} from 'react-native'
 import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 
-import * as Constants from '../../../constants/index.js';
+import * as Constants from '../../../constants/index';
 import * as Styles from '../../../styles/index.js';
 
 import IconComponent from '../../common/IconComponent.jsx';
-import { Time} from '../../../classes/timers_base/Preset.js';
+import { Time} from '../../../classes/timers_base/Preset';
 import ModalTimerPicker from '../../ModalTimerPicker';
 
 interface StageTimeFieldRef {
@@ -14,7 +14,7 @@ interface StageTimeFieldRef {
 }
 
 interface StageTimeFieldProps {
-  icon: any;
+  icon: Constants.IconType;
   title: string;
   onChange?: (time: any) => void;
   hideHours?: boolean;

@@ -1,29 +1,65 @@
 import * as Constants from '../constants';
 
-import {MMKV} from 'react-native-mmkv';
-import { Preset, Time} from './timers_base/Preset.js';
-import { FischerIncrementStage, FischerIncrementTimer } from './timers_base/Preset.js';
-//initialize MMKV storage
+import { MMKV } from 'react-native-mmkv';
+import Preset, { PresetJSON } from './timers_base/Preset';
+import Time from './timers_base/Time';
+import { FischerIncrementStage, FischerIncrementTimer } from './timers_clock_types/FischerIncrement';
+
+// types for preset data structure
+interface PresetGroup {
+    icon: Constants.IconType;
+    iconColor: string;
+    title: string;
+    presets: Preset[];
+}
+
+interface PresetData {
+    [key: string]: PresetGroup;
+}
+
+// JSON representation of preset groups for storage
+interface PresetGroupJSON {
+    icon: Constants.IconType;
+    iconColor: string;
+    title: string;
+    presets: PresetJSON[];
+}
+
+interface PresetDataJSON {
+    [key: string]: PresetGroupJSON;
+}
+
+// initialize MMKV storage
 class Storage {
-    
+    private storage: MMKV;
+    private customTimers: PresetData;
+
     constructor() {
         this.storage = new MMKV();
-        this.#setup()
+        this.customTimers = {
+            "custom": {
+                "icon": Constants.icons.preset_custom,
+                "iconColor": Constants.COLORS.text_dark,
+                "title": "Custom",
+                "presets": []
+            }
+        };
+        this.#setup();
     }
 
-    #setup() {
+    #setup(): void {
         if (!this.storage.getBoolean('firstTime')) {
-            this.#initialSetup()
+            this.#initialSetup();
             this.storage.set('firstTime', true);
         }
     }
 
-    #initialSetup() {
-        this.#initialSetupTimers()
+    #initialSetup(): void {
+        this.#initialSetupTimers();
     }
 
-    #initialSetupTimers() {
-      const defaultPresets = {
+    #initialSetupTimers(): void {
+      const defaultPresets: PresetData = {
           "bullet": {
             "icon": Constants.icons.preset_bullet,
             "iconColor": Constants.COLORS.preset_blue,
@@ -100,75 +136,95 @@ class Storage {
       this.storage.set(Constants.storageNames.PRESETS.CUSTOM, JSON.stringify(this.customTimers, this.#serializePresetGroupFunc));
     }
 
-    #getObject(key) {
-        const value = this.storage.getString(key)
+    #getObject(key: string): PresetDataJSON | null {
+        const value = this.storage.getString(key);
         return value ? JSON.parse(value) : null;
     }
 
     //serialize a group of presets that belong to a section: standard, rapid, etc.
-    #serializePresetGroupFunc(key, value) {
+    #serializePresetGroupFunc(key: string, value: unknown): unknown {
       if (Array.isArray(value)) {
-        return value.map((item) => item instanceof Preset ? item.toJSON() : item);
+        return value.map((item) => {
+            // Check if item has toJSON method (is a Preset instance)
+            if (item && typeof item === 'object' && 'toJSON' in item && typeof item.toJSON === 'function') {
+                return item.toJSON();
+            }
+            return item;
+        });
       }
       return value;
-    };
+    }
 
     //get object with presets and layout data, for default or custom presets
-    #getPresets(key) {
-      const data = this.#getObject(key)
+    #getPresets(key: string): PresetData | null {
+      const data: PresetDataJSON | null = this.#getObject(key);
 
       if (data) {
+        const result: PresetData = {};
         Object.keys(data).forEach((category) => {
-            data[category].presets = data[category].presets.map((preset) => Preset.fromJSON(preset))
-        })
+          result[category] = {
+            icon: data[category].icon,
+            iconColor: data[category].iconColor,
+            title: data[category].title,
+            presets: data[category].presets.map((preset) => Preset.fromJSON(preset))
+          };
+        });
+        return result;
       }
-
-      return data
+      return null;
     }
 
     //get default presets
-    getDefaultPresets() {
-      return this.#getPresets(Constants.storageNames.PRESETS.DEFAULT)
+    getDefaultPresets(): PresetData | null {
+      return this.#getPresets(Constants.storageNames.PRESETS.DEFAULT);
     }
 
     //get custom presets
-    getCustomPresets() {
-      return this.#getPresets(Constants.storageNames.PRESETS.CUSTOM)
+    getCustomPresets(): PresetData | null {
+      return this.#getPresets(Constants.storageNames.PRESETS.CUSTOM);
     }
 
     //update custom presets in storage
-    setCustomPresets(newPresets) {
+    setCustomPresets(newPresets: PresetData): void {
       this.storage.set(Constants.storageNames.PRESETS.CUSTOM, JSON.stringify(newPresets, this.#serializePresetGroupFunc));
     }
 
-    getPreset(preset_id) {
+    getPreset(preset_id: string): Preset | null {
       const customPresets = this.getCustomPresets();
       const defaultPresets = this.getDefaultPresets();
 
-      const preset = customPresets.custom.presets.find((preset) => preset.id === preset_id);
-      if (preset) {
-          return preset;
+      if (customPresets) {
+        const preset = customPresets.custom.presets.find((preset) => preset.id === preset_id);
+        if (preset) {
+            return preset;
+        }
       }
 
-      const preset2 = Object.values(defaultPresets)
-                        .flatMap((presetGroup) => presetGroup.presets)
-                        .find((preset) => preset.id === preset_id);
+      if (defaultPresets) {
+        const preset2 = Object.values(defaultPresets)
+                          .flatMap((presetGroup: PresetGroup) => presetGroup.presets)
+                          .find((preset) => preset.id === preset_id);
 
-      console.log("All default preset ids: ", Object.values(defaultPresets).flatMap((presetGroup) => presetGroup.presets.map(p => p.id)));
-      console.log("All custom preset ids: ", customPresets.custom.presets.map(p => p.id));
+        // console.log("All default preset ids: ", Object.values(defaultPresets).flatMap((presetGroup: PresetGroup) => presetGroup.presets.map(p => p.id)));
+        
+        // if (customPresets) {
+        //   console.log("All custom preset ids: ", customPresets.custom.presets.map(p => p.id));
+        // }
 
-      if (preset2) {
-          return preset2;
+        if (preset2) {
+            return preset2;
+        }
       }
 
       return null;
     }
 
-    addCustomPreset(preset) {
+    addCustomPreset(preset: Preset): void {
         this.customTimers.custom.presets.push(preset);
         this.setCustomPresets(this.customTimers);
     }
 }
 
- export default storage = new Storage();
+const storage = new Storage();
+export default storage;
 

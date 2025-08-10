@@ -1,6 +1,6 @@
 import { Text, TouchableOpacity, StyleSheet, TextStyle} from 'react-native'
 
-import * as Constants from '../../../constants/index.js';
+import * as Constants from '../../../constants/index';
 
 import IconComponent from '../../common/IconComponent.jsx';
 

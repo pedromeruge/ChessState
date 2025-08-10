@@ -2,7 +2,7 @@ import { Slot, useRouter, usePathname } from 'expo-router';
 import { View, Text, ScrollView, StyleSheet, TextStyle, TouchableOpacity} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import * as Constants from '../../../constants/index.js';
+import * as Constants from '../../../constants/index';
 import IconComponent from '../../../components/common/IconComponent.jsx';
 import {tabStyles} from '../../../components/common/styles.jsx';
 

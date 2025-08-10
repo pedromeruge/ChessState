@@ -1,4 +1,4 @@
-import icons from "./icons";
+import icons, { IconType } from "./icons";
 import images from "./images";
 import sounds from "./sounds";
 import storageNames from "./storageNames";
@@ -8,5 +8,9 @@ import { COLORS, FONTS, SIZES, SHADOWS } from "./theme";
 export {
     icons, images, sounds, storageNames, 
     PLAYER_NAME_DEFAULT, PLAYER_NAMES, PLAY_TABS,
-    COLORS, FONTS, SIZES, SHADOWS 
+    COLORS, FONTS, SIZES, SHADOWS,
+};
+
+export type {
+    IconType
 };

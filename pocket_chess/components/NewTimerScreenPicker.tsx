@@ -1,10 +1,10 @@
 import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { SafeAreaView, View, StyleSheet, TouchableOpacity} from 'react-native'
-import * as Constants from '../constants/index.js';
+import * as Constants from '../constants/index';
 import IconComponent from './common/IconComponent.jsx';
 import TimerPickerRoulette from './TimerPickerRoulette.jsx';
 import Header from './common/Header.jsx';
-import { Time } from '../classes/timers_base/Preset.js';
+import { Time } from '../classes/timers_base/Preset';
 
 interface NewTimerScreenPickerRef {
     showScreen: () => void;

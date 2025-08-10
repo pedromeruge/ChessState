@@ -1,4 +1,4 @@
-export default {
+const icons = {
   pawn: require("../assets/icons/pawn.png"),
   scan: require("../assets/icons/qrcode.png"),
   storage: require("../assets/icons/box.png"),
@@ -48,3 +48,6 @@ export default {
   diamond: require("../assets/icons/diamond.png"),
   experimental: require("../assets/icons/experimental.png"),
 };
+
+export default icons;
+export type IconType = keyof typeof icons;

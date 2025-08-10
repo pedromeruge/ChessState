@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { SafeAreaView, View, StyleSheet, Modal, Pressable} from 'react-native'
 
-import * as Constants from '../constants/index.js';
+import * as Constants from '../constants/index';
 import NewTimerScreenBase, {NewTimerScreenBaseRef} from './NewTimerScreenBase';
 import NewTimerScreenPicker, {NewTimerScreenPickerRef} from './NewTimerScreenPicker';
-import { Time, Preset } from '../classes/timers_base/Preset.js';
-import { FischerIncrementStage, FischerIncrementTimer } from '../classes/timers_base/Preset.js';
+import Preset, { Time } from '../classes/timers_base/Preset';
+import { FischerIncrementStage, FischerIncrementTimer } from '../classes/timers_clock_types/FischerIncrement';
 import {router} from 'expo-router'
 import storage from '../classes/Storage';
 
@@ -15,7 +15,7 @@ interface NewTimerModalRef {
 }
 
 interface NewTimerModalProps {
-    onSubmit: (presets: any) => void;
+    onSubmit: () => void;
 }
 
 const NewTimerModal = forwardRef<NewTimerModalRef, NewTimerModalProps>(
@@ -80,12 +80,9 @@ const NewTimerModal = forwardRef<NewTimerModalRef, NewTimerModalProps>(
 
     const onStartPreset = () : void => {
         const newPreset = Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(baseTime, incrementTime)]), titleText, true);
-        const customPresets = storage.getCustomPresets();
+        storage.addCustomPreset(newPreset);
 
-        customPresets.custom.presets.push(newPreset);
-        storage.setCustomPresets(customPresets);
-
-        onSubmit(customPresets);
+        onSubmit();
 
         //reset input parameters
         resetParameters();

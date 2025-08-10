@@ -1,20 +1,29 @@
 
 /**
- * One stage in a timer. Normals timers have just one stage, but Fischer timers have multiple stages
- * @param {*} time - total time in miliseconds
- * @param {*} increment - increment per move in miliseconds
- * @param {*} moves - max moves, if null it's infinite
+ * Time class for representing hours, minutes, and seconds
+ * Used for timer durations and increments
+ * One stage in a timer. Normal timers have just one stage, but customization should allow for multiple stages, and some tournaments use different stage configurations
  */
 
-export class Time {
-    constructor(hours=0, minutes=0, seconds=0) {
+export interface TimeJSON {
+    hours: number;
+    minutes: number;
+    seconds: number;
+}
+
+export default class Time {
+    public hours: number;
+    public minutes: number;
+    public seconds: number;
+
+    constructor(hours: number = 0, minutes: number = 0, seconds: number = 0) {
         this.hours = hours;
         this.minutes = minutes;
         this.seconds = seconds;
     }
 
     // create a Time object from miliseconds
-    static fromMiliseconds(miliseconds) {
+    static fromMiliseconds(miliseconds: number): Time {
         const inSeconds = Math.ceil(miliseconds / 1000);
         const hours = Math.floor(inSeconds / (60 * 60));
         const minutes = Math.floor( (inSeconds % (60 * 60)) / 60);
@@ -22,28 +31,28 @@ export class Time {
         return new Time(hours, minutes, seconds);
     }
 
-    setHours(hours) {
+    setHours(hours: number): void {
         this.hours = hours;
     }
 
-    setMinutes(minutes) {
+    setMinutes(minutes: number): void {
         this.minutes = minutes;
     }
 
-    setSeconds(seconds) {
+    setSeconds(seconds: number): void {
         this.seconds = seconds;
     }
 
     //update time from miliseconds
-    setFromMiliseconds(miliseconds) {
+    setFromMiliseconds(miliseconds: number): void {
         const inSeconds = Math.ceil(miliseconds / 1000);
         this.hours = Math.floor(inSeconds / (60 * 60));
         this.minutes = Math.floor( (inSeconds % (60 * 60)) / 60);
         this.seconds = inSeconds % 60;
     }
 
-    toStringFieldsPad(incHours, incMinutes, incSeconds, padMinutes, padSeconds) {
-        let timeParts = []
+    toStringFieldsPad(incHours: boolean, incMinutes: boolean, incSeconds: boolean, padMinutes: boolean, padSeconds: boolean): string {
+        let timeParts: string[] = []
 
         if (incHours) {
             timeParts.push(this.hours.toString())
@@ -61,7 +70,7 @@ export class Time {
         return timeParts.join(":");
     }
 
-    static toStringCleanBoth(baseTime, increment, joiner="|") {
+    static toStringCleanBoth(baseTime: Time, increment: Time, joiner: string = "|"): string {
         
         let hourClause1 = baseTime.hours !== 0
         let hourClause2 = increment.hours !== 0
@@ -88,7 +97,7 @@ export class Time {
     }
 
     // IN WORK: separte attempt at simplyfying the string representation of time, by removing padding in minutes when hours are 0
-    toStringTimer() {
+    toStringTimer(): string {
         let result = ""
 
         if (this.hours) {
@@ -111,7 +120,7 @@ export class Time {
     }
 
     // two 0 padding on each field, but ignore hours if they are 0
-    toStringTimerSimple() {
+    toStringTimerSimple(): string {
         let result = ""
 
         if (this.hours) {
@@ -123,29 +132,29 @@ export class Time {
     }
 
     // include all fields, with two 0 padding
-    toStringComplete() {
+    toStringComplete(): string {
         return `${this.hours.toString().padStart(2, "0")}:` +
                 `${this.minutes.toString().padStart(2, "0")}:`+
                 `${this.seconds.toString().padStart(2, "0")}`;
     }
 
-    toStringMinSecs() {
+    toStringMinSecs(): string {
         return `${this.minutes.toString().padStart(2, "0")}:`+
                 `${this.seconds.toString().padStart(2, "0")}`; 
     }
 
-    toMiliseconds() {
+    toMiliseconds(): number {
         return (this.hours * 60 * 60 + 
                 this.minutes * 60 + 
                 this.seconds) * 1000;
     }
 
-    isDefault() {
+    isDefault(): boolean {
         return this.hours === 0 && this.minutes === 0 && this.seconds === 0;
     }
 
     //serialize object to JSON
-    toJSON() {
+    toJSON(): TimeJSON {
         return {
             hours: this.hours,
             minutes: this.minutes,
@@ -154,11 +163,11 @@ export class Time {
     }
 
     //deserialize object from JSON
-    static fromJSON(data) {
+    static fromJSON(data: TimeJSON): Time {
         return new Time(data.hours, data.minutes, data.seconds);
     }
 
-    clone() {
+    clone(): Time {
         return new Time(this.hours, this.minutes, this.seconds);
     }
 }

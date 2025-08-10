@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { SafeAreaView, View, StyleSheet, Modal, Pressable} from 'react-native'
-import {Time} from '../classes/timers_base/Preset.js';
-import * as Constants from '../constants/index.js';
+import {Time} from '../classes/timers_base/Preset';
+import * as Constants from '../constants/index';
 import NewTimerScreenPicker from './NewTimerScreenPicker';
 
 interface ModalTimerPickerRef {
