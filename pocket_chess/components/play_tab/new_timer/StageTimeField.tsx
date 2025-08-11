@@ -53,7 +53,7 @@ const StageTimeField = forwardRef<StageTimeFieldRef,StageTimeFieldProps>(
     return (
         <TouchableOpacity style={[Styles.newPreset.timeContainer]} onPress={showTimePicker}>
             <View style={Styles.newPreset.timeTitle}>
-                <IconComponent source={icon} width={iconSize} />
+                <IconComponent source={icon} width={iconSize} tintColor={Constants.COLORS.contrast_blue_light} />
                 <Text style={Styles.newPreset.timeTitleText}>{title}</Text>
             </View>
             <Text style={[Styles.newPreset.timeInput, {color: time.isDefault() ? Constants.COLORS.line_light_grey : Constants.COLORS.text_dark_2}]}>{time.toStringComplete()}</Text>

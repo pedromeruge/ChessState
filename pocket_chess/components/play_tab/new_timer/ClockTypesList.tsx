@@ -6,12 +6,20 @@ import IconComponent from '../../common/IconComponent.jsx';
 import Header from '../../common/Header.jsx';
 import PresetType, { PresetTypes, PresetTypeSections} from '../../../classes/PresetType';
 import { ScrollView } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 // screen where all clock types are listed
 
-const ClockTypesList = ({selected_clock_type_id}) => {
+const ClockTypesList = ({}) => {
 
+    const {clock_type_id, player_name} = useLocalSearchParams();
+
+    const selected_clock_type_id = typeof clock_type_id === 'string' ? Number(clock_type_id) : 
+                                   Array.isArray(clock_type_id) ? Number(clock_type_id[0]) : 1;
+
+    const playerName = typeof player_name === 'string' ? player_name : 
+                       Array.isArray(player_name) ? player_name[0] : '';
+                       
     const [expandedClockTypeId, setExpandedClockTypeId] = useState(null);
     const [selectedClockTypeId, setSelectedClockTypeId] = useState(Number(selected_clock_type_id)); // dont forget to convert string params to number for comparisons
 
@@ -29,10 +37,13 @@ const ClockTypesList = ({selected_clock_type_id}) => {
     }
     
     function onBack() {
-      router.back()
-      router.setParams({
-        clock_type_id: String(selectedClockTypeId)
-      })
+      router.dismissTo({
+        pathname: '/play/create_timer_advanced/stages',
+        params: { 
+          clock_type_id: String(selectedClockTypeId),
+          player_name: playerName
+        }
+    });
     }
     const clock_type_sections = {
       "popular": {

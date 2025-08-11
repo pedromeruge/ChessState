@@ -1,8 +1,8 @@
 import { PresetTypes } from '../PresetType';
-import { FischerIncrementTimer, FischerIncrementStage, FischerIncrementStageJSON, FischerIncrementTimerJSON } from '../timers_clock_types/FischerIncrement';
 import Timer, {TimerJSON} from '../timers_base/Timer';
 import Stage, {StageJSON} from '../timers_base/Stage';
-import { PresetTypeJSON } from '../PresetType';
+import { FischerIncrementTimer, FischerIncrementStage, FischerIncrementStageJSON, FischerIncrementTimerJSON } from '../timers_clock_types/FischerIncrement';
+import { SimpleDelayTimer, SimpleDelayStage, SimpleDelayStageJSON, SimpleDelayTimerJSON } from '../timers_clock_types/SimpleDelay';
 
 // Type interfaces for method parameters
 interface TimerJSONData extends TimerJSON {
@@ -13,16 +13,13 @@ interface StageJSONData extends StageJSON {
     [key: string]: any; // allow additional properties for specific stage types
 }
 
-// union type for all possible timer implementations
-type AnyTimer = FischerIncrementTimer; // | SimpleDelayTimer | OtherTimerTypes...
-
 export default class TimerFactory {
     static createTimerFromJSON(data: TimerJSONData): Timer {
         switch(data.presetTypeId) {
             case PresetTypes.FISCHER_INCREMENT.id:
                 return FischerIncrementTimer.fromJSON(data as FischerIncrementTimerJSON);
-            // case PresetTypes.SIMPLE_DELAY.id:
-                // return SimpleDelayTimer.fromJSON(data);
+            case PresetTypes.SIMPLE_DELAY.id:
+                return SimpleDelayTimer.fromJSON(data as SimpleDelayTimerJSON);
             default:
                 throw new Error(`Unknown preset type: ${data.presetType.id}`);
         }
@@ -32,8 +29,8 @@ export default class TimerFactory {
         switch(presetTypeId) {
             case PresetTypes.FISCHER_INCREMENT.id:
                 return FischerIncrementStage.fromJSON(data as FischerIncrementStageJSON);
-            // case PresetTypes.SIMPLE_DELAY.id:
-                // return SimpleDelayStage.fromJSON(data);
+            case PresetTypes.SIMPLE_DELAY.id:
+                return SimpleDelayStage.fromJSON(data as SimpleDelayStageJSON);
             default:
                 throw new Error(`Unknown preset type: ${presetTypeId}`);
         }

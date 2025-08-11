@@ -80,7 +80,7 @@ const NewTimerModal = forwardRef<NewTimerModalRef, NewTimerModalProps>(
 
     const onStartPreset = () : void => {
         const newPreset = Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(baseTime, incrementTime)]), titleText, true);
-        storage.addCustomPreset(newPreset);
+        storage.addCustomPreset(newPreset); 
 
         onSubmit();
 

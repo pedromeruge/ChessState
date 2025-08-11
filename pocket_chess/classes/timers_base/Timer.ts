@@ -1,5 +1,5 @@
 import * as Constants from '../../constants';
-import PresetType, { PresetTypes, PresetTypeJSON } from '../PresetType';
+import PresetType, { PresetTypes, PresetIdToTypes} from '../PresetType';
 import Stage, { StageJSON } from './Stage';
 
 export interface TimerJSON {
@@ -25,20 +25,20 @@ export default abstract class Timer {
      * @param playerName - name of the player assigned to this timer
      * @param currentStage - current stage index
      * @param currentStageTime - current stage time in miliseconds, if passed null becomes max stage time
-     * @param presetType - type of the preset, default is Fischer Increment
+     * @param presetTypeId - id of the type of preset, default is Fischer Increment's id
     */
     constructor(
         stages: Stage[], 
         playerName: string | null = null, 
         currentStage: number = 0, 
         currentStageTime: number | null = null, 
-        presetType: PresetType = PresetTypes.FISCHER_INCREMENT
+        presetTypeId: number = PresetTypes.FISCHER_INCREMENT.id
     ) {
         this.stages = stages;
         this.playerName = playerName ? playerName : Constants.PLAYER_NAME_DEFAULT;
         this.currentStage = currentStage;
         this.currentStageTime = currentStageTime ? currentStageTime : this.stages[currentStage].time.toMiliseconds(); // in miliseconds // decreases until reaching 0
-        this.presetType = presetType;
+        this.presetType = PresetIdToTypes[presetTypeId];
     }
 
     /**

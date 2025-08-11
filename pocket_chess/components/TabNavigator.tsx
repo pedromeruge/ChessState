@@ -17,12 +17,14 @@ interface TabNavigatorProps {
     icons: Record<string, any>;
     swipeEnabled?: boolean;
     callbacks?: Array<() => void>;
+    initialTabIndex?: number;
 }
 
 const TabNavigator = forwardRef<TabNavigatorRef,TabNavigatorProps>(
-    ({tabs, icons, swipeEnabled=true, callbacks=[]}, ref) => {
+    ({tabs, icons, swipeEnabled=true, callbacks=[], initialTabIndex=0}, ref) => {
     const Tab = createMaterialTopTabNavigator();
 
+    console.log("initial tab Index:", initialTabIndex)
     function MyTabs() {
         return (
             <NavigationIndependentTree>
@@ -39,7 +41,8 @@ const TabNavigator = forwardRef<TabNavigatorRef,TabNavigatorProps>(
                         tabBarPressColor: Constants.COLORS.transparent,
                         lazy: true,
                     }}
-                    
+                    initialRouteName={Object.keys(tabs)[initialTabIndex]}
+
                 >
                     {Object.entries(tabs).map(([tabName,TabComponent], index) => {
                         return (

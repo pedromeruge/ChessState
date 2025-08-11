@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextStyle } from 'react-native'
-import {router, useLocalSearchParams} from 'expo-router'
 
 import * as Constants from '../../../constants/index';
 import * as Styles from '../../../styles/index.js';
@@ -18,14 +17,12 @@ interface TimerSelectionRef{
 interface TimerSelectionProps {
     onUpdateStages: (stages: any) => void;
     playerName: string;
+    clockTypeId: number; // The clock type for this specific timer selection
+    onSelectClockTypeId: (clockTypeId: number) => void; // Callback when user wants to change clock type
 }
 
 const TimerSelection = forwardRef<TimerSelectionRef, TimerSelectionProps>(
-    ({onUpdateStages, playerName}, ref) => { // expose the ref to the parent component
-
-    //route params
-    const {clock_type_id} = useLocalSearchParams();
-    let clockTypeIdNumber: number | null = typeof clock_type_id === 'string' ? parseInt(clock_type_id) : null; // convert clock id to int
+    ({onUpdateStages, playerName, clockTypeId, onSelectClockTypeId}, ref) => { // expose the ref to the parent component
 
     //functions for parent
     useImperativeHandle(ref, () => ({
@@ -35,47 +32,29 @@ const TimerSelection = forwardRef<TimerSelectionRef, TimerSelectionProps>(
     //refs
     const timerBuilderRef = useRef<TimerBuilderRef>(null);
 
-    const [currentClockType, setCurrentClockType] = useState(() => {
-        // ensure valid id passed in route
-        if (clockTypeIdNumber && PresetIdToTypes[clockTypeIdNumber]) {
-            return PresetIdToTypes[clockTypeIdNumber];
-        }
-        return PresetTypes.FISCHER_INCREMENT;
-    });
+    const clockType = PresetIdToTypes[clockTypeId];
 
-    //effects
-    //update clock type when returning to page with different clock_type_id
-    useEffect(() => {
-        clockTypeIdNumber = typeof clock_type_id === 'string' ? parseInt(clock_type_id) : null; // convert clock id to int
-
-        if (clockTypeIdNumber && PresetIdToTypes[clockTypeIdNumber]) {
-            setCurrentClockType(PresetIdToTypes[clockTypeIdNumber]);
-        }
-    }, [clock_type_id]);
-
-
+    console.log("Timer selection got clock type:", clockType.name);
+    
     //other funcs
     const buildTimer = () => {
         return timerBuilderRef.current?.buildTimer(playerName);
     }
 
-    const showClockTypesScreen = () => {
-        router.push({
-            pathname: '/play/clock_types/clock_types_list',
-            params: {clock_type_id: currentClockType.id}
-        });
+    const showClockTypeIdsScreen = () => {
+        onSelectClockTypeId(clockTypeId);
     }
 
     const TimerBuilderComponent = useMemo(() => {
-        return ClockTypeIdToBuilderComponent[currentClockType.id];
-    }, [currentClockType.id]);
+        return ClockTypeIdToBuilderComponent[clockTypeId];
+    }, [clockTypeId]);
 
     // safety check before rendering
     if (!TimerBuilderComponent) {
-        console.error(`No builder component found for clock type ID: ${currentClockType.id}`);
+        console.error(`No builder component found for clock type ID: ${clockTypeId}`);
         return (
             <View style={styles.container}>
-                <Text>Builder component not available for {currentClockType.name}</Text>
+                <Text>Builder component not available for {clockType.name}</Text>
             </View>
         );
     }
@@ -83,13 +62,13 @@ const TimerSelection = forwardRef<TimerSelectionRef, TimerSelectionProps>(
     return (
         <View style={styles.container}>
             <View style={[Styles.newPreset.sectionContainer, {paddingBottom: 0}]}>
-                <TouchableOpacity style={[styles.clockTypeContainer]} onPress={showClockTypesScreen}>
+                <TouchableOpacity style={[styles.clockTypeIdContainer]} onPress={showClockTypeIdsScreen}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                         <IconComponent source={Constants.icons.clock_type} width={15} tintColor={Constants.COLORS.white} />
                         <Text style={[Styles.newPreset.sectionTitleText, {color: Constants.COLORS.white, marginLeft: 7}]}>Clock type</Text>
                     </View>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                        <Text style={styles.clockTypeText}>{currentClockType.name}</Text>
+                        <Text style={styles.clockTypeIdText}>{clockType.name}</Text>
                         <IconComponent source={Constants.icons.arrow_right} width={15} tintColor={Constants.COLORS.white} />
                     </View>
                 </TouchableOpacity>
@@ -110,7 +89,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
 
-    clockTypeContainer: {
+    clockTypeIdContainer: {
         width: '100%',
         flexDirection: 'row',
         minHeight: 40,
@@ -122,7 +101,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
     },
 
-    clockTypeText: {
+    clockTypeIdText: {
         fontFamily: Constants.FONTS.BASE_FONT_NAME,
         fontSize: Constants.SIZES.medium,
         fontWeight: Constants.FONTS.regular as TextStyle['fontWeight'],

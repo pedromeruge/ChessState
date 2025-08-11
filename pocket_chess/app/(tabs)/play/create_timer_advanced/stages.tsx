@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, forwardRef, useImperativeHandle, useCallback, useReducer, useMemo } from 'react';
 import { SafeAreaView, ScrollView, View, StyleSheet, TextInput, Image, Text, TextStyle } from 'react-native'
-import { router} from 'expo-router';
+import { router, useLocalSearchParams} from 'expo-router';
 
 import * as Constants from '../../../../constants/index';
 import * as Styles from '../../../../styles/index.js';
@@ -10,8 +10,12 @@ import ActionButton from '../../../../components/common/ActionButton.jsx';
 import storage from '../../../../classes/Storage';
 import TabNavigator from '../../../../components/TabNavigator';
 import TimerSelection, { TimerSelectionRef } from '../../../../components/play_tab/new_timer/TimerSelection';
+import PresetType, { PresetTypes, PresetIdToTypes } from '../../../../classes/PresetType';
 
 const Stages = ({}) => { // expose the ref to the parent component
+
+    //route params
+    const {clock_type_id, player_name} = useLocalSearchParams();
 
     //state
     const [title, setTitle] = useState(''); // title of the preset
@@ -19,6 +23,41 @@ const Stages = ({}) => { // expose the ref to the parent component
     const [playersStages, setPlayersStages] = useState<{[key: string]: Stage[]}>(
         Object.fromEntries(Constants.PLAYER_NAMES.map(playerName => [playerName, []])) // dictionary where key is player and value is timers array
     );
+
+    // state to track clock type for each player separately
+    const [playersClockTypes, setPlayersClockTypes] = useState<{[key: string]: number}>(() => {
+        
+        // by default pass Fischer Increment clock to players
+        return Object.fromEntries(
+            Constants.PLAYER_NAMES.map(playerName => [playerName, PresetTypes.FISCHER_INCREMENT.id])
+        );
+    });
+
+    // track which player is currently selecting a clock type
+    const [initialTabIndex, setInitialTabIndex] = useState<number>(0);
+
+    //effects
+    // Handle clock type updates from the ClockTypesList screen
+    useEffect(() => {
+        
+        if (clock_type_id && player_name) {
+            const clockTypeIdNumber = typeof clock_type_id === 'string' ? parseInt(clock_type_id, 10) :
+                typeof clock_type_id === 'number' ? clock_type_id : null;
+            const playerNameString = player_name as string;
+
+            if (clockTypeIdNumber && PresetIdToTypes[clockTypeIdNumber]) {
+                setPlayersClockTypes(prev => ({
+                    ...prev,
+                    [playerNameString]: clockTypeIdNumber
+                }));
+
+                console.log(`Updated clock type for ${playerNameString} to:`, PresetIdToTypes[clockTypeIdNumber].name);
+            }
+
+            // clear the selecting player after update
+            setInitialTabIndex(Constants.PLAYER_NAMES.indexOf(playerNameString));
+        }
+    }, [clock_type_id, player_name]);
 
     //refs
     // create refs for each player tab
@@ -32,12 +71,25 @@ const Stages = ({}) => { // expose the ref to the parent component
     const titleTextRef = useRef(''); // reference to the title input, used in textInput to prevent re-rendering, instead of using state directly
     
     //callbacks
+    // handle change in stages for a specific player
     const updateStages = useCallback((player: string, stages: Stage[]) => {
         setPlayersStages(prev => ({
             ...prev,
             [player]: stages
         }));
     }, []);
+
+    // clock type selection for a specific player
+    const onSelectClockTypeForPlayer = (playerName: string, currentClockTypeId: number) => {
+        
+        router.push({
+            pathname: '/play/clock_types/clock_types_list',
+            params: {
+                clock_type_id: String(currentClockTypeId),
+                player_name: playerName
+            }
+        });
+    };
 
     const allPlayersHaveStages = useCallback(() =>  {
         return Object.values(playersStages)
@@ -48,6 +100,7 @@ const Stages = ({}) => { // expose the ref to the parent component
     const resetParameters = () => {
         setTitle('');
         setPlayersStages(Object.fromEntries(Constants.PLAYER_NAMES.map(playerName => [playerName, []]))); // dictionary where key is player and value is empty array
+        setPlayersClockTypes(Object.fromEntries(Constants.PLAYER_NAMES.map(playerName => [playerName, PresetTypes.FISCHER_INCREMENT.id]))); // reset clock types
         titleTextRef.current = '';
     }
 
@@ -106,7 +159,16 @@ const Stages = ({}) => { // expose the ref to the parent component
                                 tabs = {
                                     Object.fromEntries(
                                         Object.keys(playersStages).map((playerName) => 
-                                            [playerName, (props) => <TimerSelection {...props} ref={playerRefs[playerName]} playerName={playerName} onUpdateStages={(stages: Stage[]) => updateStages(playerName, stages)}/>]
+                                            [playerName, (props) => (
+                                                <TimerSelection 
+                                                    {...props} 
+                                                    ref={playerRefs[playerName]} 
+                                                    playerName={playerName} 
+                                                    onUpdateStages={(stages: Stage[]) => updateStages(playerName, stages)}
+                                                    clockTypeId={playersClockTypes[playerName]}
+                                                    onSelectClockTypeId={(clockTypeId: number) => onSelectClockTypeForPlayer(playerName, clockTypeId)}
+                                                />
+                                            )]
                                         ))
                                 }
                                 icons = {
@@ -117,8 +179,9 @@ const Stages = ({}) => { // expose the ref to the parent component
                                     )
                                 }
                                 swipeEnabled={false}
+                                initialTabIndex={initialTabIndex}
                             />
-                        ), [updateStages])
+                        ), [updateStages, playersClockTypes, onSelectClockTypeForPlayer, initialTabIndex])
                         }
                     </View>
                     {/* <View style={styles.separationLine}></View> */}
