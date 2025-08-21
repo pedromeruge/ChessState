@@ -5,8 +5,11 @@ import * as Constants from '../../constants';
 import IconComponent from '../common/IconComponent.jsx';
 import ActionIcon from '../common/ActionIcon';
 import { router } from 'expo-router';
-import { Time, Stage, Timer, Preset } from '../../classes/timers_base/Preset';
 import { Animated } from 'react-native';
+
+import Preset, { Time, Stage, Timer} from '../../classes/timers_base/Preset';
+import { isTimerWithMoves, isTimerWithLives, isTimerWithDelay, TimerWithMoves, TimerWithLives, TimerWithDelay } from '../../classes/types/TimerBuilderTypes';
+import { BronsteinDelayTimer } from '../../classes/timers_clock_types/BronsteinDelay';
 
 // screen where a timer is played, with two regions where players can press to trigger their timers
 
@@ -24,9 +27,10 @@ interface PlayerTouchableSectionProps {
 }
 
 const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isActive=false, paused=true, firstPlayer=false, started=false, lostGame=false, moreStyles=null}: PlayerTouchableSectionProps) => {
-  const [currentTime, setCurrentTime] = useState(timer.currentStageTime)
-  const [currentMoves, setCurrentMoves] = useState(timer.currentStageMoves);
-  const [currentStage, setCurrentStage] = useState(timer.currentStage);
+  const [currentTime, setCurrentTime] = useState<number | null>(timer.currentStageTime);
+  const [currentMoves, setCurrentMoves] = useState<number | null>(isTimerWithMoves(timer) ? timer.getCurrentStageMoves() : null);
+  const [currentStage, setCurrentStage] = useState<number | null>(timer.currentStage);
+  const [currentLives, setCurrentLives] = useState<number | null>(isTimerWithLives(timer) ? timer.getCurrentStageLives() : null);
 
   const intervalRef = useRef(null); // to store the interval reference
 
@@ -36,11 +40,9 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
       // discard first interaction as a move, because it is used to start the timer of the opponent player, it's not an actual move from black
       if (started) {
         timer.addMove(handleTimeout); // add move to the timer, if active (this also adds increment)
-        
-        // update react component state to trigger re-render
-        setCurrentMoves(timer.currentStageMoves);
-        setCurrentTime(timer.currentStageTime); // Update time in case increment was added
-        setCurrentStage(timer.currentStage);
+
+        //re-render component
+        updateTimerState();
       }
 
       onTurnEnd();
@@ -64,10 +66,8 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
           handleTimeout();
         });
 
-        // update react component state to trigger re-render
-        setCurrentTime(timeLeft);
-        setCurrentMoves(timer.currentStageMoves);
-        setCurrentStage(timer.currentStage);
+        // re-render component
+        updateTimerState(); 
 
       }, 100); // tracking updates in 100ms intervals, to account for mid-second stops of timer
       
@@ -80,9 +80,8 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
 
   // separate react component state sync when game restarts (which changes started) (could be added to the useEffect above, but this way it is more clear)
   useEffect(() => {
-    setCurrentTime(timer.currentStageTime);
-    setCurrentMoves(timer.currentStageMoves);
-    setCurrentStage(timer.currentStage);
+    // re-render component
+    updateTimerState();
   }, [started]);
   
   const handleTimeout = () => {
@@ -95,6 +94,24 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
     } else {
       onTurnEnd();
     }
+  }
+
+  // update timer state to force react re-render
+  function updateTimerState() {
+    // update time
+    setCurrentTime(timer.currentStageTime);
+    
+    // update moves
+    if (isTimerWithMoves(timer)) {
+      setCurrentMoves(timer.getCurrentStageMoves());
+    }
+
+    //update lives
+    if (isTimerWithLives(timer)) {
+      setCurrentLives(timer.getCurrentStageLives());
+    }
+    //update current stage
+    setCurrentStage(timer.currentStage);
   }
 
   return (
@@ -111,17 +128,33 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
               })}
             </View>
           )}
-          {timer.stages[currentStage]?.moves && ( // only show moves if there is a defined limit for the stage
-            <View style={styles.movesContainer}>
+          {/*conditionally show moves if timer supports it */}
+          {(isTimerWithMoves(timer) && timer.getCurrentStageMoves()) && ( // only show moves if there is a defined limit for the stage
+            <View style={styles.headerSectionContainer}>
               <IconComponent source={Constants.icons.pawn_full} width={14} tintColor={Constants.COLORS.white}/>
               <Text style={[styles.normalText, {marginLeft: 5}]}>
                 {currentMoves}
               </Text>
             </View>
           )}
+          {/*conditionally show lives if timer supports it */}
+          {(isTimerWithLives(timer) && timer.getCurrentStageLives()) && (
+            <View style={styles.headerSectionContainer}>
+              <IconComponent source={Constants.icons.heart_full} width={14} tintColor={Constants.COLORS.white}/>
+              <Text style={[styles.normalText, {marginLeft: 5}]}>
+                {currentLives}
+              </Text>
+            </View>
+          )}
         </View>
         <View style={styles.clockContainer}>
           <Text style={[styles.hiddenText, !firstPlayer && !started && styles.normalText]}>Press here to start</Text>
+          {/*conditionally show delay if timer supports it */}
+          {isTimerWithDelay(timer) && isActive && started && ( // && turnStartTimeRef.current
+            <Text style={[styles.normalText, {marginLeft: 5}]}>
+              {(timer.stages[timer.currentStage] as any).delay} ms
+            </Text>
+          )}
           <Text style={[styles.timeText, isActive && started && styles.textActive]}>
               {Time.fromMiliseconds(currentTime).toStringTimerSimple()} {/*need to use local state for rendering time, or it wont update when timer updates*/}
             </Text>
@@ -436,7 +469,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
 
-  movesContainer: {
+  headerSectionContainer: {
     position: 'absolute',
     right: 10,
     top: 2, // some additional space to align with the stages icons

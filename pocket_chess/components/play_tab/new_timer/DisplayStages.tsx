@@ -5,7 +5,7 @@ import * as Constants from '../../../constants/index';
 import * as Styles from '../../../styles/index.js';
 
 import IconComponent from '../../common/IconComponent.jsx';
-// import { Stage } from '../../../classes/Preset';
+import Stage from '../../../classes/timers_base/Stage';
 
 // Define interfaces for TypeScript
 interface DisplayStagesRef {
@@ -15,10 +15,6 @@ interface DisplayStagesRef {
 
 interface DisplayStagesProps {
     onUpdateStages: (stages: Stage[]) => void;
-}
-
-interface Stage {
-    toString(): string; // ✅ Explicitly specify return type
 }
 
 const DisplayStages = forwardRef<DisplayStagesRef, DisplayStagesProps>(
@@ -34,10 +30,12 @@ const DisplayStages = forwardRef<DisplayStagesRef, DisplayStagesProps>(
     const [stages, setStages] = useState<Stage[]>([]); 
 
     const addStage = (newStage: Stage): void => {
+
         const newStages = [ // add stage to list
             ...stages, 
             newStage
         ]; 
+
         setStages(newStages);
         onUpdateStages(newStages);
 
@@ -92,7 +90,8 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'flex-start',
-        rowGap: 7
+        rowGap: 7,
+        paddingBottom: 30
     },
 
     noStageItemText: {
@@ -117,8 +116,8 @@ const styles = StyleSheet.create({
 
     stageItemDescription: {
         flexDirection: 'row',
-        flex: 1, // ✅ Fixed: Use flex: 1 instead of width: '100%' for proper spacing
-        marginRight: 10 // ✅ Add space between text and icon
+        flex: 1,
+        marginRight: 10
     },
 
     stageItemText: {

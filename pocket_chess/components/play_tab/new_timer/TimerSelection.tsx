@@ -61,6 +61,7 @@ const TimerSelection = forwardRef<TimerSelectionRef, TimerSelectionProps>(
 
     return (
         <View style={styles.container}>
+            {/* clock type selection */}
             <View style={[Styles.newPreset.sectionContainer, {paddingBottom: 0}]}>
                 <TouchableOpacity style={[styles.clockTypeIdContainer]} onPress={showClockTypeIdsScreen}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -85,8 +86,9 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'center',
         flexDirection: 'column',
-        height: '100%',
-        flex: 1
+        flexGrow: 1,
+        // borderWidth: 5,
+        // borderColor: Constants.COLORS.preset_red,
     },
 
     clockTypeIdContainer: {

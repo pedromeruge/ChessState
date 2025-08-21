@@ -36,6 +36,7 @@ const Stages = ({}) => { // expose the ref to the parent component
     // track which player is currently selecting a clock type
     const [initialTabIndex, setInitialTabIndex] = useState<number>(0);
 
+    
     //effects
     // Handle clock type updates from the ClockTypesList screen
     useEffect(() => {
@@ -46,18 +47,30 @@ const Stages = ({}) => { // expose the ref to the parent component
             const playerNameString = player_name as string;
 
             if (clockTypeIdNumber && PresetIdToTypes[clockTypeIdNumber]) {
-                setPlayersClockTypes(prev => ({
-                    ...prev,
-                    [playerNameString]: clockTypeIdNumber
-                }));
+                const currentClockType = playersClockTypes[playerNameString];
+                
+                //only re-render tab if clock type changed
+                if (currentClockType !== clockTypeIdNumber) {
 
-                console.log(`Updated clock type for ${playerNameString} to:`, PresetIdToTypes[clockTypeIdNumber].name);
+                    setPlayersStages(prev => ({
+                        ...prev,
+                        [playerNameString]: []
+                    }));
+                    
+                    setPlayersClockTypes(prev => ({
+                        ...prev,
+                        [playerNameString]: clockTypeIdNumber
+                    }));
+
+                    console.log(`Updated clock type for ${playerNameString} to:`, PresetIdToTypes[clockTypeIdNumber].name);
+            
+                }
+            
+                // clear the selecting player after update
+                setInitialTabIndex(Constants.PLAYER_NAMES.indexOf(playerNameString));
             }
-
-            // clear the selecting player after update
-            setInitialTabIndex(Constants.PLAYER_NAMES.indexOf(playerNameString));
         }
-    }, [clock_type_id, player_name]);
+    }, [clock_type_id, player_name, playersClockTypes]);
 
     //refs
     // create refs for each player tab
@@ -77,11 +90,12 @@ const Stages = ({}) => { // expose the ref to the parent component
             ...prev,
             [player]: stages
         }));
+        console.log(`Updated stages for ${player}:`, stages);
     }, []);
 
     // clock type selection for a specific player
-    const onSelectClockTypeForPlayer = (playerName: string, currentClockTypeId: number) => {
-        
+    // use useCallback to always keep the same function reference
+    const onSelectClockTypeForPlayer = useCallback((playerName: string, currentClockTypeId: number) => {
         router.push({
             pathname: '/play/clock_types/clock_types_list',
             params: {
@@ -89,12 +103,14 @@ const Stages = ({}) => { // expose the ref to the parent component
                 player_name: playerName
             }
         });
-    };
+    }, []);
 
     const allPlayersHaveStages = useCallback(() =>  {
-        return Object.values(playersStages)
+        const res = Object.values(playersStages)
             .every(playerStages => playerStages?.length > 0
         );
+        console.log("All players have stages:", res);
+        return res;
     }, [playersStages]);
 
     const resetParameters = () => {
@@ -144,69 +160,86 @@ const Stages = ({}) => { // expose the ref to the parent component
 
     return (
         <SafeAreaView style={styles.container}>
-            <Header leftIcon={Constants.icons.clock_lines} leftIconSize={16} text={'New preset'} rightIcon={Constants.icons.arrow_left} rightIconSize={18} 
+            <Header 
+                leftIcon={Constants.icons.clock_lines} 
+                leftIconSize={16} 
+                text={'New preset'} 
+                rightIcon={Constants.icons.arrow_left} 
+                rightIconSize={18} 
                 onPressRightIcon={onBack}
             />
-            <View style={styles.scrollContainer}>
-                <ScrollView 
-                    contentContainerStyle={styles.scrollView}>
-                    <View style={styles.bannerWrapper}>
-                        <Image source={Constants.images.banner1} style={styles.banner}/>
-                    </View>
-                    <View style={styles.tabNavigatorWrapper}>
-                        {useMemo(() => (
-                            <TabNavigator 
-                                tabs = {
-                                    Object.fromEntries(
-                                        Object.keys(playersStages).map((playerName) => 
-                                            [playerName, (props) => (
-                                                <TimerSelection 
-                                                    {...props} 
-                                                    ref={playerRefs[playerName]} 
-                                                    playerName={playerName} 
-                                                    onUpdateStages={(stages: Stage[]) => updateStages(playerName, stages)}
-                                                    clockTypeId={playersClockTypes[playerName]}
-                                                    onSelectClockTypeId={(clockTypeId: number) => onSelectClockTypeForPlayer(playerName, clockTypeId)}
-                                                />
-                                            )]
-                                        ))
-                                }
-                                icons = {
-                                    Object.fromEntries(
-                                        Object.keys(playersStages).map((playerName, idx) =>
-                                            [playerName, idx === 0 ? Constants.icons.pawn : Constants.icons.pawn_full] // assign pawn_full icon to all players except the first one
-                                        )
+            <ScrollView 
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollContent}
+                stickyHeaderIndices={[1]} // make the tabNavigator sticky (second child of scrollView)
+                showsVerticalScrollIndicator={false}
+            >
+                {/* Banner */}
+                <View style={styles.bannerWrapper}>
+                    <Image source={Constants.images.banner1} style={styles.banner}/>
+                </View>
+                {/* Tabs */}
+                <View style={styles.stickyTabContainer}>
+                    {useMemo(() => (
+                        <TabNavigator 
+                            tabs = {
+                                Object.fromEntries(
+                                    Object.keys(playersStages).map((playerName) => 
+                                        [playerName, (props) => (
+                                            <TimerSelection 
+                                                {...props} 
+                                                ref={playerRefs[playerName]} 
+                                                playerName={playerName} 
+                                                onUpdateStages={(stages: Stage[]) => updateStages(playerName, stages)}
+                                                clockTypeId={playersClockTypes[playerName]}
+                                                onSelectClockTypeId={(clockTypeId: number) => onSelectClockTypeForPlayer(playerName, clockTypeId)}
+                                            />
+                                        )]
+                                    ))
+                            }
+                            icons = {
+                                Object.fromEntries(
+                                    Object.keys(playersStages).map((playerName, idx) =>
+                                        [playerName, idx === 0 ? Constants.icons.pawn : Constants.icons.pawn_full] // assign pawn_full icon to all players except the first one
                                     )
-                                }
-                                swipeEnabled={false}
-                                initialTabIndex={initialTabIndex}
-                            />
-                        ), [updateStages, playersClockTypes, onSelectClockTypeForPlayer, initialTabIndex])
-                        }
+                                )
+                            }
+                            swipeEnabled={false}
+                            initialTabIndex={initialTabIndex}
+                        />
+                        ), [playersClockTypes])
+                    }
+                </View>
+            </ScrollView>
+            {/* Fixed Bottom Section */}
+            <View style={styles.bottomFixedContainer}>
+                <View style={[Styles.newPreset.sectionContainer]}>
+                    <View style={[Styles.newPreset.sectionTitleContainer]}>
+                        <Text style={Styles.newPreset.sectionTitleText}>Title</Text>
                     </View>
-                    {/* <View style={styles.separationLine}></View> */}
-                    <View style={Styles.newPreset.sectionContainer}>
-                        <View style={Styles.newPreset.sectionTitleContainer}>
-                            <Text style={Styles.newPreset.sectionTitleText}>Title</Text>
-                        </View>
-                        <View style={styles.titleSectionContent}>
-                            <Text style={styles.titleSectionText}>Name:</Text>
-                            <TextInput 
-                                style={Styles.newPreset.titleInput} 
-                                placeholder="New preset" 
-                                placeholderTextColor={Constants.COLORS.line_light_grey}
-                                onChangeText={onChangeTitle}
-                                value={title}
-                            />
-                        </View>
+                    <View style={styles.titleSectionContent}>
+                        <Text style={styles.titleSectionText}>Name:</Text>
+                        <TextInput 
+                            style={[Styles.newPreset.titleInput]} 
+                            placeholder="New preset" 
+                            placeholderTextColor={Constants.COLORS.line_light_grey}
+                            onChangeText={onChangeTitle}
+                            value={title}
+                        />
                     </View>
-                    <View style={styles.startButtonContainer}>
-                        <ActionButton source={Constants.icons.hourglass} text="Start" height={45} iconSize={20} fontSize={Constants.SIZES.xxLarge} componentStyle={styles.startButton}
-                            onPress={onStartPreset}
-                            disabled={!allPlayersHaveStages() || title === ''}
-                            />
-                    </View>
-                </ScrollView>
+                </View>
+                <View style={styles.startButtonContainer}>
+                    <ActionButton 
+                        source={Constants.icons.hourglass} 
+                        text="Start" 
+                        height={45} 
+                        iconSize={20} 
+                        fontSize={Constants.SIZES.xxLarge} 
+                        componentStyle={styles.startButton}
+                        onPress={onStartPreset}
+                        disabled={!allPlayersHaveStages() || title === ''}
+                    />
+                </View>
             </View>
         </SafeAreaView>
     )
@@ -218,13 +251,18 @@ const styles = StyleSheet.create({
         backgroundColor: Constants.COLORS.white,
     },
 
-    scrollContainer: {
-        flex:1
+    contentContainer: {
+        flex: 1
     },
 
     scrollView: {
-        justifyContent: 'flex-start',
-        flexGrow: 1
+        // borderWidth: 5,
+        // borderColor: Constants.COLORS.preset_yellow,
+    },
+
+    scrollContent: {
+        flex: 1,
+        minHeight: 900,
     },
 
     bannerWrapper: {
@@ -238,9 +276,23 @@ const styles = StyleSheet.create({
         resizeMode: 'contain'
     },
     
-    tabNavigatorWrapper: {
-        width: '100%',
-        flexGrow: 1
+    stickyTabContainer: {
+        elevation: 5, 
+        zIndex: 5, // ensure the tab navigator is above the scroll view content
+        flexGrow: 1,
+        // borderWidth: 3,
+        // borderColor: Constants.COLORS.preset_green
+    },
+
+    bottomFixedContainer: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        // backgroundColor: Constants.COLORS.white,
+        // borderTopWidth: 5,
+        // borderTopColor: Constants.COLORS.line_light_grey,
+        marginTop: 10
     },
 
     titleSectionContent: {
@@ -257,21 +309,11 @@ const styles = StyleSheet.create({
         color: Constants.COLORS.text_grey,
     },
 
-    separationLine: {
-        marginVertical: 5,
-        width: '45%',
-        height: 2,
-        alignSelf: 'center',
-        backgroundColor: Constants.COLORS.line_light_grey,
-        borderRadius: 5,
-        
-    },
-
     startButtonContainer: {
         width: '100%',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 40
+        marginBottom: 30,
     },
 
     startButton: {

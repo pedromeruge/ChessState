@@ -46,15 +46,18 @@ const style = StyleSheet.create({
         paddingHorizontal: 12,
         paddingTop: 5,
         paddingBottom: 10,
-        minWidth: 45,
+        minWidth: 100,
         minHeight: 70,
         rowGap: 7,
-        flex: 2
+        flexGrow: 1,
+        flexShrink: 1,
+        flexBasis: 0,
     },
 
     timeTitle: {
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'center'
     },
 
     timeTitleText: {

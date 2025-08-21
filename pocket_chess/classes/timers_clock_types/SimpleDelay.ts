@@ -2,6 +2,7 @@ import { PresetTypes} from '../PresetType';
 import Stage, {StageJSON} from '../timers_base/Stage';
 import Timer, { TimerJSON } from '../timers_base/Timer';
 import Time, { TimeJSON } from '../timers_base/Time';
+import { TimerWithMoves, TimerWithDelay } from '../types/TimerBuilderTypes';
 
 export interface SimpleDelayStageJSON extends StageJSON {
     delay: TimeJSON;
@@ -61,7 +62,7 @@ export class SimpleDelayStage extends Stage {
  * @class SimpleDelayTimer
  * @extends {Timer}
  */
-export class SimpleDelayTimer extends Timer {
+export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWithDelay {
     public currentStageMoves: number;
 
     /**
@@ -171,5 +172,13 @@ export class SimpleDelayTimer extends Timer {
     reset(): void {
         super.reset();
         this.currentStageMoves = 0;
+    }
+
+    getCurrentStageMoves(): number {
+        return this.currentStageMoves;
+    }
+
+    getCurrentStageDelay(): Time {
+        return (this.stages[this.currentStage] as SimpleDelayStage).delay;
     }
 }

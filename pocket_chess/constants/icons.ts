@@ -47,7 +47,8 @@ const icons = {
   target: require("../assets/icons/target.png"),
   diamond: require("../assets/icons/diamond.png"),
   experimental: require("../assets/icons/experimental.png"),
-  hidden: require("../assets/icons/hidden.png")
+  hidden: require("../assets/icons/hidden.png"),
+  heart_full: require("../assets/icons/heart_full.png")
 };
 
 export default icons;

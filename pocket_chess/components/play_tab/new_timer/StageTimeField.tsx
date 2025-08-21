@@ -19,10 +19,11 @@ interface StageTimeFieldProps {
   onChange?: (time: any) => void;
   hideHours?: boolean;
   iconSize?: number;
+  hideBorders?: boolean;
 }
 
 const StageTimeField = forwardRef<StageTimeFieldRef,StageTimeFieldProps>(
-    ({icon,  title, onChange=null, hideHours=false, iconSize=15}, ref) => {
+    ({title, icon=null, onChange=null, hideHours=false, iconSize=15, hideBorders=false}, ref) => {
 
     //functions for parent
     useImperativeHandle(ref, () => ({
@@ -51,10 +52,12 @@ const StageTimeField = forwardRef<StageTimeFieldRef,StageTimeFieldProps>(
     }
 
     return (
-        <TouchableOpacity style={[Styles.newPreset.timeContainer]} onPress={showTimePicker}>
-            <View style={Styles.newPreset.timeTitle}>
-                <IconComponent source={icon} width={iconSize} tintColor={Constants.COLORS.contrast_blue_light} />
-                <Text style={Styles.newPreset.timeTitleText}>{title}</Text>
+        <TouchableOpacity style={[Styles.newPreset.timeContainer, hideBorders && { borderWidth: 0 }]} onPress={showTimePicker}>
+            <View style={[Styles.newPreset.timeTitle]}>
+                { icon !== null && (
+                    <IconComponent source={icon} width={iconSize} tintColor={Constants.COLORS.contrast_blue_light} />
+                )}
+                <Text style={[Styles.newPreset.timeTitleText, hideBorders && {marginLeft: 0}]}>{title}</Text>
             </View>
             <Text style={[Styles.newPreset.timeInput, {color: time.isDefault() ? Constants.COLORS.line_light_grey : Constants.COLORS.text_dark_2}]}>{time.toStringComplete()}</Text>
             <ModalTimerPicker ref={timePickerRef} time={time} setTime={changeTime} hideHours={hideHours} fullScreen={false} headerText={title} headerLeftIcon={icon} headerRightIcon={Constants.icons.cross}/>

@@ -15,12 +15,14 @@ interface StageNumberFieldProps {
   icon: Constants.IconType;
   title: string;
   onChange?: (time: any) => void;
+  startValue?: number; // initial value of the field
   maxLength?: number; // max size of number input
   iconSize?: number;
+  hideBorders?: boolean; // hide the grey outlines of the field squarish shape
 }
 
 const StageNumberField = forwardRef<StageNumberFieldRef, StageNumberFieldProps>(
-    ({icon, title, onChange=null, maxLength=4, iconSize=12}, ref) => {
+    ({ title, icon=null, onChange=null, startValue=null, maxLength=4, iconSize=12, hideBorders=false}, ref) => {
 
     //functions for parent
     useImperativeHandle(ref, () => ({
@@ -29,7 +31,7 @@ const StageNumberField = forwardRef<StageNumberFieldRef, StageNumberFieldProps>(
     }));
 
     // state
-    const [number, setNumber] = useState(null); // track number
+    const [number, setNumber] = useState(startValue); // track number
 
     // refs
     const numberInputRef = useRef(null);
@@ -50,10 +52,12 @@ const StageNumberField = forwardRef<StageNumberFieldRef, StageNumberFieldProps>(
     }
 
     return (
-        <TouchableOpacity style={[Styles.newPreset.timeContainer]} onPress={handlePressField}>
-            <View style={Styles.newPreset.timeTitle}>
-                <IconComponent source={icon} width={iconSize} tintColor={Constants.COLORS.contrast_blue_light}/>
-                <Text style={Styles.newPreset.timeTitleText}>{title}</Text>
+        <TouchableOpacity style={[Styles.newPreset.timeContainer, hideBorders && { borderWidth: 0 }]} onPress={handlePressField}>
+            <View style={[Styles.newPreset.timeTitle]}>
+                { icon != null && (
+                    <IconComponent source={icon} width={iconSize} tintColor={Constants.COLORS.contrast_blue_light}/>
+                )}
+                <Text style={[Styles.newPreset.timeTitleText, hideBorders && {marginLeft: 0}]}>{title}</Text>
             </View>
             <TextInput 
                 ref={numberInputRef}
@@ -62,7 +66,7 @@ const StageNumberField = forwardRef<StageNumberFieldRef, StageNumberFieldProps>(
                 placeholderTextColor={Constants.COLORS.line_light_grey}
                 keyboardType='numeric'
                 onChangeText={(text) => onChangeNumber(text)}
-                value={number || ''}
+                value={number ? String(number) : ''}
                 maxLength={maxLength}
                 />
         </TouchableOpacity>

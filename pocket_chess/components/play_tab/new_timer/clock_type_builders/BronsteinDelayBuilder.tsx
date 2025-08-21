@@ -6,25 +6,25 @@ import * as Styles from '../../../../styles/index.js';
 
 import IconComponent from '../../../common/IconComponent.jsx';
 import { Time } from '../../../../classes/timers_base/Preset';
-import { FischerIncrementStage, FischerIncrementTimer} from '../../../../classes/timers_clock_types/FischerIncrement';
+import { BronsteinDelayStage, BronsteinDelayTimer} from '../../../../classes/timers_clock_types/BronsteinDelay';
 import StageNumberField, {StageNumberFieldRef} from '../StageNumberField';
 import StageTimeField, {StageTimeFieldRef} from '../StageTimeField';
 import StageAddButton from '../StageAddButton';
 import DisplayStages, {DisplayStagesRef} from '../DisplayStages';
 import { TimerBuilderProps, TimerBuilderRef } from '../../../../classes/types/TimerBuilderTypes.js';
 
-// Specific interface for Fischer Increment Builder
-interface FischerIncrementBuilderRef extends TimerBuilderRef {
-  buildTimer: (playerName: string) => FischerIncrementTimer;
+// Specific interface for Simple Delay Builder
+interface BronsteinDelayBuilderRef extends TimerBuilderRef {
+  buildTimer: (playerName: string) => BronsteinDelayTimer;
 }
 
-const FischerIncrementBuilder = forwardRef<FischerIncrementBuilderRef, TimerBuilderProps>(
+const BronsteinDelayBuilder = forwardRef<BronsteinDelayBuilderRef, TimerBuilderProps>(
     ({onUpdateStages}, ref) => {
     
     // refs
     const displayStagesRef = useRef<DisplayStagesRef>(null); // ref for displaying the stages of this builder
     const baseTimeFieldRef = useRef<StageTimeFieldRef>(null);
-    const incrementFieldRef = useRef<StageTimeFieldRef>(null);
+    const delayFieldRef = useRef<StageTimeFieldRef>(null);
     const movesFieldRef = useRef<StageNumberFieldRef>(null);
 
     // funcs for parent
@@ -41,29 +41,28 @@ const FischerIncrementBuilder = forwardRef<FischerIncrementBuilderRef, TimerBuil
 
     //other funcs
     const addStage = (): void => {
-
-        const newStage = new FischerIncrementStage(
+        const newStage = new BronsteinDelayStage(
             baseTimeFieldRef.current?.getTime(),
-            incrementFieldRef.current?.getTime(),
+            delayFieldRef.current?.getTime(),
             movesFieldRef.current?.getNumber()
         );
         
         displayStagesRef.current?.addStage(newStage);
         console.log("Added stage");
-
+        
         baseTimeFieldRef.current?.reset();
-        incrementFieldRef.current?.reset();
+        delayFieldRef.current?.reset();
         movesFieldRef.current?.reset();
 
         setIsBaseTimeDefault(true); // reset base time default state
     }
 
-    const buildTimer = (playerName: string): FischerIncrementTimer => {
-        const stages = (displayStagesRef.current?.getStages() as FischerIncrementStage[]) || [];
+    const buildTimer = (playerName: string): BronsteinDelayTimer => {
+        const stages = (displayStagesRef.current?.getStages() as BronsteinDelayStage[]) || [];
         if (stages.length === 0) {
-            throw new Error("No stages available to build FischerIncrementTimer");
+            throw new Error("No stages available to build BronsteinDelayTimer");
         }
-        return new FischerIncrementTimer(stages, playerName);
+        return new BronsteinDelayTimer(stages, playerName);
     }
 
     return (
@@ -80,9 +79,9 @@ const FischerIncrementBuilder = forwardRef<FischerIncrementBuilderRef, TimerBuil
                         onChange={checkBaseTimeDefault}
                     />
                     <StageTimeField
-                        ref={incrementFieldRef}
-                        icon={Constants.icons.plus_thick}
-                        title="Increment"
+                        ref={delayFieldRef}
+                        icon={Constants.icons.hidden}
+                        title="Delay"
                         hideHours={true}
                     />
                     <StageNumberField
@@ -98,5 +97,5 @@ const FischerIncrementBuilder = forwardRef<FischerIncrementBuilderRef, TimerBuil
     )
 });
 
-export default FischerIncrementBuilder;
-export type { FischerIncrementBuilderRef };
+export default BronsteinDelayBuilder;
+export type { BronsteinDelayBuilderRef };

@@ -13,7 +13,7 @@ interface TabNavigatorRef {
 }
 
 interface TabNavigatorProps {
-    tabs: Record<string, React.ComponentType>;
+    tabs: Record<string, React.ComponentType<any>>;
     icons: Record<string, any>;
     swipeEnabled?: boolean;
     callbacks?: Array<() => void>;
@@ -42,7 +42,6 @@ const TabNavigator = forwardRef<TabNavigatorRef,TabNavigatorProps>(
                         lazy: true,
                     }}
                     initialRouteName={Object.keys(tabs)[initialTabIndex]}
-
                 >
                     {Object.entries(tabs).map(([tabName,TabComponent], index) => {
                         return (
@@ -59,8 +58,8 @@ const TabNavigator = forwardRef<TabNavigatorRef,TabNavigatorProps>(
                                     ),
                                 }}
                             >
-                            {() => { // this needs to be a function or the component wont render right
-                                    return <TabComponent/>
+                            {(props) => { // this needs to be a function or the component wont render right
+                                    return <TabComponent {...props}/>
                                 }
                             }
                             </Tab.Screen>

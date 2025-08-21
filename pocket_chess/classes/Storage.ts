@@ -4,6 +4,10 @@ import { MMKV } from 'react-native-mmkv';
 import Preset, { PresetJSON } from './timers_base/Preset';
 import Time from './timers_base/Time';
 import { FischerIncrementStage, FischerIncrementTimer } from './timers_clock_types/FischerIncrement';
+import { SimpleDelayTimer, SimpleDelayStage } from './timers_clock_types/SimpleDelay';
+import { BronsteinDelayStage, BronsteinDelayTimer } from './timers_clock_types/BronsteinDelay';
+import { CumulativeIncrementStage, CumulativeIncrementTimer } from './timers_clock_types/CumulativeIncrement';
+import { FixedMovesStage, FixedMovesTimer } from './timers_clock_types/FixedMoves';
 
 // types for preset data structure
 interface PresetGroup {
@@ -116,6 +120,41 @@ class Storage {
                 new FischerIncrementTimer(
                   [new FischerIncrementStage(new Time(1, 30, 0), new Time(0, 0, 30))])
                 ,"90|30"),
+            ]
+          },
+          "testing": {
+            "icon": Constants.icons.experimental,
+            "iconColor": Constants.COLORS.preset_green,
+            "title": "Testing",
+            "presets": [
+              Preset.samePlayerTimers(
+                new SimpleDelayTimer(
+                  [new SimpleDelayStage(new Time(1,0,0), new Time(0,0,5), 10),
+                   new SimpleDelayStage(new Time(0,30,0), new Time(0,0,3))
+                  ]),
+                "Simple Delay"
+              ),
+              Preset.samePlayerTimers(
+                new BronsteinDelayTimer(
+                  [new BronsteinDelayStage(new Time(1,0,0), new Time(0,0,5), 10),
+                    new BronsteinDelayStage(new Time(0,30,0), new Time(0,0,3), 5)
+                  ]),
+                "Brons delay"
+              ),
+              Preset.samePlayerTimers(
+                new CumulativeIncrementTimer(
+                  [new CumulativeIncrementStage(new Time(1,0,0), new Time(0,0,5), new Time(0,0,5), 2, 10),
+                   new CumulativeIncrementStage(new Time(0,30,0), new Time(0,0,3), new Time(0,0,3), 1)
+                  ]),
+                "Cumul Increm"
+              ),
+              Preset.samePlayerTimers(
+                new FixedMovesTimer(
+                  [new FixedMovesStage(new Time(0,0,10), 3, 10),
+                   new FixedMovesStage(new Time(0,0,5), 2)
+                  ]),
+                "Fixed Moves"
+              )
             ]
           }
         }
