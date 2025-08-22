@@ -1,15 +1,15 @@
 import React, { useState, useRef, useCallback, forwardRef, useImperativeHandle, useEffect} from 'react';
 import { View, Text, StyleSheet, TextStyle, TouchableOpacity, SafeAreaView, ViewStyle} from 'react-native'
 
-import * as Constants from '../../constants';
-import IconComponent from '../common/IconComponent.jsx';
-import ActionIcon from '../common/ActionIcon';
+import * as Constants from '../../../constants';
+import IconComponent from '../../common/IconComponent.jsx';
+import ActionIcon from '../../common/ActionIcon';
 import { router } from 'expo-router';
 import { Animated } from 'react-native';
 
-import Preset, { Time, Stage, Timer} from '../../classes/timers_base/Preset';
-import { isTimerWithMoves, isTimerWithLives, isTimerWithDelay, TimerWithMoves, TimerWithLives, TimerWithDelay } from '../../classes/types/TimerBuilderTypes';
-import { BronsteinDelayTimer } from '../../classes/timers_clock_types/BronsteinDelay';
+import Preset, { Time, Stage, Timer} from '../../../classes/timers_base/Preset';
+import { isTimerWithMoves, isTimerWithLives, isTimerWithDelay, TimerWithMoves, TimerWithLives, TimerWithDelay } from '../../../classes/types/TimerBuilderTypes';
+import DelayProgressBar from './DelayProgressBar';
 
 // screen where a timer is played, with two regions where players can press to trigger their timers
 
@@ -54,14 +54,19 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
     if (isActive && !paused) {
       clearInterval(intervalRef.current!); // when timer becomes active and not paused, clear any previous intervals that linger
 
-      const startTime = Date.now();
+      const startTime = performance.now();
+
+      if (isTimerWithDelay(timer)) {
+        timer.startTurn(startTime);
+      }
+      
       const initialTime = timer.currentStageTime;
 
       intervalRef.current = setInterval(() => {
-        const elapsed = Date.now() - startTime;
+        const elapsed = performance.now() - startTime;
         const timeLeft = Math.max(0, initialTime - elapsed);
         
-        timer._updateStageTime(timeLeft, () => {
+        timer._updateStageTime(initialTime, timeLeft, () => {
           clearInterval(intervalRef.current);
           handleTimeout();
         });
@@ -69,16 +74,26 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
         // re-render component
         updateTimerState(); 
 
-      }, 100); // tracking updates in 100ms intervals, to account for mid-second stops of timer
-      
+      }, 16); // tracking updates in 16ms intervals (60fps)
+
     } else { // if timer paused or inactive
       clearInterval(intervalRef.current); // clear previously set intervals
+      
+      //end timer turn when becoming inactive
+      if (isTimerWithDelay(timer)) {
+        timer.endTurn();
+      }
     }
 
-    return () => clearInterval(intervalRef.current); // on unmount clean up created intervals
+    return () => {
+      clearInterval(intervalRef.current); // on unmount clean up created intervals
+      if (isTimerWithDelay(timer)) {
+        timer.endTurn();
+      }
+    }
   }, [isActive, paused, lostGame])
 
-  // separate react component state sync when game restarts (which changes started) (could be added to the useEffect above, but this way it is more clear)
+  // separate react component state sync when game restarts (which changes started property) (could be added to the useEffect above, but this way it is more clear)
   useEffect(() => {
     // re-render component
     updateTimerState();
@@ -118,7 +133,8 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
     <View style={[styles.touchableContainer, moreStyles, isActive && started && styles.activeContainerColor, lostGame && styles.lostContainerColor, paused && started && styles.disabledContainer]}>
       <TouchableOpacity onPress={onPressSection} style={{flex: 1}}>
         <View style={styles.headerContainer}>
-          {timer.stages.length > 1 && ( // only show stages elements if there are more than one
+          {/* only show stages elements if there are more than one */}
+          {timer.stages.length > 1 && ( 
             <View style={styles.stagesContainer}>
               {timer.stages.map((stage, i) => {
                 const isStagePassed = i <= timer.currentStage;
@@ -128,8 +144,8 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
               })}
             </View>
           )}
-          {/*conditionally show moves if timer supports it */}
-          {(isTimerWithMoves(timer) && timer.getCurrentStageMoves()) && ( // only show moves if there is a defined limit for the stage
+          {/*conditionally show moves if timer supports it, and there is a defined limit for the stage */}
+          {(isTimerWithMoves(timer) && timer.getCurrentStageMoves()) && (
             <View style={styles.headerSectionContainer}>
               <IconComponent source={Constants.icons.pawn_full} width={14} tintColor={Constants.COLORS.white}/>
               <Text style={[styles.normalText, {marginLeft: 5}]}>
@@ -148,15 +164,21 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
           )}
         </View>
         <View style={styles.clockContainer}>
-          <Text style={[styles.hiddenText, !firstPlayer && !started && styles.normalText]}>Press here to start</Text>
           {/*conditionally show delay if timer supports it */}
+          <Text style={[styles.hiddenText, !firstPlayer && !started && styles.normalText]}>Press here to start</Text>
+
           {isTimerWithDelay(timer) && isActive && started && ( // && turnStartTimeRef.current
-            <Text style={[styles.normalText, {marginLeft: 5}]}>
-              {(timer.stages[timer.currentStage] as any).delay} ms
-            </Text>
+            <DelayProgressBar
+              timer={timer as TimerWithDelay}
+              isActive={isActive}
+              started={started}
+              paused={paused}
+              style={{ marginBottom: 5 }}
+            />
           )}
+          {/*need to use local state for rendering time, or it wont update when timer updates*/}
           <Text style={[styles.timeText, isActive && started && styles.textActive]}>
-              {Time.fromMiliseconds(currentTime).toStringTimerSimple()} {/*need to use local state for rendering time, or it wont update when timer updates*/}
+              {Time.fromMiliseconds(currentTime).toStringTimerSimple()} 
             </Text>
           <IconComponent source={Constants.icons.clock_full} width={24} tintColor={isActive && started ? Constants.COLORS.contrast_blue_dark : Constants.COLORS.text_dark_2}/>
         </View>

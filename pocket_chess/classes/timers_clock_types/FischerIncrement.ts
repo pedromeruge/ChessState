@@ -2,7 +2,8 @@ import { PresetTypes} from '../PresetType';
 import Stage, {StageJSON} from '../timers_base/Stage';
 import Timer, { TimerJSON } from '../timers_base/Timer';
 import Time, { TimeJSON } from '../timers_base/Time';
-import { TimerWithMoves, TimerWithLives } from '../types/TimerBuilderTypes';
+import { TimerWithMoves } from '../types/TimerBuilderTypes';
+
 export interface FischerIncrementStageJSON extends StageJSON {
     increment: TimeJSON;
     moves: number | null;
@@ -154,7 +155,7 @@ export class FischerIncrementTimer extends Timer implements TimerWithMoves {
     }
 
     //update current stage time
-    _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): void {
+    _updateStageTime(initialTimeMiliseconds: number, timeLeftMiliseconds: number, onEndMoves: () => void): void {
         if (this.currentStageTime !== null) {
             this.currentStageTime = Math.max(0, timeLeftMiliseconds); // always set to 0 or more
             if (timeLeftMiliseconds === 0) {

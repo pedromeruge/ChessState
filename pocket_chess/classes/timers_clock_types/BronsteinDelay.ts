@@ -64,6 +64,7 @@ export class BronsteinDelayStage extends Stage {
  */
 export class BronsteinDelayTimer extends Timer implements TimerWithMoves, TimerWithDelay {
     public currentStageMoves: number;
+    public turnStartTime: number | null = null; // time when the turn started, used to calculate delay
 
     /**
      * @constructor
@@ -119,6 +120,14 @@ export class BronsteinDelayTimer extends Timer implements TimerWithMoves, TimerW
         );
     }
 
+    startTurn(): void {
+        this.turnStartTime = Date.now();
+    }
+
+    endTurn(): void {
+        this.turnStartTime = null;
+    }
+
     #moveToNextStage(): boolean {
         if (this.currentStage < this.stages.length - 1) {
             this.currentStage++;
@@ -157,7 +166,7 @@ export class BronsteinDelayTimer extends Timer implements TimerWithMoves, TimerW
 
     // TODO
     //update current stage time
-    _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): void {
+    _updateStageTime(initialTimeMiliseconds: number, timeLeftMiliseconds: number, onEndMoves: () => void): void {
         if (this.currentStageTime !== null) {
             this.currentStageTime = Math.max(0, timeLeftMiliseconds); // always set to 0 or more
             if (timeLeftMiliseconds === 0) {
@@ -180,4 +189,9 @@ export class BronsteinDelayTimer extends Timer implements TimerWithMoves, TimerW
     getCurrentStageDelay(): Time {
         return (this.stages[this.currentStage] as BronsteinDelayStage).delay;
     }
+
+    getDelayProgress(): number {
+        return 0;
+    }
+
 }

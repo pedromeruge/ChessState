@@ -183,7 +183,7 @@ export class CumulativeIncrementTimer extends Timer implements TimerWithMoves {
     }
 
     //update current stage time
-    _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): void {
+    _updateStageTime(initialTimeMiliseconds: number, timeLeftMiliseconds: number, onEndMoves: () => void): void {
         if (this.currentStageTime !== null) {
             this.currentStageTime = Math.max(0, timeLeftMiliseconds); // always set to 0 or more
             if (timeLeftMiliseconds === 0) {

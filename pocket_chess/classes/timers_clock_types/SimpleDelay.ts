@@ -64,6 +64,8 @@ export class SimpleDelayStage extends Stage {
  */
 export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWithDelay {
     public currentStageMoves: number;
+    public delayEndTime: number | null = null; // timestamp when delay period ended
+    public hasReachedDelay: boolean = false;
 
     /**
      * @constructor
@@ -119,17 +121,26 @@ export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWith
         );
     }
 
+    startTurn(startTime: number): void {
+        this.delayEndTime = startTime + (this.stages[this.currentStage] as SimpleDelayStage).delay.toMiliseconds();
+    }
+
+    endTurn(): void {
+        this.delayEndTime = null;
+        this.hasReachedDelay = false;
+    }
+
     #moveToNextStage(): boolean {
         if (this.currentStage < this.stages.length - 1) {
             this.currentStage++;
             this.currentStageTime = (this.stages[this.currentStage] as SimpleDelayStage).time.toMiliseconds(); // set current stage time to the next stage time
             this.currentStageMoves = 0; // reset moves for the new stage
+            this.endTurn(); // reset turn tracking
             return true; // moved to next stage
         }
         return false; // no more stages to move to
     }
 
-    // TODO
     //increment current stage moves
     // call OnEndMoves when timer reaches 0 moves in all stages
     addMove(onEndMoves: () => void): void {
@@ -137,15 +148,9 @@ export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWith
         if (this.currentStageMoves !== null) {
             this.currentStageMoves++;
             
-            // add delay time to current stage time
-            const delay = (this.stages[this.currentStage] as SimpleDelayStage).delay;
-            if (delay && !delay.isDefault()) {
-                this.currentStageTime += delay.toMiliseconds();
-                console.log(`Added delay: ${delay.toMiliseconds()}ms, new time: ${this.currentStageTime}ms`);
-            }
-            
             const currentStageMaxMoves = (this.stages[this.currentStage] as SimpleDelayStage).moves;
             const remainingMoves = currentStageMaxMoves - this.currentStageMoves;
+
             if (currentStageMaxMoves && remainingMoves <= 0) { // if no more moves in current stage, move to next stage
                 let moveToNextStage = this.#moveToNextStage();
                 if (!moveToNextStage) { // if no more stages, call onEndMoves
@@ -153,16 +158,27 @@ export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWith
                 }
             }
         }
+
+        this.endTurn(); // end the turn after adding a move
     }
 
-    // TODO
-    //update current stage time
-    _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): void {
-        if (this.currentStageTime !== null) {
-            this.currentStageTime = Math.max(0, timeLeftMiliseconds); // always set to 0 or more
-            if (timeLeftMiliseconds === 0) {
+    //update current stage time, taking into account delay
+    _updateStageTime(initialTimeMiliseconds: number, timeLeftMiliseconds: number, onEndMoves: () => void): void {
+        // console.log("currentStageTime: ", this.currentStageTime);
+        // console.log("timeLeftMiliseconds: ", timeLeftMiliseconds);
+        // console.log("delayEndTime: ", this.delayEndTime);
+        if (this.currentStageTime !== null && this.delayEndTime !== null) {
+            let timeInRelationToEndDelay = performance.now() - this.delayEndTime;
+            let actualTimeLeft = initialTimeMiliseconds - Math.max(0, timeInRelationToEndDelay);
+            this.currentStageTime = Math.max(0, actualTimeLeft);
+
+            // console.log("Time in relation to end delay:", timeInRelationToEndDelay);
+            // console.log("Max to 0:", Math.max(0, timeInRelationToEndDelay));
+            // console.log("Actual time left:", this.currentStageTime);
+
+            if (actualTimeLeft === 0) {
                 let moveToNextStage = this.#moveToNextStage();
-                if (!moveToNextStage) { // if no more stages, reset current stage time to 0
+                if (!moveToNextStage) {
                     onEndMoves();
                 }
             }
@@ -172,6 +188,7 @@ export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWith
     reset(): void {
         super.reset();
         this.currentStageMoves = 0;
+        this.delayEndTime = null;
     }
 
     getCurrentStageMoves(): number {
@@ -181,4 +198,20 @@ export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWith
     getCurrentStageDelay(): Time {
         return (this.stages[this.currentStage] as SimpleDelayStage).delay;
     }
+
+    getDelayProgress(): number {
+        if (this.delayEndTime === null) return 0;
+        
+        const currentDelay = (this.stages[this.currentStage] as SimpleDelayStage).delay;
+        const delayMs = currentDelay.toMiliseconds();
+        
+        if (delayMs === 0) return 1;
+
+        const delayStartTime = this.delayEndTime - delayMs;
+        const timeSinceStart = performance.now() - delayStartTime;
+        const progress = Math.min(1, Math.max(0, timeSinceStart / delayMs));
+
+        return progress;
+    }
+
 }

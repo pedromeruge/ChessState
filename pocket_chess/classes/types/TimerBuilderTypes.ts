@@ -23,6 +23,9 @@ export interface TimerWithLives {
 // functions that all timers with delay must have
 export interface TimerWithDelay {
     getCurrentStageDelay: () => Time;
+    startTurn: (startTime: number) => void;
+    endTurn: () => void;
+    getDelayProgress: () => number;
 }
 
 // TS doesnt have instancing for interfaces, so using this method

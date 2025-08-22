@@ -129,15 +129,15 @@ class Storage {
             "presets": [
               Preset.samePlayerTimers(
                 new SimpleDelayTimer(
-                  [new SimpleDelayStage(new Time(1,0,0), new Time(0,0,5), 10),
-                   new SimpleDelayStage(new Time(0,30,0), new Time(0,0,3))
+                  [new SimpleDelayStage(new Time(1,0,0), new Time(0,0,3), 10),
+                   new SimpleDelayStage(new Time(0,30,0), new Time(0,0,1))
                   ]),
                 "Simple Delay"
               ),
               Preset.samePlayerTimers(
                 new BronsteinDelayTimer(
-                  [new BronsteinDelayStage(new Time(1,0,0), new Time(0,0,5), 10),
-                    new BronsteinDelayStage(new Time(0,30,0), new Time(0,0,3), 5)
+                  [new BronsteinDelayStage(new Time(1,0,0), new Time(0,0,3), 10),
+                    new BronsteinDelayStage(new Time(0,30,0), new Time(0,0,1), 5)
                   ]),
                 "Brons delay"
               ),
