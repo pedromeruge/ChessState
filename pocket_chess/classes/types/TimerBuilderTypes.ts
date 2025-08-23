@@ -25,6 +25,9 @@ export interface TimerWithDelay {
     getCurrentStageDelay: () => Time;
     startTurn: (startTime: number) => void;
     endTurn: () => void;
+    pauseTurn: () => void;
+    resumeTurn: () => void;
+    isPaused: () => boolean; 
     getDelayProgress: () => number;
 }
 

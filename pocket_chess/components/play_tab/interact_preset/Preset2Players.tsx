@@ -51,12 +51,14 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
 
   // sync timer state with react component state on active state change
   useEffect(() => {
+    // when timer becomes active and not paused
     if (isActive && !paused) {
-      clearInterval(intervalRef.current!); // when timer becomes active and not paused, clear any previous intervals that linger
+      clearInterval(intervalRef.current!); //clear any previous intervals that linger
 
       const startTime = performance.now();
 
-      if (isTimerWithDelay(timer)) {
+      // only start the turn if it's a new turn, not a resume
+      if (isTimerWithDelay(timer) && !timer.isPaused()) {
         timer.startTurn(startTime);
       }
       
@@ -79,19 +81,28 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
     } else { // if timer paused or inactive
       clearInterval(intervalRef.current); // clear previously set intervals
       
-      //end timer turn when becoming inactive
-      if (isTimerWithDelay(timer)) {
-        timer.endTurn();
+      //end/pause timer turn when becoming inactive
+      if (isTimerWithDelay(timer) && started && isActive) {
+          if (paused) {
+            timer.pauseTurn();
+          } else {
+            timer.endTurn();
+          }
       }
     }
 
     return () => {
-      clearInterval(intervalRef.current); // on unmount clean up created intervals
-      if (isTimerWithDelay(timer)) {
-        timer.endTurn();
-      }
+      // on unmount clean up created intervals
+      clearInterval(intervalRef.current); 
+    };
+  }, [isActive, paused, lostGame]);
+
+  // handle resume when unpausing
+  useEffect(() => {
+    if (isTimerWithDelay(timer) && started && !paused && isActive && timer.isPaused()) {
+      timer.resumeTurn(); // resume the timer when unpausing
     }
-  }, [isActive, paused, lostGame])
+  }, [paused, started, isActive]);
 
   // separate react component state sync when game restarts (which changes started property) (could be added to the useEffect above, but this way it is more clear)
   useEffect(() => {
@@ -145,29 +156,29 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
             </View>
           )}
           {/*conditionally show moves if timer supports it, and there is a defined limit for the stage */}
-          {(isTimerWithMoves(timer) && timer.getCurrentStageMoves()) && (
+          {(isTimerWithMoves(timer) && timer.getCurrentStageMoves()) ? (
             <View style={styles.headerSectionContainer}>
               <IconComponent source={Constants.icons.pawn_full} width={14} tintColor={Constants.COLORS.white}/>
               <Text style={[styles.normalText, {marginLeft: 5}]}>
                 {currentMoves}
               </Text>
             </View>
-          )}
+          ) : null }
           {/*conditionally show lives if timer supports it */}
-          {(isTimerWithLives(timer) && timer.getCurrentStageLives()) && (
+          {(isTimerWithLives(timer) && timer.getCurrentStageLives()) ? (
             <View style={styles.headerSectionContainer}>
               <IconComponent source={Constants.icons.heart_full} width={14} tintColor={Constants.COLORS.white}/>
               <Text style={[styles.normalText, {marginLeft: 5}]}>
                 {currentLives}
               </Text>
             </View>
-          )}
+          ) : null }
         </View>
         <View style={styles.clockContainer}>
           {/*conditionally show delay if timer supports it */}
           <Text style={[styles.hiddenText, !firstPlayer && !started && styles.normalText]}>Press here to start</Text>
 
-          {isTimerWithDelay(timer) && isActive && started && ( // && turnStartTimeRef.current
+          {(isTimerWithDelay(timer) && isActive && started) ? ( // && turnStartTimeRef.current
             <DelayProgressBar
               timer={timer as TimerWithDelay}
               isActive={isActive}
@@ -175,7 +186,7 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
               paused={paused}
               style={{ marginBottom: 5 }}
             />
-          )}
+          ) : null }
           {/*need to use local state for rendering time, or it wont update when timer updates*/}
           <Text style={[styles.timeText, isActive && started && styles.textActive]}>
               {Time.fromMiliseconds(currentTime).toStringTimerSimple()} 
@@ -332,7 +343,6 @@ const PlayPreset2Players = ({preset}) => {
     function onPressPause() {
       if (gameOver) return; // don't allow pause if game is over
       setPaused(!paused);
-      console.log('pressed pause');
     }
 
     function onPressRestart() {
@@ -346,8 +356,7 @@ const PlayPreset2Players = ({preset}) => {
       setCurrentPlayer(1);
       setGameOver(false);
       setWinner(null);
-      
-      console.log('pressed restart');
+
     }
 
     function onPressCamera() {
@@ -355,7 +364,6 @@ const PlayPreset2Players = ({preset}) => {
     }
 
     function onPressBack() {
-      console.log('back button pressed');
       
       if (!preset.isCustom) {
         console.log('navigating to preset timers');
