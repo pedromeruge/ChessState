@@ -189,7 +189,7 @@ export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWith
     }
 
     //update current stage time, taking into account delay
-    _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): void {
+    _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): boolean {
 
         if (this.currentStageTime !== null && this.turnStartTimestamp !== null && !this.isPaused()) {
             const delayMs = this.getCurrentStageDelay().toMiliseconds();
@@ -216,6 +216,7 @@ export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWith
                 }
             }
         }
+        return false;
     }
 
     reset(): void {

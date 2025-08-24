@@ -158,7 +158,6 @@ export class BronsteinDelayTimer extends Timer implements TimerWithMoves, TimerW
     }
 
     #moveToNextStage(): boolean {
-        console.log("current stage:", this.currentStage, "stages length:", this.stages.length - 1);
         if (this.currentStage < this.stages.length - 1) {
             this.currentStage++;
             this.currentStageTime = (this.stages[this.currentStage] as BronsteinDelayStage).time.toMiliseconds(); // set current stage time to the next stage time
@@ -172,7 +171,6 @@ export class BronsteinDelayTimer extends Timer implements TimerWithMoves, TimerW
     //increment current stage moves, when ending turn
     // call OnEndMoves when timer reaches 0 moves in all stages
     addMove(onEndMoves: () => void): void {
-        console.log('adding move to timer');
         if (this.currentStageMoves !== null) {
             this.currentStageMoves++;
             
@@ -181,14 +179,12 @@ export class BronsteinDelayTimer extends Timer implements TimerWithMoves, TimerW
 
             if (stageDelay && !stageDelay.isDefault()) {
                 this.currentStageTime = Math.min(this.stageTimeAtTurnStart, this.currentStageTime + stageDelay.toMiliseconds());
-                console.log(`prev time: ${this.stageTimeAtTurnStart}ms, Added delay: ${stageDelay.toMiliseconds()}ms, new time: ${this.currentStageTime}ms`);
             }
             
             const currentStageMaxMoves = (this.stages[this.currentStage] as BronsteinDelayStage).moves;
             const remainingMoves = currentStageMaxMoves - this.currentStageMoves;
             
             if (currentStageMaxMoves && remainingMoves <= 0) { // if no more moves in current stage, move to next stage
-                console.log("calling moveToNextStage in addMove");
                 let movedToNextStage = this.#moveToNextStage();
                 if (!movedToNextStage) { // if no more stages, call onEndMoves
                     onEndMoves();
@@ -200,20 +196,20 @@ export class BronsteinDelayTimer extends Timer implements TimerWithMoves, TimerW
     }
 
     //update current stage time
-    _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): void {
+    _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): boolean {
         if (this.currentStageTime !== null) {
-            console.log("time left miliseconds:", timeLeftMiliseconds);
             this.currentStageTime = timeLeftMiliseconds;
             if (timeLeftMiliseconds <= 0) { // if no more time in current stage, move to next stage
-                console.log("calling moveToNextStage in _updateStageTime");
                 let movedToNextStage = this.#moveToNextStage();
                 if (movedToNextStage) {
                     this.startTurn(performance.now());
+                    return true;
                 } else { // if no more stages, call onEndMoves
                     onEndMoves();
                 }
             }
         }
+        return false;
     }
 
     reset(): void {

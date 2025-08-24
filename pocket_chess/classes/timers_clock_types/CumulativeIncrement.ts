@@ -190,7 +190,7 @@ export class CumulativeIncrementTimer extends Timer implements TimerWithMoves {
     }
 
     //update current stage time
-    _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): void {
+    _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): boolean {
         if (this.currentStageTime !== null) {
             this.currentStageTime = Math.max(0, timeLeftMiliseconds); // always set to 0 or more
             if (timeLeftMiliseconds === 0) {
@@ -200,10 +200,13 @@ export class CumulativeIncrementTimer extends Timer implements TimerWithMoves {
                 }
             }
         }
+        return false;
     }
 
     reset(): void {
         super.reset();
+        this.currentStageIncrement = (this.stages[this.currentStage] as CumulativeIncrementStage).incrementBase.toMiliseconds(); // reset increment to base increment
+        this.currentStageMovesToGrowIncrement = 0;
         this.currentStageTotalMoves = 0;
     }
 

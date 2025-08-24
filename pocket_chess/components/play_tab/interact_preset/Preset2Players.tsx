@@ -5,7 +5,6 @@ import * as Constants from '../../../constants';
 import IconComponent from '../../common/IconComponent.jsx';
 import ActionIcon from '../../common/ActionIcon';
 import { router } from 'expo-router';
-import { Animated } from 'react-native';
 
 import Preset, { Time, Stage, Timer} from '../../../classes/timers_base/Preset';
 import { isTimerWithMoves, isTimerWithLives, isTimerWithDelay, TimerWithMoves, TimerWithLives, TimerWithDelay } from '../../../classes/types/TimerBuilderTypes';
@@ -29,7 +28,6 @@ interface PlayerTouchableSectionProps {
 const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isActive=false, paused=true, firstPlayer=false, started=false, lostGame=false, moreStyles=null}: PlayerTouchableSectionProps) => {
   const [currentTime, setCurrentTime] = useState<number | null>(timer.currentStageTime);
   const [currentMoves, setCurrentMoves] = useState<number | null>(isTimerWithMoves(timer) ? timer.getCurrentStageMoves() : null);
-  const [currentStage, setCurrentStage] = useState<number | null>(timer.currentStage);
   const [currentLives, setCurrentLives] = useState<number | null>(isTimerWithLives(timer) ? timer.getCurrentStageLives() : null);
 
   const intervalRef = useRef(null); // to store the interval reference
@@ -67,17 +65,12 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
         const elapsed = performance.now() - startTime;
         const timeLeft = Math.max(0, stageTimeAtTurnStart - elapsed);
 
-        const stageBeforeUpdate = timer.currentStage;
-
-        timer._updateStageTime(timeLeft, () => {
+        const requiresUpdateTimers = timer._updateStageTime(timeLeft, () => {
           clearInterval(intervalRef.current);
           handleTimeout();
         });
 
-        const stageAfterUpdate = timer.currentStage;
-
-        // if changed stage, update values to new stage
-        if (stageAfterUpdate > stageBeforeUpdate) {
+        if (requiresUpdateTimers) {
           startTime = performance.now();
           stageTimeAtTurnStart = timer.currentStageTime;
         }
@@ -145,49 +138,53 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
     if (isTimerWithLives(timer)) {
       setCurrentLives(timer.getCurrentStageLives());
     }
-    //update current stage
-    setCurrentStage(timer.currentStage);
   }
 
   return (
     <View style={[styles.touchableContainer, moreStyles, isActive && started && styles.activeContainerColor, lostGame && styles.lostContainerColor, paused && started && styles.disabledContainer]}>
       <TouchableOpacity onPress={onPressSection} style={{flex: 1}}>
         <View style={styles.headerContainer}>
-          {/* only show stages elements if there are more than one */}
-          {timer.stages.length > 1 && ( 
-            <View style={styles.stagesContainer}>
-              {timer.stages.map((stage, i) => {
-                const isStagePassed = i <= timer.currentStage;
-                return (
-                  <View style={[isStagePassed ? styles.passedStageIndicator : styles.unpassedStageIndicator]} key={i}/>
-                );
-              })}
-            </View>
-          )}
-          {/*conditionally show moves if timer supports it, and there is a defined limit for the stage */}
-          {(isTimerWithMoves(timer) && timer.getCurrentStageMoves()) ? (
-            <View style={styles.headerSectionContainer}>
-              <IconComponent source={Constants.icons.pawn_full} width={14} tintColor={Constants.COLORS.white}/>
-              <Text style={[styles.normalText, {marginLeft: 5}]}>
-                {currentMoves}
-              </Text>
-            </View>
-          ) : null }
           {/*conditionally show lives if timer supports it */}
-          {(isTimerWithLives(timer) && timer.getCurrentStageLives()) ? (
-            <View style={styles.headerSectionContainer}>
-              <IconComponent source={Constants.icons.heart_full} width={14} tintColor={Constants.COLORS.white}/>
-              <Text style={[styles.normalText, {marginLeft: 5}]}>
-                {currentLives}
-              </Text>
-            </View>
-          ) : null }
+          <View style={styles.headerSideContainer}>
+            {(isTimerWithLives(timer) && timer.getCurrentStageLives()) ? (
+              <View style={styles.headerInfoContainer}>
+                <IconComponent source={Constants.icons.heart_full} width={14} tintColor={Constants.COLORS.white}/>
+                <Text style={[styles.normalText, {marginLeft: 5}]}>
+                  {currentLives}
+                </Text>
+              </View>
+            ) : null }
+          </View>
+          {/* only show stages elements if there are more than one */}
+          <View style={styles.headerCenterContainer}>
+            {timer.stages.length > 1 && ( 
+              <View style={styles.stagesContainer}>
+                {timer.stages.map((stage, i) => {
+                  const isStagePassed = i <= timer.currentStage;
+                  return (
+                    <View style={[isStagePassed ? styles.passedStageIndicator : styles.unpassedStageIndicator]} key={i}/>
+                  );
+                })}
+              </View>
+            )}
+          </View>
+          {/*conditionally show moves if timer supports it, and there is a defined limit for the stage */}
+          <View style={[styles.headerSideContainer, { justifyContent: 'flex-end' }]}>
+            {(isTimerWithMoves(timer) && timer.getCurrentStageMoves()) ? (
+              <View style={styles.headerInfoContainer}>
+                <IconComponent source={Constants.icons.pawn_full} width={14} tintColor={Constants.COLORS.white}/>
+                <Text style={[styles.normalText, {marginLeft: 5}]}>
+                  {currentMoves}
+                </Text>
+              </View>
+            ) : null }
+          </View>
         </View>
         <View style={styles.clockContainer}>
           {/*conditionally show delay if timer supports it */}
           <Text style={[styles.hiddenText, !firstPlayer && !started && styles.normalText]}>Press here to start</Text>
 
-          {(isTimerWithDelay(timer) && isActive && started) ? ( // && turnStartTimeRef.current
+          {(isTimerWithDelay(timer) && isActive && started) ? (
             <DelayProgressBar
               timer={timer}
               isActive={isActive}
@@ -476,15 +473,18 @@ const styles = StyleSheet.create({
   headerContainer: {
     height: 30,
     width: '100%',
-    position: 'relative',
-    alignItems: 'center',
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingTop: 5,
+    position: 'absolute'
   },
 
   stagesContainer: {
     columnGap: 10,
     justifyContent: 'center',
-    width: '100%',
+    alignItems: 'center',
     flexDirection: 'row',
   },
 
@@ -508,10 +508,21 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
 
-  headerSectionContainer: {
-    position: 'absolute',
-    right: 10,
-    top: 2, // some additional space to align with the stages icons
+  headerSideContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+
+  headerCenterContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  headerInfoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },

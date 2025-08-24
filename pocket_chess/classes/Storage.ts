@@ -150,8 +150,8 @@ class Storage {
               ),
               Preset.samePlayerTimers(
                 new FixedMovesTimer(
-                  [new FixedMovesStage(new Time(0,0,10), 3, 10),
-                   new FixedMovesStage(new Time(0,0,5), 2)
+                  [new FixedMovesStage(new Time(0,0,10), 2, 10),
+                   new FixedMovesStage(new Time(0,0,5), 3)
                   ]),
                 "Fixed Moves"
               )

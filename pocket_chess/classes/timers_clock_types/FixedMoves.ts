@@ -91,8 +91,8 @@ export class FixedMovesTimer extends Timer implements TimerWithMoves, TimerWithL
         }
 
         super(stages, playerName, currentStage, currentStageTime, PresetTypes.FIXED_MOVES.id);
+        this.currentStageLives = currentStageLives ? currentStageLives : (this.stages[this.currentStage] as FixedMovesStage).lives; // it decreases from max stage lives to 0
         this.currentStageMoves = currentStageMoves ? currentStageMoves : 0; // it increases until reaching max stage moves (if it exists)
-        this.currentStageLives = currentStageLives ? currentStageLives : 0; // it increases until reaching max stage lives
     }
 
     static fromJSON(data: FixedMovesTimerJSON): FixedMovesTimer {
@@ -132,7 +132,7 @@ export class FixedMovesTimer extends Timer implements TimerWithMoves, TimerWithL
         if (this.currentStage < this.stages.length - 1) {
             this.currentStage++;
             this.currentStageTime = (this.stages[this.currentStage] as FixedMovesStage).time.toMiliseconds(); // set current stage time to the next stage time
-            this.currentStageLives = 0; // reset lives for the new stage
+            this.currentStageLives = (this.stages[this.currentStage] as FixedMovesStage).lives; // reset max lives for the new stage
             this.currentStageMoves = 0; // reset moves for the new stage
             return true; // moved to next stage
         }
@@ -141,14 +141,13 @@ export class FixedMovesTimer extends Timer implements TimerWithMoves, TimerWithL
 
     // reduce lives in current stage for player (if possible)
     #consumeLife(): boolean {
-        const currentStageMaxLives = (this.stages[this.currentStage] as FixedMovesStage).lives;
-        if (this.currentStageLives == currentStageMaxLives) {
-            this.currentStageLives = 0;
-            return false; // no more lives to consume in current stage
+        this.currentStageLives--;
+        if (this.currentStageLives === 0) {
+            return true; // no more lives to consume in current stage
         }
 
-        this.currentStageLives++;
-        return true;
+        this.currentStageTime = (this.stages[this.currentStage] as FixedMovesStage).time.toMiliseconds(); // set current stage time to the next stage time
+        return false;
     }
 
     //increment current stage moves
@@ -173,27 +172,30 @@ export class FixedMovesTimer extends Timer implements TimerWithMoves, TimerWithL
     }
 
     //update current stage time
-    _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): void {
+    _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): boolean {
         if (this.currentStageTime !== null) {
-            this.currentStageTime = Math.max(0, timeLeftMiliseconds); // always set to 0 or more
-            if (timeLeftMiliseconds === 0) {
-                const reduceLives : boolean = this.#consumeLife();
-                if (reduceLives) {
-                    this.currentStageTime = (this.stages[this.currentStage] as FixedMovesStage).time.toMiliseconds(); // reset current stage time to the start stage time
-                } else {
+            this.currentStageTime = timeLeftMiliseconds;
+            if (timeLeftMiliseconds <= 0) {
+                console.log("before lives:", this.currentStageLives, "/", (this.stages[this.currentStage] as FixedMovesStage).lives);
+                const reducedLives : boolean = this.#consumeLife();
+                console.log("after lives:", this.currentStageLives, "/", (this.stages[this.currentStage] as FixedMovesStage).lives);
+                console.log("current stage time:", this.currentStageTime);
+                if (reducedLives) {
                     const moveToNextStage : boolean = this.#moveToNextStage();
                     if (!moveToNextStage) { // if no more stages, end timer
                         onEndMoves();
                     }
-                    
                 }
+                return true;
             }
         }
+        return false;
     }
 
     reset(): void {
         super.reset();
         this.currentStageMoves = 0;
+        this.currentStageLives = (this.stages[this.currentStage] as FixedMovesStage).lives;
     }
 
     getCurrentStageLives(): number {

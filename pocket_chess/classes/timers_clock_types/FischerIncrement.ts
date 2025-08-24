@@ -155,7 +155,7 @@ export class FischerIncrementTimer extends Timer implements TimerWithMoves {
     }
 
     //update current stage time
-    _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): void {
+    _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): boolean {
         if (this.currentStageTime !== null) {
             this.currentStageTime = Math.max(0, timeLeftMiliseconds); // always set to 0 or more
             if (timeLeftMiliseconds === 0) {
@@ -165,6 +165,7 @@ export class FischerIncrementTimer extends Timer implements TimerWithMoves {
                 }
             }
         }
+        return false;
     }
 
     reset(): void {
