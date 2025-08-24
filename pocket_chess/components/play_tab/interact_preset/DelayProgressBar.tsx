@@ -4,9 +4,10 @@ import * as Constants from '../../../constants/index';
 import { SimpleDelayTimer } from '../../../classes/timers_clock_types/SimpleDelay';
 import { BronsteinDelayTimer } from '../../../classes/timers_clock_types/BronsteinDelay';
 import { isTimerWithDelay, TimerWithDelay } from '../../../classes/types/TimerBuilderTypes';
+import Timer from '../../../classes/timers_base/Timer';
 
 interface DelayProgressBarProps {
-  timer: TimerWithDelay;
+  timer: Timer & TimerWithDelay;
   isActive: boolean;
   started: boolean;
   paused: boolean;
@@ -54,14 +55,14 @@ const DelayProgressBar: React.FC<DelayProgressBarProps> = ({ timer, isActive, st
       progressAnim.setValue(currentProgress);
 
     } else {
-      // Reset if not active or not started
+      // reset if not active or not started
       progressAnim.setValue(0);
     }
 
     return () => {
       animationRef.current?.stop();
     };
-  }, [isActive, started, paused]);
+  }, [isActive, started, paused, timer.getCurrentStageId()]); // also retrigger when stage changes
 
   // hide progress bar if no delay attributes or null delay
   if (!isTimerWithDelay(timer) || 

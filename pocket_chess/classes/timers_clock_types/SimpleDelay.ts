@@ -64,10 +64,10 @@ export class SimpleDelayStage extends Stage {
  */
 export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWithDelay {
     public currentStageMoves: number;
-    public delayStartTime: number | null = null; // timestamp when delay period started
+    public turnStartTimestamp: number | null = null; // timestamp when current active turn started
     public pausedAt: number | null = null; // timestamp when the timer was paused
     public totalPausedDuration: number = 0; // total time spent paused
-    public turnInitialTime: number | null = null; // time when current active turn started
+    public stageTimeAtTurnStart: number | null = null; // value of stage time at the start of turn
 
     /**
      * @constructor
@@ -124,30 +124,30 @@ export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWith
     }
 
     startTurn(startTime: number): void {
-        this.delayStartTime = startTime;
+        this.turnStartTimestamp = startTime;
         this.pausedAt = null;
         this.totalPausedDuration = 0;
-        this.turnInitialTime = this.currentStageTime;
+        this.stageTimeAtTurnStart = this.currentStageTime;
     }
 
     endTurn(): void {
-        this.delayStartTime = null;
+        this.turnStartTimestamp = null;
         this.pausedAt = null;
         this.totalPausedDuration = 0;
-        this.turnInitialTime = null;
+        this.stageTimeAtTurnStart = null;
     }
 
-    // new pause method
+    // pause method
     pauseTurn(): void {
-        if (this.delayStartTime && this.pausedAt === null) {
+        if (this.pausedAt === null) {
             this.pausedAt = performance.now();
         }
     }
 
-    // new resume method
+    // resume method
     resumeTurn(): void {
 
-        if (this.delayStartTime && this.pausedAt) {
+        if (this.pausedAt) {
             const pauseDuration = performance.now() - this.pausedAt;
             this.totalPausedDuration += pauseDuration;
             this.pausedAt = null;
@@ -194,24 +194,28 @@ export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWith
     //update current stage time, taking into account delay
     _updateStageTime(initialTimeMiliseconds: number, timeLeftMiliseconds: number, onEndMoves: () => void): void {
 
-        if (this.currentStageTime !== null && this.delayStartTime !== null && !this.isPaused()) {
+        if (this.currentStageTime !== null && this.turnStartTimestamp !== null && !this.isPaused()) {
             const delayMs = this.getCurrentStageDelay().toMiliseconds();
             const now = performance.now();
-            const elapsedTime = (now - this.delayStartTime) - this.totalPausedDuration;
+            const elapsedTime = (now - this.turnStartTimestamp) - this.totalPausedDuration;
 
             if (elapsedTime < delayMs) {
                 // dont know why, but this helps prevent flickering (because linking changes between state and progress bar?)
-                this.currentStageTime = initialTimeMiliseconds;
+                this.currentStageTime = this.stageTimeAtTurnStart;
             } else {
                 // after delay, count down from original time
                 const timeAfterDelay = elapsedTime - delayMs;
-                this.currentStageTime = Math.max(0, this.turnInitialTime - timeAfterDelay);
+                const newCurrentStageTime = this.stageTimeAtTurnStart - timeAfterDelay;
 
-                if (this.currentStageTime === 0) {
-                    let moveToNextStage = this.#moveToNextStage();
-                    if (!moveToNextStage) {
+                if (newCurrentStageTime <= 0) {
+                    let movedToNextStage = this.#moveToNextStage();
+                    if (movedToNextStage) {
+                        this.startTurn(performance.now());
+                    } else {
                         onEndMoves();
                     }
+                } else {
+                    this.currentStageTime = newCurrentStageTime;
                 }
             }
         }
@@ -220,10 +224,10 @@ export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWith
     reset(): void {
         super.reset();
         this.currentStageMoves = 0;
-        this.delayStartTime = null;
+        this.turnStartTimestamp = null;
         this.pausedAt = null;
         this.totalPausedDuration = 0;
-        this.turnInitialTime = null;
+        this.stageTimeAtTurnStart = null;
     }
 
     getCurrentStageMoves(): number {
@@ -235,7 +239,7 @@ export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWith
     }
 
     getDelayProgress(): number {
-        if (this.delayStartTime === null) return 0;
+        if (this.turnStartTimestamp === null) return 0;
         
         const delayMs = this.getCurrentStageDelay().toMiliseconds();
         if (delayMs === 0) return 1;
@@ -246,7 +250,7 @@ export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWith
             currentTime = this.pausedAt;
         }
 
-        const elapsedTime = (currentTime - this.delayStartTime) - this.totalPausedDuration;
+        const elapsedTime = (currentTime - this.turnStartTimestamp) - this.totalPausedDuration;
         const progress = Math.min(1, Math.max(0, elapsedTime / delayMs));
         
         return progress;

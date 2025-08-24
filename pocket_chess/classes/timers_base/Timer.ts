@@ -101,6 +101,14 @@ export default abstract class Timer {
         this.currentStageTime = this.stages[0].time.toMiliseconds();
     }
 
+    getCurrentStageId(): number {
+        return this.currentStage;
+    }
+
+    getCurrentStage(): Stage {
+        return this.stages[this.currentStage];
+    }
+
     /**
      * Deserialize object from JSON
      * Defined in TimerFactory.js to avoid cyclic depedencies

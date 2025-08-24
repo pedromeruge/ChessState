@@ -67,7 +67,7 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
       intervalRef.current = setInterval(() => {
         const elapsed = performance.now() - startTime;
         const timeLeft = Math.max(0, initialTime - elapsed);
-        
+
         timer._updateStageTime(initialTime, timeLeft, () => {
           clearInterval(intervalRef.current);
           handleTimeout();
@@ -180,7 +180,7 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
 
           {(isTimerWithDelay(timer) && isActive && started) ? ( // && turnStartTimeRef.current
             <DelayProgressBar
-              timer={timer as TimerWithDelay}
+              timer={timer}
               isActive={isActive}
               started={started}
               paused={paused}
