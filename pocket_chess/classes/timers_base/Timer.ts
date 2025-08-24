@@ -53,7 +53,7 @@ export default abstract class Timer {
      * @param timeLeftMiliseconds - time left in milliseconds after frame interval
      * @param onEndMoves - callback function to call when no more moves are available in all stages
      */
-    abstract _updateStageTime(initialTimeMiliseconds: number, timeLeftMiliseconds: number, onEndMoves: () => void): void;
+    abstract _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): void;
 
     /**
      * @abstract

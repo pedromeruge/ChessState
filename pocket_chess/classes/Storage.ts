@@ -136,8 +136,8 @@ class Storage {
               ),
               Preset.samePlayerTimers(
                 new BronsteinDelayTimer(
-                  [new BronsteinDelayStage(new Time(0,0,10), new Time(0,0,3), 5),
-                    new BronsteinDelayStage(new Time(0,0,30), new Time(0,0,1), 3)
+                  [new BronsteinDelayStage(new Time(0,0,10), new Time(0,0,3), 10),
+                   new BronsteinDelayStage(new Time(0,0,30), new Time(0,0,1))
                   ]),
                 "Brons delay"
               ),

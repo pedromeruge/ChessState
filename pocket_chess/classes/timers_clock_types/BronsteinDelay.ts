@@ -65,10 +65,10 @@ export class BronsteinDelayStage extends Stage {
  */
 export class BronsteinDelayTimer extends Timer implements TimerWithMoves, TimerWithDelay {
     public currentStageMoves: number;
-    public delayStartTime: number | null = null; // timestamp when delay period started
+    public stageTimeAtTurnStartstamp: number | null = null; // timestamp when current active turn started
     public pausedAt: number | null = null; // timestamp when the timer was paused
     public totalPausedDuration: number = 0; // total time spent paused
-    public turnStartTime: number | null = null; // time when current active turn started
+    public stageTimeAtTurnStart: number | null = null; // value of stage time at the start of turn
 
     /**
      * @constructor
@@ -125,30 +125,27 @@ export class BronsteinDelayTimer extends Timer implements TimerWithMoves, TimerW
     }
 
     startTurn(startTime: number): void {
-        this.delayStartTime = startTime;
+        this.stageTimeAtTurnStartstamp = startTime;
         this.pausedAt = null;
         this.totalPausedDuration = 0;
-        this.turnStartTime = this.currentStageTime;
+        this.stageTimeAtTurnStart = this.currentStageTime;
     }
 
     endTurn(): void {
-        this.delayStartTime = null;
+        this.stageTimeAtTurnStartstamp = null;
         this.pausedAt = null;
         this.totalPausedDuration = 0;
-        this.turnStartTime = null;
+        this.stageTimeAtTurnStart = null;
     }
 
     // pause method
     pauseTurn(): void {
-        if (this.delayStartTime && this.pausedAt === null) {
-            this.pausedAt = performance.now();
-        }
+        this.pausedAt = performance.now();
     }
 
     // resume method
     resumeTurn(): void {
-
-        if (this.delayStartTime && this.pausedAt) {
+        if (this.pausedAt) {
             const pauseDuration = performance.now() - this.pausedAt;
             this.totalPausedDuration += pauseDuration;
             this.pausedAt = null;
@@ -161,10 +158,12 @@ export class BronsteinDelayTimer extends Timer implements TimerWithMoves, TimerW
     }
 
     #moveToNextStage(): boolean {
+        console.log("current stage:", this.currentStage, "stages length:", this.stages.length - 1);
         if (this.currentStage < this.stages.length - 1) {
             this.currentStage++;
             this.currentStageTime = (this.stages[this.currentStage] as BronsteinDelayStage).time.toMiliseconds(); // set current stage time to the next stage time
             this.currentStageMoves = 0; // reset moves for the new stage
+            this.endTurn();
             return true; // moved to next stage
         }
         return false; // no more stages to move to
@@ -177,32 +176,40 @@ export class BronsteinDelayTimer extends Timer implements TimerWithMoves, TimerW
         if (this.currentStageMoves !== null) {
             this.currentStageMoves++;
             
-            // add delay time to current stage time
-            const delay = (this.stages[this.currentStage] as BronsteinDelayStage).delay;
-            if (delay && !delay.isDefault()) {
-                this.currentStageTime += delay.toMiliseconds();
-                console.log(`Added delay: ${delay.toMiliseconds()}ms, new time: ${this.currentStageTime}ms`);
+            // add delay time to current stage time, with time only being able to stay the same or decrease
+            const stageDelay = (this.stages[this.currentStage] as BronsteinDelayStage).delay;
+
+            if (stageDelay && !stageDelay.isDefault()) {
+                this.currentStageTime = Math.min(this.stageTimeAtTurnStart, this.currentStageTime + stageDelay.toMiliseconds());
+                console.log(`prev time: ${this.stageTimeAtTurnStart}ms, Added delay: ${stageDelay.toMiliseconds()}ms, new time: ${this.currentStageTime}ms`);
             }
             
             const currentStageMaxMoves = (this.stages[this.currentStage] as BronsteinDelayStage).moves;
             const remainingMoves = currentStageMaxMoves - this.currentStageMoves;
+            
             if (currentStageMaxMoves && remainingMoves <= 0) { // if no more moves in current stage, move to next stage
-                let moveToNextStage = this.#moveToNextStage();
-                if (!moveToNextStage) { // if no more stages, call onEndMoves
+                console.log("calling moveToNextStage in addMove");
+                let movedToNextStage = this.#moveToNextStage();
+                if (!movedToNextStage) { // if no more stages, call onEndMoves
                     onEndMoves();
                 }
             }
         }
+
+        this.endTurn(); // end delay calculations for this turn
     }
 
-    // TODO
     //update current stage time
-    _updateStageTime(initialTimeMiliseconds: number, timeLeftMiliseconds: number, onEndMoves: () => void): void {
+    _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): void {
         if (this.currentStageTime !== null) {
-            this.currentStageTime = Math.max(0, timeLeftMiliseconds); // always set to 0 or more
-            if (timeLeftMiliseconds === 0) {
-                let moveToNextStage = this.#moveToNextStage();
-                if (!moveToNextStage) { // if no more stages, reset current stage time to 0
+            console.log("time left miliseconds:", timeLeftMiliseconds);
+            this.currentStageTime = timeLeftMiliseconds;
+            if (timeLeftMiliseconds <= 0) { // if no more time in current stage, move to next stage
+                console.log("calling moveToNextStage in _updateStageTime");
+                let movedToNextStage = this.#moveToNextStage();
+                if (movedToNextStage) {
+                    this.startTurn(performance.now());
+                } else { // if no more stages, call onEndMoves
                     onEndMoves();
                 }
             }
@@ -212,10 +219,10 @@ export class BronsteinDelayTimer extends Timer implements TimerWithMoves, TimerW
     reset(): void {
         super.reset();
         this.currentStageMoves = 0;
-        this.delayStartTime = null;
+        this.stageTimeAtTurnStartstamp = null;
         this.pausedAt = null;
         this.totalPausedDuration = 0;
-        this.turnStartTime = null;
+        this.stageTimeAtTurnStart = null;
     }
 
     getCurrentStageMoves(): number {
@@ -227,7 +234,7 @@ export class BronsteinDelayTimer extends Timer implements TimerWithMoves, TimerW
     }
 
     getDelayProgress(): number {
-        if (this.delayStartTime === null) return 0;
+        if (this.stageTimeAtTurnStartstamp === null) return 0;
         
         const delayMs = this.getCurrentStageDelay().toMiliseconds();
         if (delayMs === 0) return 1;
@@ -238,7 +245,7 @@ export class BronsteinDelayTimer extends Timer implements TimerWithMoves, TimerW
             currentTime = this.pausedAt;
         }
 
-        const elapsedTime = (currentTime - this.delayStartTime) - this.totalPausedDuration;
+        const elapsedTime = (currentTime - this.stageTimeAtTurnStartstamp) - this.totalPausedDuration;
         const progress = Math.min(1, Math.max(0, elapsedTime / delayMs));
         
         return progress;

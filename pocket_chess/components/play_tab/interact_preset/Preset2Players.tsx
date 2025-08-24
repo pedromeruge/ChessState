@@ -55,24 +55,33 @@ const PlayerTouchableSection = ({timer, onTurnEnd, onGameOver, playerIndex, isAc
     if (isActive && !paused) {
       clearInterval(intervalRef.current!); //clear any previous intervals that linger
 
-      const startTime = performance.now();
+      let startTime = performance.now();
+      let stageTimeAtTurnStart = timer.currentStageTime;
 
       // only start the turn if it's a new turn, not a resume
       if (isTimerWithDelay(timer) && !timer.isPaused()) {
         timer.startTurn(startTime);
       }
       
-      const initialTime = timer.currentStageTime;
-
       intervalRef.current = setInterval(() => {
         const elapsed = performance.now() - startTime;
-        const timeLeft = Math.max(0, initialTime - elapsed);
+        const timeLeft = Math.max(0, stageTimeAtTurnStart - elapsed);
 
-        timer._updateStageTime(initialTime, timeLeft, () => {
+        const stageBeforeUpdate = timer.currentStage;
+
+        timer._updateStageTime(timeLeft, () => {
           clearInterval(intervalRef.current);
           handleTimeout();
         });
 
+        const stageAfterUpdate = timer.currentStage;
+
+        // if changed stage, update values to new stage
+        if (stageAfterUpdate > stageBeforeUpdate) {
+          startTime = performance.now();
+          stageTimeAtTurnStart = timer.currentStageTime;
+        }
+        
         // re-render component
         updateTimerState(); 
 

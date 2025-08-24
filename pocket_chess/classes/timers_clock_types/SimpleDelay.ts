@@ -139,14 +139,11 @@ export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWith
 
     // pause method
     pauseTurn(): void {
-        if (this.pausedAt === null) {
-            this.pausedAt = performance.now();
-        }
+        this.pausedAt = performance.now();
     }
 
     // resume method
     resumeTurn(): void {
-
         if (this.pausedAt) {
             const pauseDuration = performance.now() - this.pausedAt;
             this.totalPausedDuration += pauseDuration;
@@ -164,7 +161,7 @@ export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWith
             this.currentStage++;
             this.currentStageTime = (this.stages[this.currentStage] as SimpleDelayStage).time.toMiliseconds(); // set current stage time to the next stage time
             this.currentStageMoves = 0; // reset moves for the new stage
-            this.endTurn(); // reset turn tracking
+            this.endTurn(); // start turn for new stage
             return true; // moved to next stage
         }
         return false; // no more stages to move to
@@ -188,11 +185,11 @@ export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWith
             }
         }
 
-        this.endTurn(); // end the turn after adding a move
+        this.endTurn(); // end delay calculations for this turn
     }
 
     //update current stage time, taking into account delay
-    _updateStageTime(initialTimeMiliseconds: number, timeLeftMiliseconds: number, onEndMoves: () => void): void {
+    _updateStageTime(timeLeftMiliseconds: number, onEndMoves: () => void): void {
 
         if (this.currentStageTime !== null && this.turnStartTimestamp !== null && !this.isPaused()) {
             const delayMs = this.getCurrentStageDelay().toMiliseconds();
@@ -207,11 +204,11 @@ export class SimpleDelayTimer extends Timer implements TimerWithMoves, TimerWith
                 const timeAfterDelay = elapsedTime - delayMs;
                 const newCurrentStageTime = this.stageTimeAtTurnStart - timeAfterDelay;
 
-                if (newCurrentStageTime <= 0) {
+                if (newCurrentStageTime <= 0) { // if no more time in current stage, move to next stage
                     let movedToNextStage = this.#moveToNextStage();
                     if (movedToNextStage) {
                         this.startTurn(performance.now());
-                    } else {
+                    } else { // if no more stages, call onEndMoves
                         onEndMoves();
                     }
                 } else {
