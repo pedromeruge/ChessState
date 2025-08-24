@@ -7,7 +7,7 @@ import { TimerWithMoves } from '../types/TimerBuilderTypes';
 export interface CumulativeIncrementStageJSON extends StageJSON {
     incrementBase: TimeJSON;
     incrementGrowth: TimeJSON;
-    incrementPerMoves: number;
+    movesToGrowIncrement: number;
     totalMoves: number | null;
 }
 
@@ -16,23 +16,20 @@ export interface CumulativeIncrementTimerJSON {
     playerName: string;
     currentStage: number;
     currentStageTime: number;
-    currentStageIncrement: number;
-    currentStageIncrementMoves: number;
-    currentStageTotalMoves: number;
     presetTypeId: number;
 }
 
 export class CumulativeIncrementStage extends Stage {
     public incrementBase: Time;
     public incrementGrowth: Time;
-    public incrementPerMoves: number;
+    public movesToGrowIncrement: number;
     public totalMoves: number | null;
 
-    constructor(time: Time = new Time(0,0,0), incrementBase: Time = new Time(0,0,1), incrementGrowth: Time = new Time(0,0,1), incrementPerMoves: number = 1, totalMoves: number | null = null) {
+    constructor(time: Time = new Time(0,0,0), incrementBase: Time = new Time(0,0,1), incrementGrowth: Time = new Time(0,0,1), movesToGrowIncrement: number = 1, totalMoves: number | null = null) {
         super(time);
         this.incrementBase = incrementBase;
         this.incrementGrowth = incrementGrowth;
-        this.incrementPerMoves = incrementPerMoves;
+        this.movesToGrowIncrement = movesToGrowIncrement;
         this.totalMoves = totalMoves;
     }
 
@@ -40,7 +37,7 @@ export class CumulativeIncrementStage extends Stage {
         const json = super.toJSON() as any;
         json.incrementBase = this.incrementBase.toJSON();
         json.incrementGrowth = this.incrementGrowth.toJSON();
-        json.incrementPerMoves = this.incrementPerMoves;
+        json.movesToGrowIncrement = this.movesToGrowIncrement;
         json.totalMoves = this.totalMoves;
         return json;
     }
@@ -50,13 +47,13 @@ export class CumulativeIncrementStage extends Stage {
             Time.fromJSON(data.time),
             Time.fromJSON(data.incrementBase),
             Time.fromJSON(data.incrementGrowth),
-            data.incrementPerMoves,
+            data.movesToGrowIncrement,
             data.totalMoves,
         );
     }
 
     toString(): string {
-        return `${Time.toStringCleanBoth(this.time, this.incrementBase)} - ${this.incrementGrowth.toStringTimerSimple()} after ${this.incrementPerMoves ? this.incrementPerMoves : '∞'} moves`;
+        return `${Time.toStringCleanBoth(this.time, this.incrementBase)} - ${this.incrementGrowth.toStringTimerSimple()} after ${this.movesToGrowIncrement ? this.movesToGrowIncrement : '∞'} moves`;
     }
 
     clone(): CumulativeIncrementStage {
@@ -64,7 +61,7 @@ export class CumulativeIncrementStage extends Stage {
             this.time.clone(),
             this.incrementBase.clone(),
             this.incrementGrowth.clone(),
-            this.incrementPerMoves,
+            this.movesToGrowIncrement,
             this.totalMoves
         );
     }
@@ -78,7 +75,7 @@ export class CumulativeIncrementStage extends Stage {
  */
 export class CumulativeIncrementTimer extends Timer implements TimerWithMoves {
     public currentStageIncrement: number | null;
-    public currentStageIncrementMoves: number;
+    public currentStageMovesToGrowIncrement: number;
     public currentStageTotalMoves: number;
 
     /**
@@ -89,7 +86,7 @@ export class CumulativeIncrementTimer extends Timer implements TimerWithMoves {
      * @param currentStage - current stage index
      * @param currentStageTime - current stage time in miliseconds, if passed null becomes max stage time
      * @param currentStageIncrement - current stage value of increment (progressively increased by growth rate, after x increment moves). If null is base stage increment time
-     * @param currentStageIncrementMoves - current number of moves since last increment, by default 0
+     * @param currentStageMovesToGrowIncrement - current number of moves since last increment, by default 0
      * @param currentStageTotalMoves - current stage totalMoves, if null is max stage totalMoves
      */
     constructor(
@@ -98,7 +95,7 @@ export class CumulativeIncrementTimer extends Timer implements TimerWithMoves {
         currentStage: number = 0, 
         currentStageTime: number | null = null, 
         currentStageIncrement: number | null = null,
-        currentStageIncrementMoves: number = 0,
+        currentStageMovesToGrowIncrement: number = 0,
         currentStageTotalMoves: number | null = null
     ) {
         //guarantee stages is a list of FischerIncremenStages objects
@@ -108,7 +105,7 @@ export class CumulativeIncrementTimer extends Timer implements TimerWithMoves {
 
         super(stages, playerName, currentStage, currentStageTime, PresetTypes.CUMULATIVE_INCREMENT.id);
         this.currentStageIncrement = currentStageIncrement ? currentStageIncrement : (this.stages[currentStage] as CumulativeIncrementStage).incrementBase.toMiliseconds(); // in miliseconds
-        this.currentStageIncrementMoves = currentStageIncrementMoves;
+        this.currentStageMovesToGrowIncrement = currentStageMovesToGrowIncrement ? currentStageMovesToGrowIncrement : 0; // it increases until reaching max stage movesToGrowIncrement
         this.currentStageTotalMoves = currentStageTotalMoves ? currentStageTotalMoves : 0; // it increases until reaching max stage totalMoves (if it exists)
     }
 
@@ -117,10 +114,7 @@ export class CumulativeIncrementTimer extends Timer implements TimerWithMoves {
             data.stages.map((stage: CumulativeIncrementStageJSON) => CumulativeIncrementStage.fromJSON(stage)), 
             data.playerName,
             data.currentStage,
-            data.currentStageTime,
-            data.currentStageIncrement,
-            data.currentStageIncrementMoves,
-            data.currentStageTotalMoves,
+            data.currentStageTime
         );
     }
 
@@ -129,9 +123,6 @@ export class CumulativeIncrementTimer extends Timer implements TimerWithMoves {
         return {
             ...json,
             stages: (this.stages as CumulativeIncrementStage[]).map((stage: CumulativeIncrementStage) => stage.toJSON()), // typcast the stages to be of specific type CumulativeIncrementStageJSON instead of just StageJSON
-            currentStageIncrement: this.currentStageIncrement,
-            currentStageIncrementMoves: this.currentStageIncrementMoves,
-            currentStageTotalMoves: this.currentStageTotalMoves
         };
     }
 
@@ -140,10 +131,7 @@ export class CumulativeIncrementTimer extends Timer implements TimerWithMoves {
             (this.stages as CumulativeIncrementStage[]).map((stage: CumulativeIncrementStage) => stage.clone()), // typcast stages as specific type CumulativeIncrementStage
             this.playerName,
             this.currentStage,
-            this.currentStageTime,
-            this.currentStageIncrement,
-            this.currentStageIncrementMoves,
-            this.currentStageTotalMoves
+            this.currentStageTime
         );
     }
 
@@ -152,6 +140,8 @@ export class CumulativeIncrementTimer extends Timer implements TimerWithMoves {
             this.currentStage++;
             this.currentStageTime = (this.stages[this.currentStage] as CumulativeIncrementStage).time.toMiliseconds(); // set current stage time to the next stage time
             this.currentStageTotalMoves = 0; // reset totalMoves for the new stage
+            this.currentStageMovesToGrowIncrement = 0;
+            this.currentStageIncrement = (this.stages[this.currentStage] as CumulativeIncrementStage).incrementBase.toMiliseconds(); // reset increment to base increment
             return true; // moved to next stage
         }
         return false; // no more stages to move to
@@ -162,18 +152,35 @@ export class CumulativeIncrementTimer extends Timer implements TimerWithMoves {
     addMove(onEndMoves: () => void): void {
         console.log('adding move to timer');
         if (this.currentStageTotalMoves !== null) {
-            this.currentStageTotalMoves++;
-            
+
             // add increment time to current stage time
             const increment = this.currentStageIncrement;
             if (increment) {
                 this.currentStageTime += increment;
-                console.log(`Added increment: ${increment}ms, new time: ${this.currentStageTime}ms`);
+            }
+
+            this.currentStageTotalMoves++;
+            this.currentStageMovesToGrowIncrement++;
+            const currentStageIncrementMaxMoves = (this.stages[this.currentStage] as CumulativeIncrementStage).movesToGrowIncrement;
+            
+            // if reached max moves to raise increment
+            if (this.currentStageMovesToGrowIncrement === currentStageIncrementMaxMoves) { 
+                this.currentStageMovesToGrowIncrement = 0; // reset increment moves
+                const currentStageIncrementGrowth = (this.stages[this.currentStage] as CumulativeIncrementStage).incrementGrowth.toMiliseconds();
+                this.currentStageIncrement += currentStageIncrementGrowth; // increase increment by growth rate
             }
             
             const currentStageMaxMoves = (this.stages[this.currentStage] as CumulativeIncrementStage).totalMoves;
             const remainingMoves = currentStageMaxMoves - this.currentStageTotalMoves;
-            if (currentStageMaxMoves && remainingMoves <= 0) { // if no more totalMoves in current stage, move to next stage
+
+            // console.log("baseIncrement:", (this.stages[this.currentStage] as CumulativeIncrementStage).incrementBase.toMiliseconds(),
+            //             "growth:", (this.stages[this.currentStage] as CumulativeIncrementStage).incrementGrowth.toMiliseconds(),
+            //             "currentIncrement:", this.currentStageIncrement, 
+            //             "currentMovesToIncrement:", this.currentStageMovesToGrowIncrement, "/", (this.stages[this.currentStage] as CumulativeIncrementStage).movesToGrowIncrement,
+            //             "currentStageTotalMoves:", this.currentStageTotalMoves, "/", currentStageMaxMoves);
+            
+            // if no more totalMoves in current stage, move to next stage
+            if (currentStageMaxMoves && remainingMoves <= 0) { 
                 let moveToNextStage = this.#moveToNextStage();
                 if (!moveToNextStage) { // if no more stages, call onEndMoves
                     onEndMoves();
