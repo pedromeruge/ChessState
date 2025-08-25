@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { BackHandler } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation for navigation control
 
-import BottomNavBar from '../../components/BottomNavBar';
+import BottomNavBar from '../../components/common/navbar/BottomNavBar';
 
 // handles the tab navigation layout
 const TabsLayout = () => {

@@ -1,5 +1,5 @@
 import { Text, StyleSheet } from 'react-native';
-import * as Constants from '../constants/index';
+import * as Constants from '../../../constants/index';
 import { PlatformPressable } from '@react-navigation/elements';
 import { useSharedValue, withSpring } from "react-native-reanimated"; // for animations
 import { useEffect } from 'react';

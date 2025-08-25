@@ -8,7 +8,7 @@ import Preset, { Stage, Timer } from '../../../../classes/timers_base/Preset';
 import Header from '../../../../components/common/Header.jsx';
 import ActionButton from '../../../../components/common/ActionButton.jsx';
 import storage from '../../../../classes/Storage';
-import TabNavigator from '../../../../components/TabNavigator';
+import TabNavigator from '../../../../components/common/TabNavigator';
 import TimerSelection, { TimerSelectionRef } from '../../../../components/play_tab/new_timer/TimerSelection';
 import PresetType, { PresetTypes, PresetIdToTypes } from '../../../../classes/PresetType';
 

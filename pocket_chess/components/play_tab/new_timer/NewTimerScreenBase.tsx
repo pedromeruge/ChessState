@@ -2,13 +2,13 @@ import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Keyboard, TextStyle } from 'react-native'
 import { useRouter } from 'expo-router';
 
-import * as Constants from '../constants/index';
-import * as Styles from '../styles/index.js';
+import * as Constants from '../../../constants/index';
+import * as Styles from '../../../styles/index.js';
 
-import IconComponent from './common/IconComponent.jsx';
-import ActionButton from './common/ActionButton.jsx';
-import Header from './common/Header.jsx';
-import { Time } from '../classes/timers_base/Preset';
+import IconComponent from '../../common/IconComponent.jsx';
+import ActionButton from '../../common/ActionButton.jsx';
+import Header from '../../common/Header.jsx';
+import { Time } from '../../../classes/timers_base/Preset';
 
 interface NewTimerScreenBaseRef {
     showScreen: () => void;

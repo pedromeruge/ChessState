@@ -6,7 +6,7 @@ import * as Styles from '../../../styles/index.js';
 
 import IconComponent from '../../common/IconComponent.jsx';
 import { Time} from '../../../classes/timers_base/Preset';
-import ModalTimerPicker from '../../ModalTimerPicker';
+import ModalTimerPicker from '../../common/ModalTimerPicker';
 
 interface StageTimeFieldRef {
   getTime: () => Time;

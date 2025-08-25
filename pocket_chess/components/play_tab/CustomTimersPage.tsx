@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Constants from '../../constants';
 import IconComponent from '../common/IconComponent.jsx';
 import TimerPresetSection from './TimerPresetSection';
-import NewTimerModal, {NewTimerModalRef} from '../NewTimerModal';
+import NewTimerModal, {NewTimerModalRef} from './new_timer/NewTimerModal';
 import storage from '../../classes/Storage';
 import SmallActionButton from '../common/SmallActionButton';
 import Preset from '../../classes/timers_base/Preset';

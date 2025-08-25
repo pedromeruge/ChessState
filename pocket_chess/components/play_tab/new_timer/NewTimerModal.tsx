@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { SafeAreaView, View, StyleSheet, Modal, Pressable} from 'react-native'
 
-import * as Constants from '../constants/index';
 import NewTimerScreenBase, {NewTimerScreenBaseRef} from './NewTimerScreenBase';
 import NewTimerScreenPicker, {NewTimerScreenPickerRef} from './NewTimerScreenPicker';
-import Preset, { Time } from '../classes/timers_base/Preset';
-import { FischerIncrementStage, FischerIncrementTimer } from '../classes/timers_clock_types/FischerIncrement';
+import Preset, { Time } from '../../../classes/timers_base/Preset';
+import { FischerIncrementStage, FischerIncrementTimer } from '../../../classes/timers_clock_types/FischerIncrement';
 import {router} from 'expo-router'
-import storage from '../classes/Storage';
+import storage from '../../../classes/Storage';
 
 interface NewTimerModalRef {
     showModal: () => void;

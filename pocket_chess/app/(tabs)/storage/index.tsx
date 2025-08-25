@@ -1,12 +1,8 @@
-import { View, Text } from 'react-native'
 import React from 'react'
+import { Redirect } from 'expo-router';
 
 const Storage = () => {
-  return (
-    <View>
-      <Text>Storage</Text>
-    </View>
-  )
+  return <Redirect href="/storage/store_new_timer" />;
 }
 
 export default Storage
