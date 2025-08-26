@@ -35,7 +35,7 @@ const Layout = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <Stack screenOptions={{ headerShown: false }}/>
+      <Stack screenOptions={{ headerShown: false}}/>
     </View>
   );
 };

@@ -30,7 +30,7 @@ const TabsLayout = () => {
           tabBar={props => <BottomNavBar {...props}/>}
           screenOptions={{
             headerShown: false,
-            animation: 'shift'
+            animation: 'shift',
           }}
         >
           <Tabs.Screen name="play" options={{ title: "Play"}} />

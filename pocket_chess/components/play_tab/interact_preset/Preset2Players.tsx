@@ -296,17 +296,20 @@ const MiddleBarContainer =({started, paused, ended, onPressBack, onPressRestart,
       <ActionIcon 
         source_on={Constants.icons.arrow_left} 
         onPress={onPressBack}
-        width={22} tintColor={Constants.COLORS.white}/>
+        width={22} 
+        tintColor={Constants.COLORS.white}/>
       <ActionIcon 
         source_on={Constants.icons.pause} 
         onPress={onPressPause}
-        width={22} tintColor={Constants.COLORS.white}/>
+        width={22} 
+        tintColor={Constants.COLORS.white}/>
       <ActionIcon 
         source_on={Constants.icons.volume_on} 
         source_off={Constants.icons.volume_off} 
         onPress={onPressVolume}
         startOn={true}
-        width={25} tintColor={Constants.COLORS.white}/>
+        width={25} 
+        tintColor={Constants.COLORS.white}/>
     </View>
   );
 }

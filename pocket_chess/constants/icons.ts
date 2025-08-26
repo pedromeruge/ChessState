@@ -1,7 +1,7 @@
 const icons = {
   pawn: require("../assets/icons/pawn.png"),
   scan: require("../assets/icons/qrcode.png"),
-  storage: require("../assets/icons/box.png"),
+  box: require("../assets/icons/box.png"),
   no_camera: require("../assets/icons/no_camera.png"),
   camera: require("../assets/icons/camera.png"),
   flash_off: require("../assets/icons/flash_off.png"),
@@ -48,7 +48,12 @@ const icons = {
   diamond: require("../assets/icons/diamond.png"),
   experimental: require("../assets/icons/experimental.png"),
   hidden: require("../assets/icons/hidden.png"),
-  heart_full: require("../assets/icons/heart_full.png")
+  heart_full: require("../assets/icons/heart_full.png"),
+  bookmark: require("../assets/icons/bookmark.png"),
+  bookmark_full: require("../assets/icons/bookmark_full.png"),
+  rotate: require("../assets/icons/rotate.png"),
+  clear: require("../assets/icons/clear.png"),
+  undo: require("../assets/icons/undo.png")
 };
 
 export default icons;

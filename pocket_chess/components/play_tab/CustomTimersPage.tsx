@@ -8,7 +8,6 @@ import TimerPresetSection from './TimerPresetSection';
 import NewTimerModal, {NewTimerModalRef} from './new_timer/NewTimerModal';
 import storage from '../../classes/Storage';
 import SmallActionButton from '../common/SmallActionButton';
-import Preset from '../../classes/timers_base/Preset';
 
 
 const CustomTimersPage = () => {

@@ -43,7 +43,7 @@ const ClockTypesList = ({}) => {
           clock_type_id: String(selectedClockTypeId),
           player_name: playerName
         }
-    });
+      });
     }
     const clock_type_sections = {
       "popular": {

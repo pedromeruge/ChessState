@@ -3,7 +3,11 @@ import { TouchableOpacity } from 'react-native';
 import IconComponent from './IconComponent';
 
 // Icon with on and off state, that triggers an onPress function
-const ActionIcon = ({ source_on, source_off=null, onPress, startOn=true, width, tintColor=null, opacity=1.0, addStyle=null, ...props}) => {
+
+// NOTE: addStyle -> applies to the iconComponent
+//       style    -> applies to the TouchableOpacity
+
+const ActionIcon = ({ source_on, source_off=null, onPress, startOn=true, width=null, tintColor=null, opacity=1.0, addStyle=null, ...props}) => {
   
   if (!source_on) {
     console.warn("Icon source is missing!");
@@ -20,8 +24,13 @@ const ActionIcon = ({ source_on, source_off=null, onPress, startOn=true, width, 
   }
 
   return (
-    <TouchableOpacity onPress={onPressIcon}>
-      <IconComponent source={isOn ? source_on : source_off} width={width} tintColor={tintColor} opacity={opacity} addStyle={addStyle} onPress={onPress} {...props} />
+    <TouchableOpacity 
+      onPress={onPressIcon}
+      {...props}
+    >
+      <IconComponent 
+        source={isOn ? source_on : source_off} 
+        width={width} tintColor={tintColor} opacity={opacity} addStyle={addStyle} onPress={onPress} {...props} />
     </TouchableOpacity>
   )
 };

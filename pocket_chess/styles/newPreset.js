@@ -83,6 +83,13 @@ const style = StyleSheet.create({
         marginTop: 20,
     },
 
+    sectionContent: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginRight: 10
+    },
+
     titleText: {
         fontFamily: Constants.FONTS.BASE_FONT_NAME,
         fontSize: Constants.SIZES.large,

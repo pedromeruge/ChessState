@@ -49,7 +49,7 @@ function BottomNavBar({ state, descriptors, navigation }) {
     const navBarIcons = {
         play: (props) => (<IconComponent source={Constants.icons.pawn} width={22} {...props} />),
         index: (props) => (<IconComponent source={Constants.icons.scan} width={24} {...props} />),
-        storage: (props) => (<IconComponent source={Constants.icons.storage} width={24} {...props} />)
+        storage: (props) => (<IconComponent source={Constants.icons.box} width={24} {...props} />)
     }
 
     return (
