@@ -10,7 +10,7 @@ import Header from '../../common/Header.jsx';
 import IconComponent from '../../common/IconComponent';
 import ActionIcon from '../../common/ActionIcon';
 import HorizontalMultiChoice, { ChoiceOption } from '../../common/HorizontalMultiChoice';
-import DraggablePiece, {ContainerLayout} from './DraggablePiece';
+import DraggablePiece, {BoardLayout, ContainerLayout} from './DraggablePiece';
 
 interface PlacedPiecesProps {
   id: string,
@@ -37,55 +37,51 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
 
   //piece related
   const [placedPieces, setPlacedPieces] = useState<PlacedPiecesProps[]>([]);
-  // const chessboardLayout = useRef<BoardLayout>({x: 0, y: 0, size: 0, tileSize: 0});
 
   const leftPanelRef = useRef<View>(null);
   const rightPanelRef = useRef<View>(null);
   const boardImageRef = useRef<Image>(null);
 
-  const boardLayoutRef = useRef({
-    board: { x: 0, y: 0, size: 0, tileSize: 0 },
-    left: { x: 0, y: 0, size: 0, tileSize: 0 },
-    right: { x: 0, y: 0, size: 0, tileSize: 0 }
+  const [layout, setLayout] = useState({
+    board: { x: 0, y: 0, size: 0, tileSize: 0},
+    left:  { x: 0, y: 0 },
+    right: { x: 0, y: 0 }
   });
-// Remove: const chessboardLayout = useRef<BoardLayout>(...) and containersOffset state
 
-// Measurement helpers (replace current measure logic):
-const measureLeft = () => {
-  leftPanelRef.current?.measureInWindow((x,y,w,h) => {
-    if (w || h) {
-      boardLayoutRef.current.left = { x, y, size: w, tileSize: w / 8 };
-    }
-  });
-};
-const measureRight = () => {
-  rightPanelRef.current?.measureInWindow((x,y,w,h) => {
-    if (w || h) {
-      boardLayoutRef.current.right = { x, y, size: w, tileSize: w / 8 };
-    }
-  });
-};
-const measureBoard = () => {
-  boardImageRef.current?.measureInWindow((x,y,w,h) => {
-    if (w > 0) {
-      boardLayoutRef.current.board = { x, y, size: w, tileSize: w / 8 };
-      boardLayoutRef.current.left.tileSize = w / 8; // update left container tileSize
-      boardLayoutRef.current.right.tileSize = w / 8; // update right container tileSize
-    }
-  });
-};
+  // Measurement helpers (replace current measure logic):
+  const measureLeft = () => {
+    leftPanelRef.current?.measureInWindow((x,y,w,h) => {
+      if (w || h) setLayout(prev => ({ ...prev, left: { x, y } }));
+    });
+  };
 
-// onLayout callbacks (replace old ones):
-const onLeftLayout  = () => requestAnimationFrame(measureLeft);
-const onRightLayout = () => requestAnimationFrame(measureRight);
-const onBoardLayout = () => requestAnimationFrame(measureBoard);
+  const measureRight = () => {
+    rightPanelRef.current?.measureInWindow((x,y,w,h) => {
+      if (w || h) setLayout(prev => ({ ...prev, right: { x, y } }));
+    });
+  };
 
+  const measureBoard = () => {
+    boardImageRef.current?.measureInWindow((x,y,w,h) => {
+      if (w > 0) {
+        setLayout(prev => ({
+          ...prev,
+            board: { x, y, size: w, tileSize: w / 8}
+        }));
+      }
+    });
+  };
+
+  // onLayout callbacks:
+  const onLeftLayout  = () => requestAnimationFrame(measureLeft);
+  const onRightLayout = () => requestAnimationFrame(measureRight);
+  const onBoardLayout = () => requestAnimationFrame(measureBoard);
 
   // handle dropping pieces so they snap to chessboard grid
   const snapToGrid = (e: GestureResponderEvent, gesture: PanResponderGestureState , type: string, fromPalette: boolean, id?: string) => {
 
     const { moveX, moveY } = gesture;
-    const { x, y, size, tileSize } = boardLayoutRef.current.board;
+    const { x, y, size, tileSize } = layout.board
     const isInsideBoard = moveX > x && moveX < x + size && moveY > y && moveY < y + size;
 
     if (isInsideBoard) {
@@ -216,9 +212,8 @@ const onBoardLayout = () => requestAnimationFrame(measureBoard);
                 key={i}
                 type={piece}
                 fromPalette={true}
-                rootLayoutRef={boardLayoutRef}
-                containerKey='left'
-                boardPadding={CHESSBOARD_PADDING}
+                rootLayout={layout.left}
+                boardLayout={{ boardPadding: CHESSBOARD_PADDING, tileSize: layout.board.tileSize }}
                 onDrop={snapToGrid}
               />
             ))}
@@ -239,9 +234,8 @@ const onBoardLayout = () => requestAnimationFrame(measureBoard);
                 id={p.id}
                 type={p.type}
                 tile={p.tile}
-                containerKey='board'
-                rootLayoutRef={boardLayoutRef}
-                boardPadding={CHESSBOARD_PADDING}
+                boardLayout={{ boardPadding: CHESSBOARD_PADDING, tileSize: layout.board.tileSize }}
+                rootLayout={{x:layout.board.x, y: layout.board.y}}
                 onDrop={snapToGrid}
               />
             ))}
@@ -253,9 +247,8 @@ const onBoardLayout = () => requestAnimationFrame(measureBoard);
                 key={i}
                 type={piece}
                 fromPalette={true}
-                rootLayoutRef={boardLayoutRef}
-                boardPadding={CHESSBOARD_PADDING}
-                containerKey='right'
+                boardLayout={{ boardPadding: CHESSBOARD_PADDING, tileSize: layout.board.tileSize }}
+                rootLayout={layout.right}
                 onDrop={snapToGrid}
               />
             ))}

@@ -12,7 +12,11 @@ export interface BoardLayoutRefShape {
 export interface ContainerLayout {
   x: number;
   y: number;
-  size: number;
+
+}
+
+export interface BoardLayout {
+  boardPadding: number;
   tileSize: number;
 }
 
@@ -26,13 +30,12 @@ interface DraggablePieceProps {
   type: string;
   tile?: Tile;           // defined only if currently on board
   fromPalette?: boolean;     // true if side panel source
-  containerKey: 'left' | 'board' | 'right';
-  rootLayoutRef: React.MutableRefObject<BoardLayoutRefShape>;
-  boardPadding: number;
+  rootLayout:  ContainerLayout | undefined; // layout of the container this piece is in
+  boardLayout: BoardLayout | undefined;
   onDrop: (event: GestureResponderEvent, gestureState: PanResponderGestureState, type: string, fromPalette: boolean, id?: string) => void;
 }
 
-const DraggablePiece: React.FC<DraggablePieceProps> = ({ id, type, tile, fromPalette = false, containerKey, rootLayoutRef, boardPadding, onDrop}) => {
+const DraggablePiece: React.FC<DraggablePieceProps> = ({ id, type, tile, fromPalette = false, rootLayout, boardLayout, onDrop}) => {
 
     const pan = useRef(new Animated.ValueXY()).current;
     const [dragging, setDragging] = useState(false);
@@ -42,7 +45,8 @@ const DraggablePiece: React.FC<DraggablePieceProps> = ({ id, type, tile, fromPal
         console.log("startDrag")
 
         // re-read tileSize each time (may have been 0 earlier)
-        const { tileSize, x, y } = rootLayoutRef.current?.[containerKey] || {};
+        const { x, y } = rootLayout || {};
+        const {tileSize} = boardLayout || {};
         if (!tileSize) return;
 
         // offset so ghost centers under finger
@@ -59,27 +63,30 @@ const DraggablePiece: React.FC<DraggablePieceProps> = ({ id, type, tile, fromPal
 
     const finishDrag = (e: GestureResponderEvent, g: PanResponderGestureState) => {
         console.log("Dropped piece:", { type, id, fromPalette });
-        pan.extractOffset();         // merge offset into value
+        pan.extractOffset(); // merge offset into value
         setDragging(false);
         onDrop(e, g, type, fromPalette, id);
     };
 
-    const panResponder = useRef(
+    // recreate panResponder function whenver board and rootLayout update with the correct values (after )
+    const panResponder = React.useMemo(
+        () =>
         PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: () => true,
-        onPanResponderTerminationRequest: () => false,
-        onPanResponderGrant: startDrag,
-        onPanResponderMove: Animated.event(
-            [null, { dx: pan.x, dy: pan.y }],
-            { useNativeDriver: false }
-        ),
-        onPanResponderRelease: finishDrag,
-        onPanResponderTerminate: finishDrag
-        })
-    ).current;
+            onStartShouldSetPanResponder: () => true,
+            onMoveShouldSetPanResponder: () => true,
+            onPanResponderTerminationRequest: () => false,
+            onPanResponderGrant: startDrag,
+            onPanResponderMove: Animated.event(
+                [null, { dx: pan.x, dy: pan.y }], {
+                useNativeDriver: false
+            }),
+            onPanResponderRelease: finishDrag,
+            onPanResponderTerminate: finishDrag
+        }),
+        [boardLayout.tileSize, rootLayout.x, rootLayout.y] // dependencies
+    );
 
-    const { tileSize } = rootLayoutRef.current?.[containerKey] || {};
+    const { tileSize, boardPadding } = boardLayout || {};
 
     // palette default style (keeps original layout space)
     const fromPaletteStyle: ViewStyle | null =
