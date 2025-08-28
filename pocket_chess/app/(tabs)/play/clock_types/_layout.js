@@ -6,6 +6,7 @@ const StackLayout = () => {
             screenOptions={{
                 headerShown: false,
                 animation: 'fade',
+                gestureEnabled: false
             }}
         />
     );

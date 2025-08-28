@@ -8,7 +8,7 @@ import BottomNavBar from '../../components/common/navbar/BottomNavBar';
 // handles the tab navigation layout
 const TabsLayout = () => {
     const navigation = useNavigation();
-
+    
     useEffect(() => {
         //handle back button press from any tab, go to main screen
         const backAction = () => {
@@ -31,11 +31,23 @@ const TabsLayout = () => {
           screenOptions={{
             headerShown: false,
             animation: 'shift',
+            swipeEnabled: false, // disable horizontal swipe between tabs
+            gestureEnabled: false,
+            gestureResponseDistance: { horizontal: 0 }, // (iOS) also kill edge gesture width so accidental edge pans do nothing
           }}
         >
-          <Tabs.Screen name="play" options={{ title: "Play"}} />
-          <Tabs.Screen name="index" options={{ title: "Scan"}} />
-          <Tabs.Screen name="storage" options={{ title: "Storage"}}/>
+          <Tabs.Screen name="play" options={{
+            title: 'Play',
+            swipeEnabled: false,
+          }} />
+          <Tabs.Screen name="index" options={{
+            title: 'Scan',
+            swipeEnabled: false,
+          }}/>
+          <Tabs.Screen name="storage" options={{
+            title: 'Storage',
+            swipeEnabled: false,
+          }}/>
       </Tabs>
     );
 }

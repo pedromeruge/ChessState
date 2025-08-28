@@ -8,14 +8,7 @@ const IconComponent = ({ source, width=null, tintColor=null, opacity=1.0, addSty
     console.warn("Icon source is missing!");
     return null;
   }
-//   return (
-//       <SvgUri
-//         width={width}
-//         height={height}
-//         uri={source}
-//         fill={tintColor}
-//       />
-//   );j
+
   const styles = StyleSheet.create({
     icon: {
       width: width ? width : '100%',

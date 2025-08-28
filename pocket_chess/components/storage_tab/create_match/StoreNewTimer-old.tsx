@@ -1,20 +1,37 @@
 import React, { useState, useRef, useCallback, useEffect} from 'react';
-import { View, Text, ScrollView, StyleSheet, TextStyle, Image, TouchableOpacity, TextInput} from 'react-native'
-import * as Styles from '../../styles/index.js';
+import { View, Text, ScrollView, StyleSheet, PanResponder, TextStyle, Image, TextInput, Animated, ViewStyle} from 'react-native'
+import * as Styles from '../../../styles/index.js';
 
-import * as Constants from '../../constants';
-import storage from '../../classes/Storage';
-import Preset from '../../classes/timers_base/Preset';
-import ActionButton from '../common/ActionButton';
-import Header from '../common/Header';
-import IconComponent from '../common/IconComponent';
-import ActionIcon from '../common/ActionIcon';
-import HorizontalMultiChoice, { ChoiceOption } from '../common/HorizontalMultiChoice';
+import * as Constants from '../../../constants/index';
+import storage from '../../../classes/Storage';
+import Preset from '../../../classes/timers_base/Preset.js';
+import ActionButton from '../../common/ActionButton';
+import Header from '../../common/Header.jsx';
+import IconComponent from '../../common/IconComponent';
+import ActionIcon from '../../common/ActionIcon';
+import HorizontalMultiChoice, { ChoiceOption } from '../../common/HorizontalMultiChoice';
+
+interface PlacedPiecesProps {
+  id: string,
+  type: string, 
+  tile: {
+    row: number,
+    col: number
+  }
+}
+
+interface DraggedPieceProps {
+  type: string;
+  sourceId?: string;
+}
 
 interface StoreNewTimerProps {
   preset?: Preset | null;
   boardScan?: string | null; // TODO: represent a chessboard scan
 }
+
+const CHESSBOARD_PADDING = 7;
+
 const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
 
   //state
@@ -22,6 +39,135 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
   const [nextPlayer, setNextPlayer] = useState('white');
   const [gameCreationDate] = useState<Date>(new Date());
 
+  //piece related
+  const [placedPieces, setPlacedPieces] = useState<PlacedPiecesProps[]>([]);
+  const [draggingPiece, setDraggingPiece] = useState<DraggedPieceProps | null>(null);
+  const pan = useRef(new Animated.ValueXY()).current;
+  const chessboardLayout = useRef({x: 0, y: 0, size: 0, tileSize: 0});
+  const imageRef = useRef<Image>(null);
+
+  // This ref will temporarily hold the data of the piece that the user touches.
+  const activeDragPayload = useRef<any>(null);
+
+  // measure board size after layout stabilized // using onLayout() in the component wasn't working, because it got dimensions to early
+  useEffect(() => {
+    const measureBoard = () => {
+      if (imageRef.current) {
+        imageRef.current.measureInWindow((x, y, width, height) => {
+          // Ensure we have valid measurements before setting the layout
+          if (width > 0 && height > 0) {
+            chessboardLayout.current = { 
+              x: x, 
+              y: y, 
+              size: width, 
+              tileSize: width / 8 };
+          }
+        });
+      }
+    };
+    // measure after a short delay to ensure the UI has settled
+    const timeoutId = setTimeout(measureBoard, 150);
+    return () => clearTimeout(timeoutId);
+  }, []); // run once after component mount
+
+  // handle dropping pieces so they snap to chessboard grid
+  const snapToGrid = (e: any, gesture: any) => {
+    const payload = activeDragPayload.current;
+    if (!payload) return;
+
+    const { moveX, moveY } = gesture;
+    const { x, y, size, tileSize } = chessboardLayout.current;
+    const isOverBoard = moveX > x && moveX < x + size && moveY > y && moveY < y + size;
+
+    if (isOverBoard) {
+      const col = Math.floor((moveX - x) / tileSize);
+      const row = Math.floor((moveY - y) / tileSize);
+
+      //piece was dragged from the board
+      if (payload.id) { 
+        setPlacedPieces(prev => prev.map(p => 
+          p.id === payload.id ? { ...p, tile: { row, col } } : p
+        ));
+      } else { // Piece was dragged from the side panel
+        setPlacedPieces(prev => [
+          ...prev,
+          { id: `${Date.now()}`, type: payload.type, tile: { row, col } }
+        ]);
+      }
+      
+    // --- REMOVE PIECE LOGIC ---
+    } else {
+      if (payload.id) { // Only remove pieces that were already on the board
+        setPlacedPieces(prev => prev.filter(p => p.id !== payload.id));
+      }
+    }
+
+    // end the drag operation
+    setDraggingPiece(null);
+  };
+
+  const panResponder = useRef(
+    PanResponder.create({
+      // The parent PanResponder takes over when the user starts dragging
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: () => true,
+
+      // The drag begins
+      onPanResponderGrant: (evt, gestureState) => {
+        const payload = activeDragPayload.current;
+        if (!payload) return;
+
+        pan.setOffset({
+          x: gestureState.x0 - chessboardLayout.current.tileSize / 2,
+          y: gestureState.y0 - chessboardLayout.current.tileSize / 2,
+        });
+
+        // Set the piece being dragged and its initial position
+        setDraggingPiece({ type: payload.type, sourceId: payload.id });
+
+      },
+
+      // piece is moving
+      onPanResponderMove: Animated.event(
+        [null, { dx: pan.x, dy: pan.y }],
+        { useNativeDriver: false }
+      ),
+
+      // drag ends, aka piece is released
+      onPanResponderRelease: (e, gesture) => {
+        pan.flattenOffset();
+        snapToGrid(e, gesture);
+        // clean up
+        setDraggingPiece(null);
+        activeDragPayload.current = null;
+      },
+    })
+  ).current;
+
+  // wrapper to identify dragged piece and drag start location
+  const DraggableSource = ({ payload, children, style=null}) => {
+    return (
+      <View
+        style={style ? style : styles.pieceButton}
+        onStartShouldSetResponder={() => true}
+        onResponderGrant={(e) => {
+          if (!chessboardLayout.current.tileSize) return;
+          activeDragPayload.current = payload;
+          setDraggingPiece({ type: payload.type, sourceId: payload.id });
+
+          // Finger center start
+          const { pageX, pageY } = e.nativeEvent;
+          pan.setValue({
+            x: pageX - chessboardLayout.current.tileSize / 2,
+            y: pageY - chessboardLayout.current.tileSize / 2
+          });
+        }}
+      >
+        {children}
+      </View>
+    );
+  };
+  
   const onChangeTitle = (text: string) => {
       setTitle(text);
   };
@@ -30,7 +176,7 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
     return title !== '';
   }, [title]);
 
-
+  
   // timestamp string formatting
   const getFormattedTimestamp = (date: Date): string => {
     const pad = (n: number) => (n < 10 ? '0' + n : n);
@@ -66,10 +212,6 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
 
   const onPressUndo = () => {
     console.log("Undo pressed");
-  };
-
-  const onPressPiece = (piece: string) => {
-    console.log(`Piece pressed: ${piece}`);
   };
 
   const nextPlayerOptions: ChoiceOption[] = [
@@ -122,29 +264,53 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
           <View style={styles.piecesPannel}>
             {Array.from(
               ['light_pawn', 'light_bishop', 'light_knight', 'light_rook', 'light_queen', 'light_king'], (piece, i) => (
-              <ActionIcon
-                key={i}
-                source_on={Constants.icons[piece as keyof typeof Constants.icons]}
-                onPress={() => onPressPiece(piece)}
-                style={styles.pieceButton}
-              />
+              <DraggableSource key={i} payload={{ type: piece }}>
+                <IconComponent
+                  key={i}
+                  source={Constants.icons[piece as keyof typeof Constants.icons]}                  
+                />
+              </DraggableSource>
             ))}
           </View>
-          <View style={[styles.chessboardContainer, Constants.SHADOWS.preset]}>
+          <View 
+            style={[styles.chessboardContainer, Constants.SHADOWS.preset]}
+          >
             <Image
               source={Constants.images.empty_chessboard}
               style={styles.chessboard}
+              ref={imageRef}
             />
+            {/* Render the pieces that are already on the board */}
+            {placedPieces.map(p => {
+              const { tileSize } = chessboardLayout.current;
+              const pieceStyle: ViewStyle = {
+                position: 'absolute',
+                left: p.tile.col * tileSize + CHESSBOARD_PADDING,
+                top: p.tile.row * tileSize + CHESSBOARD_PADDING,
+                width: tileSize,
+                height: tileSize,
+                // Hide the original piece while it's being dragged
+                opacity: draggingPiece?.sourceId === p.id ? 0 : 1,
+              };
+              return (
+                <View 
+                  key={p.id} style={pieceStyle}>
+                  <DraggableSource payload={p} style={{width: '100%', height: '100%'}}>
+                    <IconComponent source={Constants.icons[p.type as keyof typeof Constants.icons]} />
+                  </DraggableSource>
+                </View>
+              )
+            })}
           </View>
           <View style={styles.piecesPannel}>
             {Array.from(
               ['dark_pawn', 'dark_bishop', 'dark_knight', 'dark_rook', 'dark_queen', 'dark_king'], (piece, i) => (
-              <ActionIcon
-                key={i}
-                source_on={Constants.icons[piece as keyof typeof Constants.icons]}
-                onPress={() => onPressPiece(piece)}
-                style={styles.pieceButton}
-              />
+              <DraggableSource key={i} payload={{ type: piece }}>
+                <IconComponent
+                  key={i}
+                  source={Constants.icons[piece as keyof typeof Constants.icons]}
+                />
+              </DraggableSource>
             ))}
           </View>
         </View>
@@ -202,7 +368,23 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
           onPress={onPressSave}
           disabled={!allFieldsFilled()}
         />
-      </View> 
+      </View>
+      {/* Render the piece currently being dragged */}
+      {draggingPiece && (
+        <Animated.View
+          {...panResponder.panHandlers}
+          style={[
+            { position: 'absolute', 
+              zIndex: 6, 
+              width: chessboardLayout.current.tileSize, 
+              height: chessboardLayout.current.tileSize },
+              pan.getLayout(),
+            ]}
+            pointerEvents="box-none"
+        >
+          <IconComponent source={Constants.icons[draggingPiece.type]} />
+        </Animated.View>
+      )}
     </View>
   )
 }
@@ -266,7 +448,7 @@ const styles = StyleSheet.create({
   chessboardContainer: {
     flex: 6,
     backgroundColor: Constants.COLORS.white,
-    padding: 7,
+    padding: CHESSBOARD_PADDING,
     borderRadius: 12,
     aspectRatio: 1,
   },

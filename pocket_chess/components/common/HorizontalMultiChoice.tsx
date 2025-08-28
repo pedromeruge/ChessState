@@ -21,31 +21,17 @@ interface HorizontalMultiChoiceProps {
 }
 
 // constant for the fixed width for clarity and easy modification
-const FIXED_OPTION_WIDTH = 130; 
-const BORDER_RADIUS_AMOUNT = 5;
+const FIXED_OPTION_WIDTH = 120; 
 
 const HorizontalMultiChoice= ({ options, onSelect, title, style, occupyFullWidth } : HorizontalMultiChoiceProps) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [layout, setLayout] = useState({ width: 0, optionWidth: 0 });
 
   const slideAnim = useRef(new Animated.Value(0)).current; // for animating the sliding background
-  const borderTopLeftRadiusAnim = useRef(new Animated.Value(10)).current;
-  const borderBottomLeftRadiusAnim = useRef(new Animated.Value(10)).current;
-  const borderTopRightRadiusAnim = useRef(new Animated.Value(0)).current;
-  const borderBottomRightRadiusAnim = useRef(new Animated.Value(0)).current;
 
   // animated slide when the selected index or layout changes
   useEffect(() => {
     if (layout.optionWidth > 0) {
-      const isFirst = selectedIndex === 0;
-      const isLast = selectedIndex === options.length - 1;
-
-      // target border radius for each corner
-      const targetTopLeft = isFirst ? BORDER_RADIUS_AMOUNT : 0;
-      const targetBottomLeft = isFirst ? BORDER_RADIUS_AMOUNT : 0;
-      const targetTopRight = isLast ? BORDER_RADIUS_AMOUNT : 0;
-      const targetBottomRight = isLast ? BORDER_RADIUS_AMOUNT : 0;
-
       // run all animations simultaneously
       Animated.timing(slideAnim, {
         toValue: selectedIndex * layout.optionWidth,
@@ -132,7 +118,7 @@ const HorizontalMultiChoice= ({ options, onSelect, title, style, occupyFullWidth
 const styles = StyleSheet.create({
   containerFixed: {
     flexDirection: 'row',
-    height: 75,
+    height: 70,
     backgroundColor: Constants.COLORS.white,
     borderRadius: 12,
     borderWidth: 1,

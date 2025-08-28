@@ -39,13 +39,16 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         minHeight: 40,
         backgroundColor: Constants.COLORS.white,
-        alignSelf: 'stretch' // stretch to fit full width of parent container
+        alignSelf: 'stretch', // stretch to fit full width of parent container
+        zIndex: 5
     }, 
+
     containerHeaderLeft: {
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
     },
+
     containerHeaderText: {
         fontFamily: Constants.FONTS.BASE_FONT_NAME,
         fontSize: Constants.SIZES.large,
@@ -53,6 +56,7 @@ const styles = StyleSheet.create({
         color: Constants.COLORS.text_dark,
         marginLeft: 8
     },     
+    
     containerHeaderRight: {
     }
 });

@@ -1,7 +1,7 @@
 import Preset from '../../../classes/timers_base/Preset';
 import Time from '../../../classes/timers_base/Time';
 import { FischerIncrementStage, FischerIncrementTimer } from '../../../classes/timers_clock_types/FischerIncrement';
-import StoreNewTimer from '../../../components/storage_tab/StoreNewTimer';
+import StoreNewTimer from '../../../components/storage_tab/create_match/StoreNewTimer';
 import * as Constants from '../../../constants';
 
 export default function NewTimerScreen() {
