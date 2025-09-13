@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { View, Animated, PanResponder, StyleSheet, ViewStyle, GestureResponderEvent, PanResponderGestureState } from 'react-native';
 import IconComponent from '../../common/IconComponent';
 import * as Constants from '../../../constants/index';
+import { BoardPiece, BoardPieceToUnicode } from '../../../classes/BoardState';
 
 export interface BoardLayoutRefShape {
   board: ContainerLayout;
@@ -27,12 +28,12 @@ interface Tile {
 
 interface DraggablePieceProps {
   id?: string;           // undefined if from palette
-  type: string;
+  type: BoardPiece;
   tile?: Tile;           // defined only if currently on board
   fromPalette?: boolean;     // true if side panel source
   rootLayout:  ContainerLayout | undefined; // layout of the container this piece is in
   boardLayout: BoardLayout | undefined;
-  onDrop: (event: GestureResponderEvent, gestureState: PanResponderGestureState, type: string, fromPalette: boolean, id?: string) => void;
+  onDrop: (event: GestureResponderEvent, gestureState: PanResponderGestureState, type: BoardPiece, fromPalette: boolean, id?: string) => void;
 }
 
 const DraggablePiece: React.FC<DraggablePieceProps> = ({ id, type, tile, fromPalette = false, rootLayout, boardLayout, onDrop}) => {
@@ -63,7 +64,8 @@ const DraggablePiece: React.FC<DraggablePieceProps> = ({ id, type, tile, fromPal
 
     const finishDrag = (e: GestureResponderEvent, g: PanResponderGestureState) => {
         console.log("Dropped piece:", { type, id, fromPalette });
-        pan.extractOffset(); // merge offset into value
+        pan.flattenOffset(); // merge offset into value
+        pan.setOffset({x: 0, y: 0})
         setDragging(false);
         onDrop(e, g, type, fromPalette, id);
     };
@@ -120,7 +122,7 @@ const DraggablePiece: React.FC<DraggablePieceProps> = ({ id, type, tile, fromPal
                 style={[staticStyle, dragging && { opacity: 0 }]}
                 {...panResponder.panHandlers}
             >
-                <IconComponent source={Constants.icons[type as keyof typeof Constants.icons]} />
+                <IconComponent source={Constants.icons[BoardPieceToUnicode[type] as keyof typeof Constants.icons]} />
             </View>
 
             {dragging && tileSize > 0 && (
@@ -139,7 +141,7 @@ const DraggablePiece: React.FC<DraggablePieceProps> = ({ id, type, tile, fromPal
                     }
                 ]}
                 >
-                <IconComponent source={Constants.icons[type as keyof typeof Constants.icons]} />
+                <IconComponent source={Constants.icons[BoardPieceToUnicode[type] as keyof typeof Constants.icons]} />
                 </Animated.View>
             )}
         </>

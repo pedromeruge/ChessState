@@ -93,10 +93,6 @@ const NewTimerModal = forwardRef<NewTimerModalRef, NewTimerModalProps>(
         });
     }
 
-    // ✅ Add debugging for visibility changes
-    useEffect(() => {
-        console.log('NewTimerModal visible state changed to:', visible);
-    }, [visible]);
 
     // auto-suggest title based on input time
     useEffect(() => {

@@ -7,23 +7,14 @@ import storage from '../../../classes/Storage';
 import Preset from '../../../classes/timers_base/Preset';
 import ActionButton from '../../common/ActionButton';
 import Header from '../../common/Header.jsx';
-import IconComponent from '../../common/IconComponent';
 import ActionIcon from '../../common/ActionIcon';
 import HorizontalMultiChoice, { ChoiceOption } from '../../common/HorizontalMultiChoice';
-import DraggablePiece, {BoardLayout, ContainerLayout} from './DraggablePiece';
-
-interface PlacedPiecesProps {
-  id: string,
-  type: string, 
-  tile: {
-    row: number,
-    col: number
-  }
-}
+import DraggablePiece from './DraggablePiece';
+import BoardState, {BoardPiece, PlacedPiece, SideToMove} from '../../../classes/BoardState';
 
 interface StoreNewTimerProps {
   preset?: Preset | null;
-  boardScan?: string | null; // TODO: represent a chessboard scan
+  boardScan?: BoardState | null;
 }
 
 const CHESSBOARD_PADDING = 7;
@@ -32,12 +23,15 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
 
   //state
   const [title, setTitle] = useState('');
-  const [nextPlayer, setNextPlayer] = useState('white');
+  const [nextPlayer, setNextPlayer] = useState<SideToMove>(SideToMove.WHITE);
   const [gameCreationDate] = useState<Date>(new Date());
-
+  
   //piece related
-  const [placedPieces, setPlacedPieces] = useState<PlacedPiecesProps[]>([]);
+  const startState = boardScan?.toPlacedPieces() || [];
+  const [placedPieces, setPlacedPieces] = useState<PlacedPiece[]>(startState);
+  const historyStack = useRef<PlacedPiece[][]>([startState]); // stack to keep track of history for undo functionality
 
+  //refs
   const leftPanelRef = useRef<View>(null);
   const rightPanelRef = useRef<View>(null);
   const boardImageRef = useRef<Image>(null);
@@ -78,7 +72,7 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
   const onBoardLayout = () => requestAnimationFrame(measureBoard);
 
   // handle dropping pieces so they snap to chessboard grid
-  const snapToGrid = (e: GestureResponderEvent, gesture: PanResponderGestureState , type: string, fromPalette: boolean, id?: string) => {
+  const snapToGrid = (e: GestureResponderEvent, gesture: PanResponderGestureState , type: BoardPiece, fromPalette: boolean, id?: string) => {
 
     const { moveX, moveY } = gesture;
     const { x, y, size, tileSize } = layout.board
@@ -90,24 +84,36 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
 
       //piece was dragged inside the board (from one position to another in the board)
       if (id) { 
-        setPlacedPieces(prev => prev.map(p => 
-          p.id === id ? { ...p, tile: { row, col } } : p
-        ));
+        setPlacedPieces(prev => {
+          const updated = prev.map(p => 
+            p.id === id ? { ...p, tile: { row, col } } : p
+          );
+          historyStack.current.push(updated);
+          return updated;
+        });
           console.log("Piece moved in board:", { type, row, col });
 
       // piece was dragged from the side panel to the board
       } else { 
-        setPlacedPieces(prev => [
-          ...prev,
-          { id: `${Date.now()}`, type: type, tile: { row, col } }
-        ]);
+        setPlacedPieces(prev => {
+            const updated = [
+              ...prev,
+              { id: `${Date.now()}`, type: type, tile: { row, col } }
+            ];
+            historyStack.current.push(updated);
+            return updated;
+        });
         console.log("Piece placed from palette to board:", { type, row, col });
       }
       
     // piece dragged from inside the board to outside, to be removed
     } else {
       if (id) { // Only remove pieces that were already on the board
-        setPlacedPieces(prev => prev.filter(p => p.id !== id));
+        setPlacedPieces(prev => {
+          const updated = prev.filter(p => p.id !== id);
+          historyStack.current.push(updated);
+          return updated;
+        });
       }
     }
   };
@@ -135,9 +141,17 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
 
     return `${day}/${month}/${year} - ${hours}h ${minutes}m ${seconds}s`;
   };
-
+  
   // save game to storage
   const onPressSave = async () => {
+    // create new board
+    const savedBoard: BoardState = new BoardState(SideToMove.WHITE)
+    savedBoard.loadPlacedPieces(placedPieces.map(p => ({
+      type: p.type,
+      tile: p.tile,
+      id: p.id
+    })));
+    savedBoard.setSideToMove(nextPlayer);
     console.log("Pressed save")
   };
 
@@ -147,20 +161,43 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
   };
 
   const onPressRotate = () => {
+    setPlacedPieces(prev => {
+      const updated = prev.map(p => ({
+        ...p,
+        tile: { row: p.tile.col, col: 7 - p.tile.row } // rotate 90 degrees clockwise
+      }));
+      historyStack.current.push(updated);
+      return updated;
+    });
     console.log("Rotate pressed");
   }
 
   const onPressClear = () => {
+    setPlacedPieces(prev => {
+      historyStack.current.push(prev);
+      return [];
+    });
+
     console.log("Clear pressed");
   };
 
   const onPressUndo = () => {
+    setPlacedPieces(prev => {
+      console.log("History stack before undo:", historyStack.current);
+      if (historyStack.current.length > 1) {
+        historyStack.current.pop(); // remove current state
+        const previous = historyStack.current[historyStack.current.length - 1];
+        return previous;
+      }
+      return prev; // no change if no history
+    });
+
     console.log("Undo pressed");
   };
 
   const nextPlayerOptions: ChoiceOption[] = [
-    { icon: Constants.icons.light_king, text: 'White', value: 'white' },
-    { icon: Constants.icons.dark_king, text: 'Black', value: 'black' }
+    { icon: Constants.icons.light_king, text: 'White', value: SideToMove.WHITE},
+    { icon: Constants.icons.dark_king, text: 'Black', value: SideToMove.BLACK}
   ];
 
   return (
@@ -172,7 +209,7 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
         rightIconSize={18} 
         lowBorder={true}/>
       <View style={styles.prebodyContent}>
-        <View style={styles.topPannel}>
+        <View style={styles.topPannel}> 
           <View style={styles.iconGroup}>
             <ActionIcon
               source_on={Constants.icons.rotate} 
@@ -180,8 +217,9 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
               onPress={onPressRotate}
               hitSlop={{top: 10, bottom: 25, left: 25, right: 25}}
               width={30}
+              disabled={placedPieces.length === 0}
             />
-            <Text style={styles.iconText}>Rotate 90º</Text>
+            <Text style={[styles.iconText, placedPieces.length === 0 ? Styles.common.disabled : null]}>Rotate 90º</Text>
           </View>
           <View style={styles.iconGroup}>
             <ActionIcon
@@ -190,24 +228,29 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
               onPress={onPressClear}
               hitSlop={{top: 10, bottom: 25, left: 25, right: 25}}
               width={30} 
+              disabled={placedPieces.length === 0}
             />
-            <Text style={styles.iconText}>Clear board</Text>
+            <Text style={[styles.iconText, placedPieces.length === 0 ? Styles.common.disabled : null]}>Clear board</Text>
           </View>
           <View style={styles.iconGroup}>
             <ActionIcon
               source_on={Constants.icons.undo} 
               tintColor={Constants.COLORS.preset_blue} 
               width={25} 
+              disabled={historyStack.current.length === 1 && placedPieces.length === 0}
               onPress={onPressUndo}
               hitSlop={{top: 10, bottom: 25, left: 25, right: 25}}
             />
-            <Text style={styles.iconText}>Undo step</Text>
+            <Text style={[
+              styles.iconText, 
+              (historyStack.current.length === 1 && placedPieces.length === 0) ? Styles.common.disabled : null
+            ]}>Undo step</Text>
           </View>
         </View>
         <View style={styles.bottomPannel}>
           <View ref={leftPanelRef} onLayout={onLeftLayout} style={styles.piecesPannel}>
             {Array.from(
-              ['light_pawn', 'light_bishop', 'light_knight', 'light_rook', 'light_queen', 'light_king'], (piece, i) => (
+              [BoardPiece.LIGHT_PAWN, BoardPiece.LIGHT_BISHOP, BoardPiece.LIGHT_KNIGHT, BoardPiece.LIGHT_ROOK, BoardPiece.LIGHT_QUEEN, BoardPiece.LIGHT_KING], (piece, i) => (
               <DraggablePiece
                 key={i}
                 type={piece}
@@ -242,7 +285,7 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
           </View>
           <View ref={rightPanelRef} onLayout={onRightLayout} style={styles.piecesPannel}>
             {Array.from(
-              ['dark_pawn', 'dark_bishop', 'dark_knight', 'dark_rook', 'dark_queen', 'dark_king'], (piece, i) => (
+              [BoardPiece.DARK_PAWN, BoardPiece.DARK_BISHOP, BoardPiece.DARK_KNIGHT, BoardPiece.DARK_ROOK, BoardPiece.DARK_QUEEN, BoardPiece.DARK_KING], (piece, i) => (
               <DraggablePiece
                 key={i}
                 type={piece}
@@ -292,7 +335,7 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
           <View style={styles.nextPlayerContainer}>
             <HorizontalMultiChoice 
               options={nextPlayerOptions}
-              onSelect={setNextPlayer}
+              onSelect={(value) => setNextPlayer(value as SideToMove)}
               title={"Next move"}
             />
           </View>
