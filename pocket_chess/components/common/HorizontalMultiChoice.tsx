@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Easing, LayoutChangeEvent, ViewStyle, TextStyle } from 'react-native';
 
 import * as Constants from '../../constants';
@@ -14,20 +14,28 @@ export interface ChoiceOption {
 
 interface HorizontalMultiChoiceProps {
   options: ChoiceOption[];
-  onSelect: (selectedValue: string) => void;
+  onSelect?: (selectedValue: string) => void;
   title?: string;
   style?: ViewStyle;
   occupyFullWidth?: boolean; // make the component occupy full width provided by parent (flex: 1)
 }
 
+interface HorizontalMultiChoiceRef {
+  getSelectedChoice: () => ChoiceOption; // returns the index of the selected choice
+}
+
 // constant for the fixed width for clarity and easy modification
 const FIXED_OPTION_WIDTH = 120; 
 
-const HorizontalMultiChoice= ({ options, onSelect, title, style, occupyFullWidth } : HorizontalMultiChoiceProps) => {
+const HorizontalMultiChoice = forwardRef<HorizontalMultiChoiceRef, HorizontalMultiChoiceProps>(({ options, onSelect, title, style, occupyFullWidth }, ref) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [layout, setLayout] = useState({ width: 0, optionWidth: 0 });
 
   const slideAnim = useRef(new Animated.Value(0)).current; // for animating the sliding background
+
+  useImperativeHandle(ref, () => ({
+    getSelectedChoice: () => options[selectedIndex]
+  }));
 
   // animated slide when the selected index or layout changes
   useEffect(() => {
@@ -66,7 +74,7 @@ const HorizontalMultiChoice= ({ options, onSelect, title, style, occupyFullWidth
   // handle press events on an option
   const handlePress = (option: ChoiceOption, index: number) => {
     setSelectedIndex(index);
-    onSelect(option.value);
+    onSelect?.(option.value);
   };
 
   // use different styles depending on the fullWidth prop
@@ -113,7 +121,7 @@ const HorizontalMultiChoice= ({ options, onSelect, title, style, occupyFullWidth
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   containerFixed: {

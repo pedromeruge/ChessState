@@ -4,13 +4,16 @@ import * as Styles from '../../../styles/index.js';
 
 import * as Constants from '../../../constants/index';
 import storage from '../../../classes/Storage';
-import Preset from '../../../classes/timers_base/Preset';
+import Preset, { Time } from '../../../classes/timers_base/Preset';
 import ActionButton from '../../common/ActionButton';
 import Header from '../../common/Header.jsx';
 import ActionIcon from '../../common/ActionIcon';
 import HorizontalMultiChoice, { ChoiceOption } from '../../common/HorizontalMultiChoice';
 import DraggablePiece from './DraggablePiece';
 import BoardState, {BoardPiece, PlacedPiece, SideToMove} from '../../../classes/BoardState';
+import PresetDetails from './PresetDetails';
+import { FischerIncrementStage, FischerIncrementTimer } from '../../../classes/timers_clock_types/FischerIncrement';
+import Collapsible from '../../common/Collapsible';
 
 interface StoreNewTimerProps {
   preset?: Preset | null;
@@ -20,10 +23,11 @@ interface StoreNewTimerProps {
 const CHESSBOARD_PADDING = 7;
 
 const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
-
+  
   //state
   const [title, setTitle] = useState('');
-  const [nextPlayer, setNextPlayer] = useState<SideToMove>(SideToMove.WHITE);
+  const playerChoiceRef = useRef(null);
+  
   const [gameCreationDate] = useState<Date>(new Date());
   
   //piece related
@@ -35,6 +39,7 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
   const leftPanelRef = useRef<View>(null);
   const rightPanelRef = useRef<View>(null);
   const boardImageRef = useRef<Image>(null);
+  const scrollRef = useRef<ScrollView>(null); // scroll view ref for auto scrolling when expanding details in dropdowns
 
   const [layout, setLayout] = useState({
     board: { x: 0, y: 0, size: 0, tileSize: 0},
@@ -117,11 +122,11 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
       }
     }
   };
-  
-  const onChangeTitle = (text: string) => {
+
+  const onChangeTitle = useCallback((text: string) => {
       setTitle(text);
-  };
-  
+  }, []);
+
   const allFieldsFilled = useCallback(() => {
     return title !== '';
   }, [title]);
@@ -151,7 +156,8 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
       tile: p.tile,
       id: p.id
     })));
-    savedBoard.setSideToMove(nextPlayer);
+
+    savedBoard.setSideToMove(playerChoiceRef.current?.getSelectedValue() as SideToMove || SideToMove.WHITE);
     console.log("Pressed save")
   };
 
@@ -200,6 +206,8 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
     { icon: Constants.icons.dark_king, text: 'Black', value: SideToMove.BLACK}
   ];
 
+  const testPreset = Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(new Time(0, 1, 0), new Time(0, 0, 1))]),"1|1");
+
   return (
     <View style={styles.page}>
       <Header 
@@ -208,150 +216,171 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
         rightIcon={Constants.icons.arrow_left} 
         rightIconSize={18} 
         lowBorder={true}/>
-      <View style={styles.prebodyContent}>
-        <View style={styles.topPannel}> 
-          <View style={styles.iconGroup}>
-            <ActionIcon
-              source_on={Constants.icons.rotate} 
-              tintColor={Constants.COLORS.preset_blue} 
-              onPress={onPressRotate}
-              hitSlop={{top: 10, bottom: 25, left: 25, right: 25}}
-              width={30}
-              disabled={placedPieces.length === 0}
-            />
-            <Text style={[styles.iconText, placedPieces.length === 0 ? Styles.common.disabled : null]}>Rotate 90º</Text>
-          </View>
-          <View style={styles.iconGroup}>
-            <ActionIcon
-              source_on={Constants.icons.clear} 
-              tintColor={Constants.COLORS.preset_blue} 
-              onPress={onPressClear}
-              hitSlop={{top: 10, bottom: 25, left: 25, right: 25}}
-              width={30} 
-              disabled={placedPieces.length === 0}
-            />
-            <Text style={[styles.iconText, placedPieces.length === 0 ? Styles.common.disabled : null]}>Clear board</Text>
-          </View>
-          <View style={styles.iconGroup}>
-            <ActionIcon
-              source_on={Constants.icons.undo} 
-              tintColor={Constants.COLORS.preset_blue} 
-              width={25} 
-              disabled={historyStack.current.length === 1 && placedPieces.length === 0}
-              onPress={onPressUndo}
-              hitSlop={{top: 10, bottom: 25, left: 25, right: 25}}
-            />
-            <Text style={[
-              styles.iconText, 
-              (historyStack.current.length === 1 && placedPieces.length === 0) ? Styles.common.disabled : null
-            ]}>Undo step</Text>
-          </View>
-        </View>
-        <View style={styles.bottomPannel}>
-          <View ref={leftPanelRef} onLayout={onLeftLayout} style={styles.piecesPannel}>
-            {Array.from(
-              [BoardPiece.LIGHT_PAWN, BoardPiece.LIGHT_BISHOP, BoardPiece.LIGHT_KNIGHT, BoardPiece.LIGHT_ROOK, BoardPiece.LIGHT_QUEEN, BoardPiece.LIGHT_KING], (piece, i) => (
-              <DraggablePiece
-                key={i}
-                type={piece}
-                fromPalette={true}
-                rootLayout={layout.left}
-                boardLayout={{ boardPadding: CHESSBOARD_PADDING, tileSize: layout.board.tileSize }}
-                onDrop={snapToGrid}
+      <ScrollView 
+          ref={scrollRef}
+          contentContainerStyle={{flexGrow: 1, width: '100%', alignItems: 'center'}} 
+          style={{width: '100%'}}
+          stickyHeaderIndices={[2]} // make tabs sticky
+        >
+        <View style={styles.prebodyContent}>
+          <View style={styles.topPannel}> 
+            <View style={styles.iconGroup}>
+              <ActionIcon
+                source_on={Constants.icons.rotate} 
+                tintColor={Constants.COLORS.preset_blue} 
+                onPress={onPressRotate}
+                hitSlop={{top: 10, bottom: 25, left: 25, right: 25}}
+                width={30}
+                disabled={placedPieces.length === 0}
               />
-            ))}
-          </View>
-          <View 
-            style={[styles.chessboardContainer, Constants.SHADOWS.preset]}
-          >
-            <Image
-              ref={boardImageRef}
-              onLayout={onBoardLayout}
-              source={Constants.images.empty_chessboard}
-              style={styles.chessboard}
-            />
-            {/* Render the pieces that are already on the board */}
-            {placedPieces.map(p => (
-              <DraggablePiece
-                key={p.id}
-                id={p.id}
-                type={p.type}
-                tile={p.tile}
-                boardLayout={{ boardPadding: CHESSBOARD_PADDING, tileSize: layout.board.tileSize }}
-                rootLayout={{x:layout.board.x, y: layout.board.y}}
-                onDrop={snapToGrid}
+              <Text style={[styles.iconText, placedPieces.length === 0 ? Styles.common.disabled : null]}>Rotate 90º</Text>
+            </View>
+            <View style={styles.iconGroup}>
+              <ActionIcon
+                source_on={Constants.icons.clear} 
+                tintColor={Constants.COLORS.preset_blue} 
+                onPress={onPressClear}
+                hitSlop={{top: 10, bottom: 25, left: 25, right: 25}}
+                width={30} 
+                disabled={placedPieces.length === 0}
               />
-            ))}
-          </View>
-          <View ref={rightPanelRef} onLayout={onRightLayout} style={styles.piecesPannel}>
-            {Array.from(
-              [BoardPiece.DARK_PAWN, BoardPiece.DARK_BISHOP, BoardPiece.DARK_KNIGHT, BoardPiece.DARK_ROOK, BoardPiece.DARK_QUEEN, BoardPiece.DARK_KING], (piece, i) => (
-              <DraggablePiece
-                key={i}
-                type={piece}
-                fromPalette={true}
-                boardLayout={{ boardPadding: CHESSBOARD_PADDING, tileSize: layout.board.tileSize }}
-                rootLayout={layout.right}
-                onDrop={snapToGrid}
+              <Text style={[styles.iconText, placedPieces.length === 0 ? Styles.common.disabled : null]}>Clear board</Text>
+            </View>
+            <View style={styles.iconGroup}>
+              <ActionIcon
+                source_on={Constants.icons.undo} 
+                tintColor={Constants.COLORS.preset_blue} 
+                width={25} 
+                disabled={historyStack.current.length === 1 && placedPieces.length === 0}
+                onPress={onPressUndo}
+                hitSlop={{top: 10, bottom: 25, left: 25, right: 25}}
               />
-            ))}
+              <Text style={[
+                styles.iconText, 
+                (historyStack.current.length === 1 && placedPieces.length === 0) ? Styles.common.disabled : null
+              ]}>Undo step</Text>
+            </View>
+          </View>
+          <View style={styles.bottomPanel}>
+            <View ref={leftPanelRef} onLayout={onLeftLayout} style={styles.piecesPanel}>
+              {Array.from(
+                [BoardPiece.LIGHT_PAWN, BoardPiece.LIGHT_BISHOP, BoardPiece.LIGHT_KNIGHT, BoardPiece.LIGHT_ROOK, BoardPiece.LIGHT_QUEEN, BoardPiece.LIGHT_KING], (piece, i) => (
+                <DraggablePiece
+                  key={i}
+                  type={piece}
+                  fromPalette={true}
+                  rootLayout={layout.left}
+                  boardLayout={{ boardPadding: CHESSBOARD_PADDING, tileSize: layout.board.tileSize }}
+                  onDrop={snapToGrid}
+                />
+              ))}
+            </View>
+            <View 
+              style={[styles.chessboardContainer, Constants.SHADOWS.preset]}
+            >
+              <Image
+                ref={boardImageRef}
+                onLayout={onBoardLayout}
+                source={Constants.images.empty_chessboard}
+                style={styles.chessboard}
+              />
+              {/* Render the pieces that are already on the board */}
+              {placedPieces.map(p => (
+                <DraggablePiece
+                  key={p.id}
+                  id={p.id}
+                  type={p.type}
+                  tile={p.tile}
+                  boardLayout={{ boardPadding: CHESSBOARD_PADDING, tileSize: layout.board.tileSize }}
+                  rootLayout={{x:layout.board.x, y: layout.board.y}}
+                  onDrop={snapToGrid}
+                />
+              ))}
+            </View>
+            <View ref={rightPanelRef} onLayout={onRightLayout} style={styles.piecesPanel}>
+              {Array.from(
+                [BoardPiece.DARK_PAWN, BoardPiece.DARK_BISHOP, BoardPiece.DARK_KNIGHT, BoardPiece.DARK_ROOK, BoardPiece.DARK_QUEEN, BoardPiece.DARK_KING], (piece, i) => (
+                <DraggablePiece
+                  key={i}
+                  type={piece}
+                  fromPalette={true}
+                  boardLayout={{ boardPadding: CHESSBOARD_PADDING, tileSize: layout.board.tileSize }}
+                  rootLayout={layout.right}
+                  onDrop={snapToGrid}
+                />
+              ))}
+            </View>
           </View>
         </View>
-      </View>
-      <View style={styles.bodyContent}>
-        <View style={styles.legendContainer}>
-          <Text style={styles.legendText}>{getFormattedTimestamp(gameCreationDate)}</Text>
-          <View style={styles.legendIcon}>
-            <ActionIcon 
-              source_on={Constants.icons.bookmark_full} 
-              source_off={Constants.icons.bookmark} 
-              onPress={onPressBookmark}
-              startOn={false}
-              width={25} 
-              tintColor={Constants.COLORS.preset_blue}
-            />
+        <View style={styles.bodyContent}>
+          <View style={styles.legendContainer}>
+            <Text style={styles.legendText}>{getFormattedTimestamp(gameCreationDate)}</Text>
+            <View style={styles.legendIcon}>
+              <ActionIcon 
+                source_on={Constants.icons.bookmark_full} 
+                source_off={Constants.icons.bookmark} 
+                onPress={onPressBookmark}
+                startOn={false}
+                width={25} 
+                tintColor={Constants.COLORS.preset_blue}
+              />
+            </View>
           </View>
-
+          <View style={Styles.newPreset.sectionContainer}>
+            <View style={Styles.newPreset.sectionTitleContainer}>
+                <Text style={Styles.newPreset.sectionTitleText}>Title</Text>
+            </View>
+            <View style={Styles.newPreset.sectionContent}>
+                <Text style={Styles.newPreset.titleText}>Name:</Text>
+                <TextInput 
+                    style={[Styles.newPreset.titleInput]} 
+                    placeholder="New preset" 
+                    placeholderTextColor={Constants.COLORS.line_light_grey}
+                    onChangeText={onChangeTitle}
+                    value={title}
+                    />
+            </View>
+          </View>
+          <View style={Styles.newPreset.sectionContainer}>
+            <View style={Styles.newPreset.sectionTitleContainer}>
+                <Text style={Styles.newPreset.sectionTitleText}>Move</Text>
+            </View>
+            <View style={styles.nextPlayerContainer}>
+              <HorizontalMultiChoice 
+                options={nextPlayerOptions}
+                title={"Next move"}
+                ref={playerChoiceRef}
+              />
+            </View>
+          </View>
         </View>
-        <View style={Styles.newPreset.sectionContainer}>
-          <View style={Styles.newPreset.sectionTitleContainer}>
-              <Text style={Styles.newPreset.sectionTitleText}>Title</Text>
-          </View>
-          <View style={Styles.newPreset.sectionContent}>
-              <Text style={Styles.newPreset.titleText}>Name:</Text>
-              <TextInput 
-                  style={[Styles.newPreset.titleInput]} 
-                  placeholder="New preset" 
-                  placeholderTextColor={Constants.COLORS.line_light_grey}
-                  onChangeText={onChangeTitle}
-                  value={title}
-                  />
-          </View>
+        <Collapsible
+          collapsedLabel="Show timer details"
+          expandedLabel="Hide timer details"
+          iconCollapsed={Constants.icons.arrow_down}
+          iconExpanded={Constants.icons.arrow_up}
+          scrollViewRef={scrollRef}
+          autoScroll={true}
+          hideHeaderWhenExpanded={false}
+          containerStyle={[styles.dropdownContent]}
+          headerStyle={[Styles.common.subSectionContainerPadding, {paddingHorizontal: 0}]}
+        >
+          <PresetDetails preset={testPreset} />
+        </Collapsible>
+        {/* to provide spacing for the sticky save button */}
+        <View style={[styles.buttonContainer, Styles.common.pageBottomPadding]}>
+          <ActionButton 
+            source={Constants.icons.box_full} 
+            text="Save" 
+            height={45} 
+            iconSize={20} 
+            fontSize={Constants.SIZES.xxLarge} 
+            onPress={onPressSave}
+            disabled={!allFieldsFilled()}
+            componentStyle={styles.buttonContent}
+          />
         </View>
-        <View style={Styles.newPreset.sectionContainer}>
-          <View style={Styles.newPreset.sectionTitleContainer}>
-              <Text style={Styles.newPreset.sectionTitleText}>Move</Text>
-          </View>
-          <View style={styles.nextPlayerContainer}>
-            <HorizontalMultiChoice 
-              options={nextPlayerOptions}
-              onSelect={(value) => setNextPlayer(value as SideToMove)}
-              title={"Next move"}
-            />
-          </View>
-        </View>
-
-        <ActionButton 
-          source={Constants.icons.box_full} 
-          text="Save" 
-          height={45} 
-          iconSize={20} 
-          fontSize={Constants.SIZES.xxLarge} 
-          componentStyle={{marginTop: 30}}
-          onPress={onPressSave}
-          disabled={!allFieldsFilled()}
-        />
-      </View>
+      </ScrollView>
     </View>
   )
 }
@@ -360,12 +389,12 @@ const styles = StyleSheet.create({
 
   page: {
     backgroundColor: Constants.COLORS.text_grey,
-    flex: 1,
     alignItems: 'center',
+    width: '100%',
+    flex: 1
   },
 
   prebodyContent: {
-    height: '45%',
     width: '100%',
     zIndex: 1
   },
@@ -375,7 +404,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: '10%',
     justifyContent: 'space-around',
-    paddingBottom: 20,
+    marginBottom: 10,
     zIndex: 2 // to allow hitSlop to extend downwards for the top row icons
   },
 
@@ -391,13 +420,13 @@ const styles = StyleSheet.create({
     color: Constants.COLORS.preset_blue,
   },
 
-  bottomPannel: {
+  bottomPanel: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
   },
 
-  piecesPannel: {
+  piecesPanel: {
     flex: 1,
     height: '100%',
     justifyContent: 'flex-start',
@@ -433,7 +462,7 @@ const styles = StyleSheet.create({
     backgroundColor: Constants.COLORS.white,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    marginTop: -20, // negative margin to pull it up behind the chessboard!
+    marginTop: -40, // negative margin to pull it up behind the chessboard!
     paddingTop: 35,
     alignItems: 'center',
   },
@@ -463,7 +492,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
+  },
+
+  dropdownContent: {
+    width: '100%',
+    paddingVertical: 10,
+    backgroundColor: Constants.COLORS.white,
+  },
+
+  dropdownHeader: {
+  },
+
+  buttonContainer: {
+    width: '100%',
+    alignItems: 'center',
+    backgroundColor: Constants.COLORS.white,    
+    paddingTop: 10,
+  },
+
+  buttonContent: {
+    alignSelf:'center',
   }
+
 })
 
 export default StoreNewTimer;

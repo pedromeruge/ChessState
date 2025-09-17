@@ -15,10 +15,14 @@ interface DisplayStagesRef {
 
 interface DisplayStagesProps {
     onUpdateStages: (stages: Stage[]) => void;
+    title: string;
+    initialStages?: Stage[]; // optional initial stages to populate
+    // optional props to higlight in previously paused timers
+    currentStageIndex?: number; // current stage index
+    currentStageTimeLeft?: number; // time left in current stage in miliseconds
 }
 
-const DisplayStages = forwardRef<DisplayStagesRef, DisplayStagesProps>(
-    ({onUpdateStages}, ref) => {
+const DisplayStages = forwardRef<DisplayStagesRef, DisplayStagesProps>(({onUpdateStages, title="Stages", initialStages=[], currentStageIndex, currentStageTimeLeft}, ref) => {
 
     //functions for parent
     useImperativeHandle(ref, () => ({
@@ -27,7 +31,7 @@ const DisplayStages = forwardRef<DisplayStagesRef, DisplayStagesProps>(
     }));
 
     // state
-    const [stages, setStages] = useState<Stage[]>([]); 
+    const [stages, setStages] = useState<Stage[]>(initialStages); // list of stages
 
     const addStage = (newStage: Stage): void => {
 
@@ -58,7 +62,7 @@ const DisplayStages = forwardRef<DisplayStagesRef, DisplayStagesProps>(
     return (
         <View style={[Styles.newPreset.sectionContainer]}>
             <View style={Styles.newPreset.sectionTitleContainer}>
-                <Text style={Styles.newPreset.sectionTitleText}>Stages</Text>
+                <Text style={Styles.newPreset.sectionTitleText}>{title}</Text>
                 <Text style={Styles.newPreset.sectionSubtitleText}>{stages.length} items</Text>
             </View>
             <View style={[styles.stagesContent]}>

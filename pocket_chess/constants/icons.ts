@@ -22,6 +22,8 @@ const icons = {
   clock_full: require("../assets/icons/clock_full.png"),
   arrow_left: require("../assets/icons/arrow_left.png"),
   arrow_right: require("../assets/icons/arrow_right.png"),
+  arrow_down: require("../assets/icons/arrow_down.png"),
+  arrow_up: require("../assets/icons/arrow_up.png"),
   check: require("../assets/icons/check.png"),
   pawn_full: require("../assets/icons/pawn_full.png"),
   light_pawn: require("../assets/icons/pieces/light_pawn.png"),

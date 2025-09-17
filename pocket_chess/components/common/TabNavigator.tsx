@@ -1,35 +1,37 @@
-import {useState, useEffect, forwardRef, useImperativeHandle, useRef} from 'react';
-import { View, Text, TextStyle } from 'react-native'
+import {useState, useEffect, forwardRef, useImperativeHandle, useRef, useMemo} from 'react';
+import { View, Text, TextStyle, ViewStyle } from 'react-native'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationContainer, NavigationIndependentTree} from '@react-navigation/native';
 
 import * as Constants from '../../constants/index';
 import IconComponent from './../common/IconComponent.jsx';
 import {tabStyles} from './../common/styles.jsx';
+import React from 'react';
 
 // based on https://www.youtube.com/watch?v=GrLCS5ww030
 
-interface TabNavigatorRef {
-}
+const Tab = createMaterialTopTabNavigator();
 
 interface TabNavigatorProps {
     tabs: Record<string, React.ComponentType<any>>;
     icons: Record<string, any>;
     swipeEnabled?: boolean;
-    callbacks?: Array<() => void>;
     initialTabIndex?: number;
+    containerStyle?: ViewStyle;
 }
 
-const TabNavigator = forwardRef<TabNavigatorRef,TabNavigatorProps>(
-    ({tabs, icons, swipeEnabled=true, callbacks=[], initialTabIndex=0}, ref) => {
-    const Tab = createMaterialTopTabNavigator();
+const TabNavigator = ({tabs, icons, swipeEnabled=true, initialTabIndex=0, containerStyle} : TabNavigatorProps) => {
 
+    const routeNames = useMemo(() => Object.keys(tabs), [tabs]); // stable reference to route names, to prevent unnecessary re-renders on parent re-renders
+    const initialRouteName = routeNames[initialTabIndex] || routeNames[0];
+  
     console.log("initial tab Index:", initialTabIndex)
-    function MyTabs() {
-        return (
+    return (
+        <View style={[{ width: '100%', flex: 1 }, containerStyle]}>
             <NavigationIndependentTree>
                 <NavigationContainer>
                 <Tab.Navigator
+                    initialRouteName={initialRouteName}
                     id={undefined}
                     screenOptions={{
                         swipeEnabled: swipeEnabled,
@@ -40,10 +42,11 @@ const TabNavigator = forwardRef<TabNavigatorRef,TabNavigatorProps>(
                         tabBarInactiveTintColor: Constants.COLORS.text_grey,
                         tabBarPressColor: Constants.COLORS.transparent,
                         lazy: true,
+                        sceneStyle: { backgroundColor: 'transparent' }, // to prevent white flash when switching tabs
                     }}
-                    initialRouteName={Object.keys(tabs)[initialTabIndex]}
                 >
-                    {Object.entries(tabs).map(([tabName,TabComponent], index) => {
+                    {routeNames.map((tabName, index) => {
+                        const TabComponent = tabs[tabName];
                         return (
                             <Tab.Screen 
                                 key={index} 
@@ -57,30 +60,28 @@ const TabNavigator = forwardRef<TabNavigatorRef,TabNavigatorProps>(
                                     />
                                     ),
                                 }}
-                            >
-                            {(props) => { // this needs to be a function or the component wont render right
-                                    return <TabComponent {...props}/>
-                                }
-                            }
+                            > 
+                                {/* this needs to be a function or the component wont render right */}
+                                {(props) => <TabComponent {...props}/>} 
                             </Tab.Screen>
                         )
                     })}
                     </Tab.Navigator>
                 </NavigationContainer>
             </NavigationIndependentTree>
-        )
-    }
-
-    return (
-        <MyTabs />
+        </View>
     )
-});
+};
 
 const CustomTabLabel = ({ focused, label, icon }) => {
 
     const textStyle: TextStyle = {
-        fontWeight: focused ? (Constants.FONTS.semi_bold as TextStyle['fontWeight']) : (Constants.FONTS.regular as TextStyle['fontWeight']),
-        color: focused ? Constants.COLORS.contrast_red_light : Constants.COLORS.text_grey, // Change label color based on focus state
+        fontWeight: focused ? 
+            (Constants.FONTS.semi_bold as TextStyle['fontWeight']) : 
+            (Constants.FONTS.regular as TextStyle['fontWeight']),
+        color: focused ? 
+            Constants.COLORS.contrast_red_light : 
+            Constants.COLORS.text_grey, // Change label color based on focus state
     };
 
     return (
