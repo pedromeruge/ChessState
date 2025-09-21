@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, Animated, Easing, LayoutChangeEvent, ScrollView, TouchableOpacity } from 'react-native';
 import * as Constants from '../../constants';
 import IconComponent from './IconComponent';
+import * as Styles from '../../styles';
 
 interface CollapsibleProps {
   collapsedLabel?: string;
@@ -65,13 +66,12 @@ const Collapsible: React.FC<CollapsibleProps> = ({
     });
   };
 
-
   return (
     <View style={[styles.container, containerStyle, {flexDirection: expanded ? 'column' : 'row'}]}> 
       {/* dont know why parent view only works with conditional flexDirection, but i guess it works?? */}
       {(hideHeaderWhenExpanded && expanded) ? null : (
         <TouchableOpacity onPress={toggleDropdown} style={[styles.header, headerStyle]}>
-          <Text style={styles.headerText}>
+          <Text style={[Styles.newPreset.sectionTitleText, styles.headerText]}>
             {expanded ? expandedLabel : collapsedLabel}
           </Text>
           <IconComponent
@@ -116,9 +116,6 @@ const styles = StyleSheet.create({
   },
 
   headerText: {
-    fontFamily: Constants.FONTS.BASE_FONT_NAME,
-    fontSize: Constants.SIZES.medium,
-    fontWeight: Constants.FONTS.semi_bold as any,
     color: Constants.COLORS.text_grey,
   },
 

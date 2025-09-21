@@ -6,23 +6,26 @@ import * as Styles from '../../../styles/index.js';
 
 import IconComponent from '../../common/IconComponent.jsx';
 import Stage from '../../../classes/timers_base/Stage';
+import Time from '../../../classes/timers_base/Time';
 
 // Define interfaces for TypeScript
 interface DisplayStagesRef {
-    addStage: (newStage: Stage) => void;
-    getStages: () => Stage[];
+    addStage: (newStage: Stage) => void; // add a new stage
+    getStages: () => Stage[]; // get current list of stages
 }
 
 interface DisplayStagesProps {
-    onUpdateStages: (stages: Stage[]) => void;
+    onUpdateStages?: (stages: Stage[]) => void;
     title: string;
     initialStages?: Stage[]; // optional initial stages to populate
+    editMode?: boolean; // if true it will be used in create/edit screens, show remove buttons to remove stages
+
     // optional props to higlight in previously paused timers
     currentStageIndex?: number; // current stage index
     currentStageTimeLeft?: number; // time left in current stage in miliseconds
 }
 
-const DisplayStages = forwardRef<DisplayStagesRef, DisplayStagesProps>(({onUpdateStages, title="Stages", initialStages=[], currentStageIndex, currentStageTimeLeft}, ref) => {
+const DisplayStages = forwardRef<DisplayStagesRef, DisplayStagesProps>(({onUpdateStages=null, title="Stages", initialStages=[], currentStageIndex=null, currentStageTimeLeft=null, editMode=true}, ref) => {
 
     //functions for parent
     useImperativeHandle(ref, () => ({
@@ -41,7 +44,7 @@ const DisplayStages = forwardRef<DisplayStagesRef, DisplayStagesProps>(({onUpdat
         ]; 
 
         setStages(newStages);
-        onUpdateStages(newStages);
+        onUpdateStages?.(newStages);
 
         console.log("Added stage");
     }
@@ -54,11 +57,44 @@ const DisplayStages = forwardRef<DisplayStagesRef, DisplayStagesProps>(({onUpdat
         const newStages = stages.filter((stage, i) => i !== index); // remove stage from list
         
         setStages(newStages);
-        onUpdateStages(newStages); // update parent component
+        onUpdateStages?.(newStages); // update parent component
 
         console.log("Removed stage in position: ", index);
     }
     
+    /*
+        @ - text to display on the right side of each stage item
+        @param currentStageIndex - the index of the current active stage of the preset
+        @param currentStageTimeLeft - the time left in the current stage of the preset (in miliseconds)
+        @param index - the index of the stage being rendered
+    */
+    const rightDisplayText = (currentStageIndex: number, currentStageTimeLeft: number, index: number) => {
+        if (index < currentStageIndex) {
+            return "Finished";
+        } else if (index === currentStageIndex) {
+            return `${Time.fromMiliseconds(currentStageTimeLeft).toStringTimerSimple()} - Paused`;
+        }
+        return '';
+    }
+
+    const rightTextStyle = (currentStageIndex: number, currentStageTimeLeft: number, index: number): TextStyle => {
+        if (index < currentStageIndex) {
+            return styles.stageItemFinishedText;
+        } else if (index === currentStageIndex) {
+            return styles.stageItemPausedText;
+        }
+        return styles.stageItemUpcomingText;
+    }
+
+    const rightItemContainerStyle = (currentStageIndex: number, currentStageTimeLeft: number, index: number): TextStyle => {
+        if (index < currentStageIndex) {
+            return styles.stageItemFinishedContainer;
+        } else if (index === currentStageIndex) {
+            return styles.stageItemPausedContainer;
+        }
+        return styles.stageItemUpcomingContainer;
+    }
+
     return (
         <View style={[Styles.newPreset.sectionContainer]}>
             <View style={Styles.newPreset.sectionTitleContainer}>
@@ -70,13 +106,19 @@ const DisplayStages = forwardRef<DisplayStagesRef, DisplayStagesProps>(({onUpdat
                     <Text style={styles.noStageItemText}>No stages added yet</Text>
                 ) : (
                     stages.map((stage: Stage, index: number) => (
-                        <View key={index} style={styles.stageItemContainer}>
+                        <View key={index} style={[styles.stageItemContainer, rightItemContainerStyle(currentStageIndex, currentStageTimeLeft, index)]}>
                             <View style={styles.stageItemDescription}>
-                                <Text style={styles.stageItemText}>{stage.toString()}</Text>
+                                <Text style={[styles.stageItemText, rightTextStyle(currentStageIndex, currentStageTimeLeft, index)]}>{stage.toString()}</Text>
                             </View>
-                            <TouchableOpacity onPress={() => {onRemoveStage(index)}}>
-                                <IconComponent source={Constants.icons.cross} width={12} tintColor={Constants.COLORS.text_dark_2}/>
-                            </TouchableOpacity>
+                            {(editMode && currentStageIndex !== null && currentStageTimeLeft !== null)? (
+                                <Text style={[styles.stageItemText, rightTextStyle(currentStageIndex, currentStageTimeLeft, index)]}>
+                                    {rightDisplayText(currentStageIndex, currentStageTimeLeft, index)}
+                                </Text>
+                            ) : (
+                                <TouchableOpacity onPress={() => {onRemoveStage(index)}}>
+                                    <IconComponent source={Constants.icons.cross} width={12} tintColor={Constants.COLORS.text_dark_2}/>
+                                </TouchableOpacity>
+                            )}
                         </View>
                     ))
                 )}
@@ -115,7 +157,22 @@ const styles = StyleSheet.create({
         borderColor: Constants.COLORS.line_light_grey,
         paddingHorizontal: 15,
         paddingVertical: 5,
-        width: '100%'
+        width: '100%',
+    },
+
+    stageItemFinishedContainer: {
+        backgroundColor: Constants.COLORS.line_light_grey,
+        borderWidth: 0,
+    },
+
+    stageItemPausedContainer: {
+        // can be different, but same for now
+
+    },
+
+    stageItemUpcomingContainer: {
+        // can be different, but same for now
+
     },
 
     stageItemDescription: {
@@ -129,7 +186,22 @@ const styles = StyleSheet.create({
         fontSize: Constants.SIZES.large,
         fontWeight: Constants.FONTS.medium as TextStyle['fontWeight'],
         color: Constants.COLORS.text_grey,
+    },
+
+    stageItemFinishedText: {
+        fontWeight: Constants.FONTS.semi_bold as TextStyle['fontWeight'],
+        color: Constants.COLORS.white
+    },
+
+    stageItemPausedText: {
+        // can be different, but same for now
+    },
+
+    stageItemUpcomingText: {
+        // can be different, but same for now
     }
+
+
 });
 
 export default DisplayStages;

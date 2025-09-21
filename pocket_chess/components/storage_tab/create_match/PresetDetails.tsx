@@ -11,10 +11,11 @@ import TabNavigator from '../../common/TabNavigator';
 import DisplayStages from '../../play_tab/new_timer/DisplayStages';
 
 interface PresetDetailsProps {
-    preset: Preset;
+    preset: Preset; // preset to display
+    editMode?: boolean; // if true, it is being used in create/edit screen, thus include remove buttons to remove stages
 }
 
-const PresetDetails = ({preset}: PresetDetailsProps) => { // expose the ref to the parent component
+const PresetDetails = ({preset, editMode = true}: PresetDetailsProps) => { // expose the ref to the parent component
 
     if (!preset) {
         return (
@@ -45,7 +46,7 @@ const PresetDetails = ({preset}: PresetDetailsProps) => { // expose the ref to t
                                     initialStages={timer.stages}
                                     currentStageIndex={timer.currentStage}
                                     currentStageTimeLeft={timer.currentStageTime}
-                                    onUpdateStages={() => {}}
+                                    editMode={editMode}
                                 />
                             )
                         ])

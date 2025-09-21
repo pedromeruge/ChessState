@@ -206,8 +206,10 @@ const StoreNewTimer = ({preset=null, boardScan=null}: StoreNewTimerProps) => {
     { icon: Constants.icons.dark_king, text: 'Black', value: SideToMove.BLACK}
   ];
 
-  const testPreset = Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(new Time(0, 1, 0), new Time(0, 0, 1))]),"1|1");
-
+  const testPreset = Preset.samePlayerTimers(new FischerIncrementTimer([new FischerIncrementStage(new Time(0, 1, 0), new Time(0, 0, 1)), new FischerIncrementStage(new Time(0, 2, 0), new Time(0, 1, 30)), new FischerIncrementStage(new Time(0, 2, 0), new Time(0, 1, 30))]),"lalala");
+  testPreset.timers[0].currentStage = 1;
+  testPreset.timers[0].currentStageTime = 4000; // 45 seconds left in current stage
+  
   return (
     <View style={styles.page}>
       <Header 
@@ -507,7 +509,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     backgroundColor: Constants.COLORS.white,    
-    paddingTop: 10,
+    paddingTop: 30,
   },
 
   buttonContent: {
