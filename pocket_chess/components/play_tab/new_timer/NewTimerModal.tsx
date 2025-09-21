@@ -7,6 +7,8 @@ import Preset, { Time } from '../../../classes/timers_base/Preset';
 import { FischerIncrementStage, FischerIncrementTimer } from '../../../classes/timers_clock_types/FischerIncrement';
 import {router} from 'expo-router'
 import storage from '../../../classes/Storage';
+import * as Constants from '../../../constants/index';
+import * as Styles from '../../../styles/index';
 
 interface NewTimerModalRef {
     showModal: () => void;
@@ -110,7 +112,7 @@ const NewTimerModal = forwardRef<NewTimerModalRef, NewTimerModalProps>(
             transparent
         >
             <View style={styles.container}>
-                <Pressable style={styles.overlay} onPress={hideModal} />
+                <Pressable style={Styles.common.modalOverlay} onPress={hideModal} />
                 {(!baseTimePickerVisible && !incrementPickerVisible) && (
                     <NewTimerScreenBase
                         ref={startScreenRef} 
@@ -162,9 +164,11 @@ const styles = StyleSheet.create({
         height: '100%',
         zIndex: 100,
     },
+
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        backgroundColor: Constants.COLORS.contrast_blue_dark,
+        opacity: 0.4
     },
 });
 

@@ -36,10 +36,12 @@ interface PresetDataJSON {
 // initialize MMKV storage
 class Storage {
     private storage: MMKV;
+    private tempStorage: Map<string,any>; // for large temporary data between pages, not persisted in memory
     private customTimers: PresetData;
 
     constructor() {
         this.storage = new MMKV();
+        this.tempStorage = new Map<string, any>();
         this.customTimers = {
             "custom": {
                 "icon": Constants.icons.preset_custom,
@@ -261,6 +263,23 @@ class Storage {
     addCustomPreset(preset: Preset): void {
         this.customTimers.custom.presets.push(preset);
         this.setCustomPresets(this.customTimers);
+    }
+
+    //temporary storage methods (not persisted in memory)
+    setTempData<T>(key: string, value: T): void {
+      this.tempStorage.set(key, value);
+    }
+
+    getTempData<T>(key: string): T | null {
+      return this.tempStorage.get(key) as T || null;
+    }
+
+    removeTempData(key: string): void {
+      this.tempStorage.delete(key);
+    }
+
+    clearTempStorage(): void {
+      this.tempStorage.clear();
     }
 }
 

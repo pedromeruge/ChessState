@@ -6,11 +6,9 @@ import ClockTypesList from '../../../../components/play_tab/new_timer/ClockTypes
 
 const Clock_types_list = () => {
   
-  const {clock_type_id} = useLocalSearchParams(); // router params to indicate necessary refresh
-
   return (
     <View style={styles.container}>
-      <ClockTypesList selected_clock_type_id={clock_type_id}/>
+      <ClockTypesList/>
     </View>
   )
 }

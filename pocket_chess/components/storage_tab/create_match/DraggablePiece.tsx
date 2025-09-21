@@ -52,7 +52,9 @@ const DraggablePiece: React.FC<DraggablePieceProps> = ({ id, type, tile, fromPal
 
         // offset so ghost centers under finger
         pan.setOffset({
-            x: gesture.x0 - x - tileSize / 2,
+            x: fromPalette ? 
+                (x - tileSize / 2) : // if from palette ignore piece offset inside container
+                (gesture.x0 - x - tileSize / 2), 
             y: gesture.y0 - y - tileSize / 2
         });
 
@@ -63,7 +65,7 @@ const DraggablePiece: React.FC<DraggablePieceProps> = ({ id, type, tile, fromPal
     };
 
     const finishDrag = (e: GestureResponderEvent, g: PanResponderGestureState) => {
-        console.log("Dropped piece:", { type, id, fromPalette });
+        // console.log("Dropped piece:", { type, id, fromPalette });
         pan.flattenOffset(); // merge offset into value
         pan.setOffset({x: 0, y: 0})
         setDragging(false);
@@ -95,7 +97,6 @@ const DraggablePiece: React.FC<DraggablePieceProps> = ({ id, type, tile, fromPal
         fromPalette ? { 
             alignItems: 'center', 
             justifyContent: 'center', 
-            width: '75%', 
             aspectRatio: 1 
         } : { 
             alignItems: 'center', 
@@ -113,7 +114,7 @@ const DraggablePiece: React.FC<DraggablePieceProps> = ({ id, type, tile, fromPal
             alignItems: 'center' as const,
             justifyContent: 'center' as const,
             zIndex: 1,
-            }
+        }
         : fromPaletteStyle;
 
     return (
